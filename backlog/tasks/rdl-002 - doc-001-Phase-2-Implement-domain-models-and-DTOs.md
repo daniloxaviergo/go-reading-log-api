@@ -3,9 +3,9 @@ id: RDL-002
 title: '[doc-001 Phase 2] Implement domain models and DTOs'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-01 00:57'
-updated_date: '2026-04-01 10:19'
+updated_date: '2026-04-01 10:20'
 labels: []
 dependencies: []
 references:
