@@ -4,10 +4,9 @@ title: >-
   [doc-001 Phase 1] Initialize Go module with dependencies and create directory
   structure
 status: Done
-assignee:
-  - next-task
+assignee: []
 created_date: '2026-04-01 00:57'
-updated_date: '2026-04-01 01:20'
+updated_date: '2026-04-01 10:11'
 labels: []
 dependencies: []
 references:
