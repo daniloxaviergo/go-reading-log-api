@@ -1,7 +1,7 @@
 ---
 id: RDL-014
 title: Add docker-compose
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-01 19:36'
