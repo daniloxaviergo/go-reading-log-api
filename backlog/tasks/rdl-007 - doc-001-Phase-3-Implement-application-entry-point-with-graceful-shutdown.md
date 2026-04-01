@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-01 00:58'
-updated_date: '2026-04-01 02:38'
+updated_date: '2026-04-01 02:39'
 labels: []
 dependencies: []
 references:
@@ -44,15 +44,15 @@ Configure HTTP server with proper timeout settings and connection pool from conf
 
 Implement a production-ready application entry point in `cmd/server.go` with:
 - Configuration loading from `.env` file and environment variables using the existing `config.LoadConfig()` function
-- PostgreSQL database connection using `pgx` driver with proper connection pooling
+- PostgreSQL database connection using `pgx` driver with proper connection pooling via `pgxpool.Pool`
 - HTTP server with timeout settings (read, write, idle) from config
 - Graceful shutdown on SIGTERM using `context.Context` and `server.Shutdown()`
-- Route registration using the existing `api.SetupRoutes()` function
+- Route registration using the existing `api.SetupRoutes()` function which requires repository instances
 - Health check endpoint at `/healthz` wired through the routes
-- Structured logging configuration with `log/slog`
-- Repository instantiation (PostgreSQL implementations) passed to handlers
+- Structured logging configuration with `log/slog` via `internal/logger/logger.go`
+- Repository instantiation (PostgreSQL implementations `ProjectRepositoryImpl`, `LogRepositoryImpl`) passed to handlers
 
-The application will follow Go best practices for server setup with proper resource cleanup and error handling.
+The application will follow Go best practices for server setup with proper resource cleanup and error handling. Database connections will be established with connection pooling, and all resources will be properly closed on shutdown.
 
 ### 2. Files to Modify
 
@@ -61,108 +61,146 @@ The application will follow Go best practices for server setup with proper resou
 
 **Files to reference (read-only for implementation):**
 - `internal/config/config.go` - Configuration struct and loading logic
-- `internal/api/v1/routes.go` - Route registration function
-- `internal/adapter/postgres/project_repository.go` - Repository implementation
-- `internal/adapter/postgres/log_repository.go` - Repository implementation
-- `internal/logger/logger.go` - Logger setup (may need to create if not exists)
-- `internal/domain/dto/health_check_response.go` - Health check DTO
-- `.env.example` - Expected environment variables
+- `internal/api/v1/routes.go` - Route registration function (returns `http.Handler`)
+- `internal/adapter/postgres/project_repository.go` - Repository implementation with `NewProjectRepositoryImpl(*pgx.Conn)`
+- `internal/adapter/postgres/log_repository.go` - Repository implementation with `NewLogRepositoryImpl(*pgx.Conn)`
+- `internal/logger/logger.go` - Logger initialization with `Initialize(level, format string) *slog.Logger`
+- `internal/domain/dto/health_check_response.go` - Health check DTO structure
+- `.env.example` - Expected environment variables for database connectivity
+- `go.mod` - Verify dependencies are available (pgx, godotenv)
 
 ### 3. Dependencies
 
 **Existing dependencies (already in go.mod):**
-- `github.com/jackc/pgx/v5` - PostgreSQL driver
+- `github.com/jackc/pgx/v5` - PostgreSQL driver and connection pool types
+- `github.com/jackc/pgx/v5/stdlib` - database/sql bridge (for connection pooling)
+- `github.com/jackc/pgpassfile` - PostgreSQL credential file handling
 - `github.com/jackc/pgx/v5/stdlib` - database/sql bridge
-- `github.com/joho/godotenv` - Environment variable loading
+- `github.com/joho/godotenv` - Environment variable loading from .env files
 - `github.com/google/uuid` - Request ID generation
 
 **No new dependencies required**
 
 **Prerequisites:**
-- PostgreSQL database must be running and accessible
-- Environment variables must be configured (via `.env` or system env vars)
-- Database schema must exist (tables: `projects`, `logs`)
-- RDL-006 (API handlers) should be completed or in progress for handler wiring
+- PostgreSQL database must be running and accessible at configured host/port
+- Environment variables must be configured (via `.env` file or system env vars):
+  - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`, `DB_DATABASE`
+- Database schema must exist (tables: `projects`, `logs`) with correct column definitions
+- RDL-006 (API handlers) should be completed for handler wiring
+- RDL-005 (middleware) should be completed for middleware chain usage
 
 ### 4. Code Patterns
 
 **Follow existing codebase patterns:**
-- Use `context.WithTimeout` for all database operations (already done in repository implementations)
-- Use `slog` for structured logging with INFO level in production
-- Use `http.Server` with explicit timeout settings
-- Use `server.Shutdown(ctx)` for graceful shutdown
+- Use `context.WithTimeout` for all database operations (already implemented in repository)
+- Use `slog` for structured logging with log level from config
+- Use `http.Server` with explicit timeout settings from config
+- Use `server.Shutdown(ctx)` for graceful shutdown with 5-second timeout
 - Wrap middleware in `middleware.Chain()` with correct order: Recovery → CORS → RequestID → Logging → Handler
 - Pass context through request chain using `r.Context()`
-- Use `middleware.DefaultTimeout` for request timeouts where applicable
+- Use `middleware.DefaultTimeout` for request-level context timeouts
+- Use `pgxpool` for database connection pooling via `pgxpool.ConnectConfig()`
 
 **Naming conventions:**
-- Variable names: camelCase (e.g., `server`, `dbConn`, `config`)
-- Types: PascalCase (e.g., `Config`, `ProjectRepositoryImpl`)
-- Constants: UPPER_SNAKE_CASE (e.g., `defaultShutdownTimeout`)
+- Variable names: camelCase (e.g., `server`, `dbPool`, `config`, `logger`)
+- Types: PascalCase (e.g., `Config`, `ProjectRepositoryImpl`, `HealthHandler`)
+- Constants: UPPER_SNAKE_CASE (e.g., `defaultShutdownTimeout = 5 * time.Second`)
 
 **Error handling:**
-- Log errors before returning them
-- Use formatted error messages with context
+- Log errors before returning them using the configured logger
+- Use formatted error messages with context (variable values, operation description)
 - Exit gracefully with non-zero status code on startup failures
+- Use `slog` for all logging (no `fmt.Print`, no `log.Println`)
+
+**Database connection pattern:**
+- Use `pgxpool.ConnectConfig()` with connection config for pooling
+- Configure pool size from config (max open connections)
+- Create repositories with `NewProjectRepositoryImpl()` and `NewLogRepositoryImpl()`
+- Pass the pool to handler constructors
 
 ### 5. Testing Strategy
 
 **Unit tests for cmd/server.go:**
-- Test server startup with valid config
+- Test server startup with valid config (mock database connection)
 - Test server startup with invalid config (wrong port, missing database)
 - Test graceful shutdown duration (should complete within 5 seconds)
 - Test health check endpoint responsiveness
+- Test context timeout handling
+- Test connection pool cleanup on shutdown
 
 **Integration tests (using existing test infrastructure):**
 - Run against test database
 - Verify all routes are registered correctly
 - Test health check endpoint returns expected JSON
 - Test full request lifecycle with middleware chain
+- Verify database queries execute successfully
+- Test graceful shutdown with active connections
 
 **How to test:**
 ```bash
 # Build the application
 go build -o server ./cmd/server.go
 
-# Run with test database
-DATABASE_URL=postgres://testuser:testpass@localhost:5432/testdb ./server
+# Set up test database
+psql -h localhost -U postgres -d reading_log -c "\dt"
+
+# Run with environment variables
+export DB_HOST=localhost
+export DB_USER=postgres
+export DB_PASS=yourpassword
+export DB_DATABASE=reading_log
+./server
 
 # Test health endpoint
 curl http://localhost:3000/healthz
+
+# Test API endpoints
+curl http://localhost:3000/api/v1/projects
+curl http://localhost:3000/api/v1/projects/1
 
 # Test shutdown (SIGTERM)
 kill -TERM $(pgrep server)
 ```
 
 **What to verify:**
-- Server starts and listens on configured port
-- Health check endpoint returns valid JSON
-- All API endpoints return expected responses
-- Graceful shutdown completes within timeout
-- No resource leaks (connections closed properly)
+- Server starts and listens on configured port (default 3000)
+- Health check endpoint `/healthz` returns valid JSON: `{"status":"healthy","message":null}`
+- All API endpoints return expected responses from database
+- Graceful shutdown completes within 5 seconds
+- No log output after shutdown completes
+- Database connections are properly closed
 
 ### 6. Risks and Considerations
 
 **Blocking issues:**
-- logger/logger.go doesn't exist yet - need to create logger setup function before server.go can configure it
-- May need to verify health check response DTO doesn't require `ctx` field in JSON serialization
-- Database repository implementations need proper `pgx.Conn` or `*sql.DB` connection
+- Database connection string building: Need to construct connection string from Config fields
+- `pgxpool` may need to be added to dependencies if not already present
+- Health check response DTO has `ctx` field which might not serialize correctly to JSON
 
 **Potential pitfalls:**
-- Context timeout handling must be consistent across all layers
+- Context timeout handling must be consistent across all layers (5 seconds per PRD)
 - Shutdown timeout must be less than Kubernetes/cluster termination grace period
-- Database connection pool settings should match server max concurrency
+- Database connection pool settings (maxidleconns, maxopenconns) must match server concurrency
 - Health check should verify database connectivity, not just return static response
+- Middleware order matters: Recovery must be outermost to catch panics from all inner layers
 
 **Trade-offs:**
-- Using `net/http` stdlib router instead of chi/echo (user preference)
+- Using `net/http` stdlib router instead of chi/mux (user preference per PRD)
 - Context timeout of 5 seconds for database operations (matches PRD requirement)
 - Graceful shutdown timeout of 5 seconds (matches PRD requirement)
-- Logger initialization before config (to enable logging during startup)
+- Connection pool configuration from config rather than hardcoding
+- Logger initialized before config to log startup errors
 
 **Deployment considerations:**
-- Kubernetes: Set pod terminationGracePeriodSeconds > 10 seconds
+- Kubernetes: Set `pod.spec.terminationGracePeriodSeconds` > 10 seconds
 - Docker: Use `docker stop` (sends SIGTERM) to test graceful shutdown
 - Health checks: `/healthz` endpoint can be used for Kubernetes liveness/readiness probes
-- Database: Ensure connection pool max equals or exceeds expected concurrency
+- Database: Ensure connection pool `MaxOpenConns` equals or exceeds expected concurrency
+- Cloud platforms: Set proper `SIGTERM` signal handling for container orchestrators
+
+**Future enhancements:**
+- Add health check that verifies database connectivity
+- Add request logging with trace ID propagation
+- Add metrics endpoint (e.g., `/metrics` for Prometheus)
+- Add graceful shutdown logging of active connections being closed
 <!-- SECTION:PLAN:END -->
