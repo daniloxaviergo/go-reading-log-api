@@ -29,10 +29,10 @@ Implement error handling to return {"error": "<resource> not found"} for missing
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 GET /api/v1/projects returns array of projects with eager-loaded logs ordered by logs descending
-- [ ] #2 GET /api/v1/projects/:id returns single project with eager-loaded logs
-- [ ] #3 GET /api/v1/projects/:project_id/logs returns first 4 logs for project with project eager-loaded
-- [ ] #4 Error responses match Rails API format
+- [x] #1 GET /api/v1/projects returns array of projects with eager-loaded logs ordered by logs descending
+- [x] #2 GET /api/v1/projects/:id returns single project with eager-loaded logs
+- [x] #3 GET /api/v1/projects/:project_id/logs returns first 4 logs for project with project eager-loaded
+- [x] #4 Error responses match Rails API format
 <!-- AC:END -->
 
 ## Implementation Plan
