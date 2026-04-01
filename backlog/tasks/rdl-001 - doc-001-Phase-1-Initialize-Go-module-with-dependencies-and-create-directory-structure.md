@@ -5,7 +5,7 @@ title: >-
   structure
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-01 00:57'
 updated_date: '2026-04-01 01:20'
 labels: []
