@@ -5,7 +5,7 @@ status: Done
 assignee:
   - catarina
 created_date: '2026-04-01 00:58'
-updated_date: '2026-04-01 11:44'
+updated_date: '2026-04-01 11:47'
 labels: []
 dependencies: []
 references:
@@ -285,8 +285,8 @@ This task establishes a comprehensive test infrastructure for the Go project fol
 - No data migration needed for tests (use existing schema)
 
 **Implementation Checklist** (from PRD Acceptance Criteria):
-- [ ] #1 Test database setup and cleanup implemented (test_helper.go)
-- [ ] #2 Integration tests for all endpoints (integration test files)
-- [ ] #3 Repository unit tests with mocks (unit test files)
-- [ ] #4 Health check integration test (health_integration_test.go)
+- [x] #1 Test database setup and cleanup implemented (test_helper.go)
+- [x] #2 Integration tests for all endpoints (integration test files)
+- [x] #3 Repository unit tests with mocks (unit test files)
+- [x] #4 Health check integration test (health_integration_test.go)
 <!-- SECTION:PLAN:END -->
