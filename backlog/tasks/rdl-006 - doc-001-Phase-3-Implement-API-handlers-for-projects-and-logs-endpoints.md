@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-01 00:58'
-updated_date: '2026-04-01 11:38'
+updated_date: '2026-04-01 11:39'
 labels: []
 dependencies: []
 references:
@@ -242,3 +242,53 @@ func formatTimePtr(t *time.Time) *string {
 
 - All tests pass with PostgreSQL database connection
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Successfully implemented API handlers for projects and logs endpoints with eager-loaded logs.
+
+### Changes Made
+
+1. **Added Repository Method** (`internal/repository/project_repository.go`)
+   - Added `GetAllWithLogs()` method that returns `[]*ProjectWithLogs` with eager-loaded logs
+
+2. **Implemented Repository Method** (`internal/adapter/postgres/project_repository.go`)
+   - Implemented `GetAllWithLogs()` with separate queries to fetch projects and logs
+   - Implemented `GetWithLogs()` that returns `ProjectWithLogs` instead of just `ProjectResponse`
+   - Added `getLogsByProjectID()` helper method for ordered log fetching
+
+3. **Updated Projects Handler** (`internal/api/v1/handlers/projects_handler.go`)
+   - `Index()`: Now uses `GetAllWithLogs()` to return projects with eager-loaded logs
+   - `Show()`: Now uses `GetWithLogs()` to return single project with logs
+
+4. **Added Log Repository Method** (`internal/repository/log_repository.go` and `internal/adapter/postgres/log_repository.go`)
+   - Added `GetByProjectIDOrdered()` method to fetch logs ordered by `data DESC`
+
+5. **Updated Logs Handler** (`internal/api/v1/handlers/logs_handler.go`)
+   - `Index()`: Now uses `GetByProjectIDOrdered()` to return logs ordered by `data DESC`
+
+6. **Test Fix** (`test/integration/projects_integration_test.go`)
+   - Fixed URL to use `server.URL` instead of relative path
+
+### Acceptance Criteria Met
+
+- [x] #1 GET /api/v1/projects returns array of projects with eager-loaded logs ordered by logs descending
+- [x] #2 GET /api/v1/projects/:id returns single project with eager-loaded logs
+- [x] #3 GET /api/v1/projects/:project_id/logs returns first 4 logs for project with project eager-loaded
+- [x] #4 Error responses match Rails API format
+
+### Tests
+
+All integration tests pass with PostgreSQL database:
+- `test`: PASS
+- `test/integration`: PASS (20 tests)
+- `test/unit`: PASS (17 tests)
+
+### Risks and Follow-ups
+
+- No new risks identified
+- Database connection configuration requires `DB_PASS=postgres` for test environment
+<!-- SECTION:FINAL_SUMMARY:END -->
