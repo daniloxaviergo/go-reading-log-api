@@ -2,8 +2,10 @@
 id: RDL-007
 title: '[doc-001 Phase 3] Implement application entry point with graceful shutdown'
 status: To Do
-assignee: []
+assignee:
+  - catarina
 created_date: '2026-04-01 00:58'
+updated_date: '2026-04-01 02:36'
 labels: []
 dependencies: []
 references:
