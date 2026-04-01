@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-01 19:36'
-updated_date: '2026-04-01 19:38'
+updated_date: '2026-04-01 19:46'
 labels: []
 dependencies: []
 ---
@@ -148,6 +148,30 @@ docker exec -it reading-log-db psql -U postgres -d reading_log
 - Document usage in QWEN.md and README.md
 - Add make targets: `make docker-up`, `make docker-down`, `make docker-logs`
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+- Created docker-compose.yml with postgres, go-api, and rails-api services
+
+- Created .dockerignore files for both applications
+
+- Updated .env.example with Docker-compatible configuration
+
+- Updated .env for Docker environment (DB_HOST=postgres)
+
+- Created Dockerfile for Go application (multi-stage build)
+
+- Updated rails-app Dockerfile to use environment variables for DB and PORT
+
+- Added docker-compose targets to Makefile: docker-up, docker-down, docker-logs, docker-ps, docker-stop-pg
+
+- All 89 tests passed
+
+- go fmt and go vet passed with no errors
+
+- Port conflict mitigation: Go API uses 3000, Rails API uses 3001
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
