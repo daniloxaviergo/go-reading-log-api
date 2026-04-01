@@ -5,7 +5,7 @@ title: >-
   implementations
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-01 00:57'
 updated_date: '2026-04-01 10:35'
 labels: []
