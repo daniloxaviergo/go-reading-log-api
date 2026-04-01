@@ -3,7 +3,7 @@ id: RDL-012
 title: Add make to project
 status: To Do
 assignee:
-  - workflow
+  - thomas
 created_date: '2026-04-01 15:12'
 updated_date: '2026-04-01 15:17'
 labels: []
