@@ -3,9 +3,9 @@ id: RDL-005
 title: '[doc-001 Phase 2] Implement middleware components'
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-01 00:58'
-updated_date: '2026-04-01 10:40'
+updated_date: '2026-04-01 10:41'
 labels: []
 dependencies: []
 references:
