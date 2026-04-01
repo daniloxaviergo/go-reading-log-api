@@ -3,7 +3,7 @@ id: RDL-014
 title: Add docker-compose
 status: To Do
 assignee:
-  - workflow
+  - thomas
 created_date: '2026-04-01 19:36'
 updated_date: '2026-04-01 19:38'
 labels: []
