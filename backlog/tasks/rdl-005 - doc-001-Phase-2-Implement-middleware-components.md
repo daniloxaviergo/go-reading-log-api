@@ -3,9 +3,9 @@ id: RDL-005
 title: '[doc-001 Phase 2] Implement middleware components'
 status: To Do
 assignee:
-  - next-task
+  - catarina
 created_date: '2026-04-01 00:58'
-updated_date: '2026-04-01 02:27'
+updated_date: '2026-04-01 10:38'
 labels: []
 dependencies: []
 references:
