@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-01 00:58'
-updated_date: '2026-04-01 10:38'
+updated_date: '2026-04-01 10:40'
 labels: []
 dependencies: []
 references:
@@ -40,117 +40,143 @@ Ensure CORS allows all origins to match Rails app behavior.
 <!-- SECTION:PLAN:BEGIN -->
 ### 1. Technical Approach
 
-Implement four middleware components for the `net/http` stdlib router:
-1. **CORS middleware** - Sets CORS headers (AllowedOrigins: *) to match Rails app behavior
-2. **Request ID middleware** - Generates unique UUIDs per request and propagates via context
-3. **Panic recovery middleware** - Recovers from panics and returns 500 errors with logging
-4. **Request logging middleware** - Logs request details (method, path, status, duration)
+This task focuses on testing and verification of the already-implemented middleware components. The middleware is fully implemented in `internal/api/v1/middleware/` but lacks tests. The PRD requires comprehensive unit tests for each middleware component.
 
-Create a middleware chain function that wraps handlers in the correct order:
-`Recovery -> CORS -> RequestID -> Logging -> Handler`
+**Key issues to address:**
+- Missing unit tests for each middleware component (cors, request_id, recovery, logging)
+- The middleware chain in `middleware.go` is implemented but unused in server.go
+- Logging middleware has an inefficient responseWriter pattern with unused GetContext() method
+- Gorilla/mux usage in routes.go contradicts PRD net/http decision (will be addressed in RDL-006)
 
-Use Go's context package for request-scoped values (request ID propagation).
-Implement handlers as `http.HandlerFunc` to work with `net/http` router.
-Follow the pattern already established in the codebase (slog logging, context propagation, error wrapping).
+**Implementation approach:**
+1. Write unit tests for each middleware component
+2. Test middleware chaining and order
+3. Fix the logging middleware responseWriter pattern
+4. Update server.go to use the Chain helper function
+5. Add tests for the Chain helper
 
 ### 2. Files to Modify
 
 | File | Action | Reason |
 |------|--------|--------|
-| `internal/api/v1/middleware/cors.go` | Create | CORS middleware implementation with AllowAllOrigins |
-| `internal/api/v1/middleware/request_id.go` | Create | Request ID generation and propagation middleware |
-| `internal/api/v1/middleware/recovery.go` | Create | Panic recovery middleware with error logging |
-| `internal/api/v1/middleware/logging.go` | Create | Request logging middleware with timing information |
-| `internal/api/v1/middleware/middleware.go` | Create | Middleware chain helper to apply all middleware |
-| `cmd/server.go` | Modify | Wire up middleware chain and register handlers |
+| `internal/api/v1/middleware/cors_test.go` | Create | Unit tests for CORS middleware (verify headers, preflight handling) |
+| `internal/api/v1/middleware/request_id_test.go` | Create | Unit tests for request ID generation and context propagation |
+| `internal/api/v1/middleware/recovery_test.go` | Create | Unit tests for panic recovery (verify 500 response, logging) |
+| `internal/api/v1/middleware/logging_test.go` | Create | Unit tests for logging middleware (verify log output, timing) |
+| `internal/api/v1/middleware/middleware_test.go` | Create | Integration tests for middleware chain ordering |
+| `internal/api/v1/middleware/logging.go` | Modify | Fix responseWriter to remove unused GetContext() method |
+| `cmd/server.go` | Modify | Use middleware.Chain() helper instead of manual chaining |
 
 ### 3. Dependencies
 
-**Existing dependencies (no new dependencies required):**
-- `net/http` (stdlib) - HTTP handling
-- `context` (stdlib) - Context propagation
-- `log/slog` (stdlib) - Structured logging
-- `github.com/google/uuid` - UUID generation for request IDs
+**No new dependencies required:**
+- Using existing dependencies: `github.com/google/uuid`, `log/slog` (stdlib)
 
 **Prerequisites:**
-- Task RDL-004 (Configuration management) should be complete - middleware needs config for log level
-- Domain layer must be initialized before middleware can use context patterns
-- Base logger must be configured before logging middleware can be used
+- All middleware components must exist (they do)
+- Logger must be configured before testing logging middleware
+- Server must be able to start and respond to requests
 
-**No blocking issues** - All components are standalone and can be implemented in any order.
+**No blocking issues** - All components are self-contained.
 
 ### 4. Code Patterns
 
-**Follow existing patterns:**
-- Use `context.WithTimeout` for request-level timeouts (already used in repository layer)
-- Use slog for logging (already used in config and logger packages)
-- Return wrapped errors with `fmt.Errorf("%w", err)` for error chain traversal
-- Use pointer types for optional fields (already used in DTOs)
-- File structure mirrors repository pattern in `internal/adapter/postgres/`
+**Following existing patterns in the codebase:**
 
-**Naming conventions:**
-- Middleware functions: `MiddlewareNameMiddleware` (e.g., `CORSMiddleware`)
-- Error constants: `ErrMiddlewareName` (e.g., `ErrRecovery`)
-- Variables: snake_case for context keys (e.g., `requestIDKey`)
-
-**Context key pattern:**
+**Test helper pattern:**
 ```go
-type contextKey string
-const requestIDKey contextKey = "request_id"
-```
+type testRequest struct {
+    method     string
+    url        string
+    body       io.Reader
+    headers    map[string]string
+}
 
-**Error handling pattern:**
-```go
-if err != nil {
-    return nil, fmt.Errorf("operation failed: %w", err)
+func makeRequest(req testRequest) *httptest.ResponseRecorder {
+    r := httptest.NewRequest(req.method, req.url, req.body)
+    for k, v := range req.headers {
+        r.Header.Set(k, v)
+    }
+    w := httptest.NewRecorder()
+    return w
 }
 ```
 
+**Test patterns for each middleware:**
+- **CORS**: Verify headers set, OPTIONS returns 204, normal requests pass through
+- **Request ID**: Verify UUID format, context value accessible, uniqueness
+- **Recovery**: Verify panic caught, 500 returned, error logged
+- **Logging**: Verify log output contains required fields, timing calculated
+
+**Naming conventions:**
+- Test files: `{middleware}_test.go`
+- Test functions: `Test{Middleware}_{Scenario}` (e.g., `TestCORS_PreflightRequest`)
+- Helper functions: `new{Middleware}Handler` (e.g., `newRecoveryHandler`)
+
 ### 5. Testing Strategy
 
-**Unit tests for each middleware:**
-- `internal/api/v1/middleware/cors_test.go`
-- `internal/api/v1/middleware/request_id_test.go`
-- `internal/api/v1/middleware/recovery_test.go`
-- `internal/api/v1/middleware/logging_test.go`
-- `internal/api/v1/middleware/middleware_test.go`
+**Unit tests for each middleware component:**
 
-**Test coverage:**
-- CORS: Verify headers are set (Access-Control-Allow-Origin, etc.)
-- Request ID: Verify unique IDs generated, context propagation works
-- Recovery: Verify panic is caught, error logged, 500 response returned
-- Logging: Verify log output format includes all required fields
+1. **cors_test.go**:
+   - `TestCORSMiddleware_PreflightRequest` - OPTIONS returns 204
+   - `TestCORSMiddleware_NormalRequest` - Normal requests pass through
+   - `TestCORSMiddleware_HeadersSet` - CORS headers are set correctly
 
-**Test approach:**
-- Use `httptest.ResponseRecorder` to capture response
-- Use `httptest.NewRequest` to create test requests
-- Test middleware in isolation (unit tests)
-- Test middleware chain (integration test)
-- Expected coverage: >80% on middleware package
+2. **request_id_test.go**:
+   - `TestRequestIDMiddleware_GeneratesUniqueIDs` - Each request gets unique ID
+   - `TestRequestIDMiddleware_ContextPropagation` - ID accessible in context
+   - `TestRequestIDMiddleware_ResponseHeader` - X-Request-ID header set
+
+3. **recovery_test.go**:
+   - `TestRecoveryMiddleware_PanicCaught` - Panic returns 500, no crash
+   - `TestRecoveryMiddleware_NoPanic` - Normal requests work
+   - `TestRecoveryMiddleware_LoggerCalled` - Error logged on panic
+
+4. **logging_test.go**:
+   - `TestLoggingMiddleware_LogsRequest` - Request logged with all fields
+   - `TestLoggingMiddleware_TimingCalculated` - Duration calculated correctly
+   - `TestLoggingMiddleware_StatusCode` - Status captured in log
+
+5. **middleware_test.go**:
+   - `TestChain_MiddlewareOrder` - Chain applies middleware in correct order
+   - `TestChain_PanicsCaught` - Recovery is outermost in chain
+   - `TestChain_ContextPropagation` - Context passed through chain
+
+**Test coverage target: 80%+ on middleware package**
 
 ### 6. Risks and Considerations
 
 **Key considerations:**
 
-1. **Middleware order matters**: Recovery must be outermost (catches all panics), CORS must be early (sets headers before response), request ID before logging (so log has ID), logging before handler (captures handler execution)
+1. **Middleware order is critical**: The Chain function applies middleware in reverse order to achieve: Recovery → CORS → RequestID → Logging → Handler. This must be verified in tests.
 
-2. **No external dependencies**: Using `net/http` stdlib means middleware must be implemented from scratch (no chi/mux with built-in middleware)
+2. **Logging middleware inefficiency**: The responseWriter has a GetContext() method that returns `context.Background()` (useless). This should be removed.
 
-3. **Context propagation**: Request ID stored in context must be accessible in handlers and repository layer for tracing
+3. **Testing panicRecovery**: Testing panic recovery requires `recover()` in a deferred function, which can be tricky in tests. Need to use subtests or separate functions.
 
-4. **Error response format**: Should match existing error format: `{"error": "<message>"}`
+4. **No mocking framework**: Using only stdlib test+httptest. For complex scenarios (testing logger calls), may need to use channels or sync primitives.
 
-5. **Performance**: Minimal overhead - context operations are cheap, logging should be async or non-blocking where possible
-
-6. **No breaking changes**: Must work with existing handlers in `cmd/server.go`
+5. **Gorilla/mux vs net/http**: routes.go uses gorilla/mux but PRD specifies net/http. This is a separate issue that will be fixed in RDL-006 when implementing handlers. Not blocking for RDL-005 middleware tests.
 
 **Trade-offs:**
-- Not using a router框架 (chi/mux) means manual middleware chaining
-- Manual context propagation required (no automatic injection)
-- Error responses must be manually formatted in recovery middleware
+
+1. **Testing approach**: Using httptest.Recorder for state observation vs mocking. Since we need to test actual behavior, using real ResponseRecorder is better.
+
+2. **No table-driven tests for some cases**: Some middleware tests may not benefit from table-driven approach due to different setup requirements.
+
+3. **Test database not required**: Middleware tests are pure HTTP handling, no database needed.
 
 **Deployment considerations:**
-- No configuration changes required (all middleware work with existing config)
-- Zero-downtime deployment possible (middleware is additive)
-- No database migration required
+- No configuration changes required
+- No database migrations required
+- Zero-downtime deployment possible
+- All changes are additive (new test files)
+
+### Next Steps
+
+1. Create unit tests for each middleware component
+2. Run tests and verify coverage > 80%
+3. Fix logging.go responseWriter pattern
+4. Update server.go to use middleware.Chain() helper
+5. Final verification: run `go test ./internal/api/v1/middleware/... -v`
 <!-- SECTION:PLAN:END -->
