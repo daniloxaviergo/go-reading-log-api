@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-01 17:19'
-updated_date: '2026-04-01 17:22'
+updated_date: '2026-04-01 17:23'
 labels: []
 dependencies: []
 ---
@@ -39,7 +39,7 @@ Create a comprehensive `README.md` file in the project root that serves as the p
 5. Running the application
 6. API documentation (endpoints, request/response formats)
 7. Testing instructions
-8. Project structure overview ( Clean Architecture layers)
+8. Project structure overview (Clean Architecture layers)
 9. Configuration options
 10. Contributing guidelines
 11. License information
@@ -218,6 +218,17 @@ Create a comprehensive `README.md` file in the project root that serves as the p
 - [ ] Marked as "Phase 1 - Read-Only API" to set expectations
 - [ ] Linked to detailed documentation in `docs/`
 - [ ] Updated backlog task with accurate DoD
+<!-- SECTION:PLAN:END -->
+
+## Definition of Done
+<!-- DOD:BEGIN -->
+- [ ] README.md file created in project root
+- [ ] All commands tested and verified working (make run, go build, curl endpoints)
+- [ ] Documentation reviewed by at least one other developer
+- [ ] Cross-referenced with docs/README.go-project.md for consistency
+- [ ] Clear indication that this is Phase 1 (read-only API)
+- [ ] Linked to detailed documentation in docs/ directory
+<!-- DOD:END -->
 <!-- SECTION:PLAN:END -->
 
 ## Definition of Done
