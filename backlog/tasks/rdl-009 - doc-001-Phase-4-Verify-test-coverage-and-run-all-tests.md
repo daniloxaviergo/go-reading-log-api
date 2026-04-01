@@ -3,9 +3,9 @@ id: RDL-009
 title: '[doc-001 Phase 4] Verify test coverage and run all tests'
 status: To Do
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-01 00:58'
-updated_date: '2026-04-01 06:42'
+updated_date: '2026-04-01 11:35'
 labels: []
 dependencies: []
 references:
@@ -21,7 +21,7 @@ priority: medium
 <!-- SECTION:DESCRIPTION:BEGIN -->
 Run `go test ./...` to execute all tests against the test database.
 
-Verify test coverage exceeds 80% on core packages using `go test -coverpkg=./... ./...`.
+Verify test coverage exceeds 100% on core packages using `go test -coverpkg=./... ./...`.
 
 Fix any failing tests to ensure all acceptance criteria are met.
 <!-- SECTION:DESCRIPTION:END -->
