@@ -17,6 +17,15 @@ Add commands like make run, make build, make test, make help, make start pg
 Should be cover all aspects of project
 <!-- SECTION:DESCRIPTION:END -->
 
+## Acceptance Criteria
+<!-- AC:BEGIN -->
+- [ ] #1 All Makefile commands work correctly (help, build, run, test, fmt, vet, clean, start-pg)
+- [ ] #2 All 121 existing tests pass when using make test
+- [ ] #3 make test-coverage generates proper coverage reports
+- [ ] #4 go fmt and go vet work correctly with Go 1.25.7
+- [ ] #5 Docker integration for PostgreSQL works (with environment variable support)
+<!-- AC:END -->
+
 ## Implementation Plan
 
 <!-- SECTION:PLAN:BEGIN -->
