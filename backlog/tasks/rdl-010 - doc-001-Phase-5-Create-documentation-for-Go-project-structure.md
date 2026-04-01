@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-01 00:58'
-updated_date: '2026-04-01 12:33'
+updated_date: '2026-04-01 12:41'
 labels: []
 dependencies: []
 references:
@@ -178,3 +178,51 @@ For task completion, one of the following:
 - [ ] Database schema documented (verify accuracy against schema.rb)
 - [ ] Run commands documented (verify accuracy against cmd/server.go)
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Research Findings (2026-04-01)
+
+### Files Reviewed
+- docs/README.go-project.md - Documentation file to verify
+- cmd/server.go - Entry point
+- internal/config/config.go - Configuration
+- internal/api/v1/routes.go - API routes
+- internal/adapter/postgres/project_repository.go - PostgreSQL project adapter
+- internal/adapter/postgres/log_repository.go - PostgreSQL log adapter
+- internal/repository/*.go - Repository interfaces
+- internal/domain/models/*.go - Domain models
+- rails-app/db/schema.rb - Rails schema (reference)
+- test/test_helper.go - Test utilities
+- .env.example - Environment variable template
+
+### Key Findings
+
+#### 1. Directory Structure Discrepancy
+Found: internal/repository/ directory exists with interface definitions
+- internal/repository/project_repository.go
+- internal/repository/log_repository.go
+
+Issue: Documentation shows repository interfaces in internal/domain/repository/ but actual location is internal/repository/
+
+#### 2. API Routes Documentation Mismatch
+Documented: POST /api/v1/logs - Create a new log entry, PUT /api/v1/logs/:id - Update a log entry
+Actual (from routes.go): GET /api/v1/projects, GET /api/v1/projects/{id}, GET /api/v1/projects/{project_id}/logs
+No POST/PUT endpoints for logs exist in current implementation.
+
+#### 3. Environment Variables - Verified Correct
+Documentation matches .env.example accurately.
+
+#### 4. Database Schema
+Rails schema (simpler) vs Go implementation (extended with computed columns: progress, status, logs_count, days_unread, median_day, finished_at)
+
+#### 5. Middleware Count
+10 middleware files (includes test files)
+
+### Recommendations for Documentation Updates
+1. Update directory structure to include internal/repository/
+2. Update API endpoints to match actual implementation (remove POST/PUT for logs)
+3. Clarify database schema - distinguish between Rails schema and actual PostgreSQL schema
+4. Update middleware documentation to clarify which are actual middleware files
+<!-- SECTION:NOTES:END -->
