@@ -2,7 +2,7 @@ project_name: "reading"
 default_status: "To Do"
 statuses: ["To Do", "In Progress", "Done"]
 labels: []
-definition_of_done: ["All unit tests pass", "All integration tests pass", "go fmt and go vet pass with no errors", "Clean Architecture layers properly followed", "Error responses consistent with existing patterns", "HTTP status codes correct for response type", "Database queries optimized with proper indexes", "Documentation updated in QWEN.md", "Test coverage ≥90% for handler packages (internal/api/v1/handlers)", "Test coverage ≥90% for middleware packages (internal/api/v1/middleware)", "Test coverage ≥80% for domain packages (internal/domain/...)", "Test coverage ≥70% for config packages (internal/config)", "New code paths include error path tests", "HTTP handlers test both success and error responses", "Integration tests verify actual database interactions", "Tests use testing-expert subagent for test execution and verification"]
+definition_of_done: ["All unit tests pass use testing-expert subagent for test execution and verification", "All integration tests pass use testing-expert subagent for test execution and verification", "go fmt and go vet pass with no errors", "Clean Architecture layers properly followed", "Error responses consistent with existing patterns", "HTTP status codes correct for response type", "Database queries optimized with proper indexes", "Documentation updated in QWEN.md", "New code paths include error path tests", "HTTP handlers test both success and error responses", "Integration tests verify actual database interactions", "Tests use testing-expert subagent for test execution and verification"]
 date_format: yyyy-mm-dd
 max_column_width: 20
 default_editor: "vim"
