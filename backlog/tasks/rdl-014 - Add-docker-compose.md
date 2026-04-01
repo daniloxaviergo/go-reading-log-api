@@ -2,8 +2,10 @@
 id: RDL-014
 title: Add docker-compose
 status: To Do
-assignee: []
+assignee:
+  - workflow
 created_date: '2026-04-01 19:36'
+updated_date: '2026-04-01 19:36'
 labels: []
 dependencies: []
 ---
