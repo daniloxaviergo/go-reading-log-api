@@ -3,9 +3,9 @@ id: RDL-008
 title: '[doc-001 Phase 4] Create test infrastructure and integration tests'
 status: Done
 assignee:
-  - next-task
+  - catarina
 created_date: '2026-04-01 00:58'
-updated_date: '2026-04-01 04:41'
+updated_date: '2026-04-01 11:44'
 labels: []
 dependencies: []
 references:
