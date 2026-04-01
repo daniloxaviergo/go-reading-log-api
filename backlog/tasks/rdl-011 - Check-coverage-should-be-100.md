@@ -3,7 +3,7 @@ id: RDL-011
 title: Check coverage should be 100%
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-01 13:29'
 updated_date: '2026-04-01 13:33'
 labels: []
