@@ -3,7 +3,7 @@ id: RDL-006
 title: '[doc-001 Phase 3] Implement API handlers for projects and logs endpoints'
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-01 00:58'
 updated_date: '2026-04-01 11:40'
 labels: []
