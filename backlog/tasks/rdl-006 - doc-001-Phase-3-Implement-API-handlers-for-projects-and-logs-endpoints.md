@@ -1,7 +1,7 @@
 ---
 id: RDL-006
 title: '[doc-001 Phase 3] Implement API handlers for projects and logs endpoints'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-01 00:58'
