@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-01 00:58'
-updated_date: '2026-04-01 11:01'
+updated_date: '2026-04-01 11:38'
 labels: []
 dependencies: []
 references:
@@ -216,3 +216,29 @@ func formatTimePtr(t *time.Time) *string {
 7. Implement helper function `formatTimePtr` for time conversion
 8. Verify `logs.data` column exists in DB schema (currently named `data datetime` in schema)
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+2026-04-01: Implementation complete. All acceptance criteria met.
+
+- Added Logs field to ProjectResponse DTO (already existed)
+
+- Added GetAllWithLogs repository method to interface
+
+- Implemented GetAllWithLogs in ProjectRepositoryImpl with eager-loaded logs
+
+- Updated ProjectsHandler.Index to use eager-loaded logs via GetAllWithLogs
+
+- Updated ProjectsHandler.Show to use eager-loaded logs via GetWithLogs
+
+- Added GetByProjectIDOrdered method to LogRepository interface and implementation
+
+- Updated LogsHandler.Index to use GetByProjectIDOrdered for ordered logs
+
+- Fixed duplicate defaultContextTimeout constant by removing it from log_repository.go
+
+- Fixed URL in TestProjectsNewWithCustomConfig to use server.URL instead of relative path
+
+- All tests pass with PostgreSQL database connection
+<!-- SECTION:NOTES:END -->
