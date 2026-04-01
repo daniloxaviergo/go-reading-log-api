@@ -3,7 +3,7 @@ id: RDL-009
 title: '[doc-001 Phase 4] Verify test coverage and run all tests'
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-01 00:58'
 updated_date: '2026-04-01 12:31'
 labels: []
