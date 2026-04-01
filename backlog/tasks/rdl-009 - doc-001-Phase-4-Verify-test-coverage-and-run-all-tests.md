@@ -3,9 +3,9 @@ id: RDL-009
 title: '[doc-001 Phase 4] Verify test coverage and run all tests'
 status: To Do
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-01 00:58'
-updated_date: '2026-04-01 04:43'
+updated_date: '2026-04-01 06:42'
 labels: []
 dependencies: []
 references:
