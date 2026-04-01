@@ -77,6 +77,7 @@ test/             → Test infrastructure
 
 ### Running the Server
 
+**Direct Run (Local Development):**
 ```bash
 # Build the application
 go build -o server ./cmd
@@ -88,7 +89,22 @@ go build -o server ./cmd
 go run ./cmd/server.go
 ```
 
-The server starts on `http://0.0.0.0:3000` (configurable via `SERVER_HOST` and `SERVER_PORT`).
+**Docker Compose (Containerized):**
+```bash
+# Start all services (PostgreSQL, Go API, Rails API)
+make docker-up
+
+# Stop all services
+make docker-down
+
+# View logs
+make docker-logs
+
+# List containers
+make docker-ps
+```
+
+The Go API starts on `http://0.0.0.0:3000` and the Rails API on `http://0.0.0.0:3001`.
 
 ### Testing
 
@@ -125,6 +141,25 @@ go vet ./...
 go build -o bin/server ./cmd/server.go
 ```
 
+### Docker Compose Commands
+
+```bash
+# Start all services via docker-compose
+make docker-up
+
+# Stop all services via docker-compose
+make docker-down
+
+# View logs from all services
+make docker-logs
+
+# List running containers
+make docker-ps
+
+# Stop only PostgreSQL container
+make docker-stop-pg
+```
+
 ## API Endpoints
 
 The API is versioned under `/api/v1/`:
@@ -158,6 +193,22 @@ The API is versioned under `/api/v1/`:
 | `SERVER_HOST` | `0.0.0.0` | Server listening host |
 | `LOG_LEVEL` | `info` | Logging level: debug, info, warn, error |
 | `LOG_FORMAT` | `text` | Log format: text or json |
+
+### Docker Compose Configuration
+
+When using Docker Compose, both applications connect to a shared PostgreSQL container:
+
+| Variable | Description | Docker Value |
+|----------|-------------|--------------|
+| `DB_HOST` | PostgreSQL hostname | `postgres` (service name) |
+| `DB_PORT` | PostgreSQL port | `5432` |
+| `DB_USER` | PostgreSQL username | `postgres` |
+| `DB_PASS` | PostgreSQL password | `postgres` |
+| `DB_DATABASE` | Database name | `reading_log` |
+| `SERVER_PORT` | Go API port | `3000` |
+| `PORT` | Rails API port | `3001` |
+
+**Port Conflict Resolution:** The Go API uses port 3000, while the Rails API uses port 3001 to avoid conflicts.
 
 ## Database Schema
 
@@ -413,6 +464,26 @@ psql -U postgres -c "CREATE DATABASE reading_log_test;"
 
 # Run tests with verbose output
 go test -v ./...
+```
+
+### Docker Compose Troubleshooting
+
+```bash
+# Check docker-compose configuration
+docker-compose config
+
+# Check container status
+docker-compose ps
+
+# View specific service logs
+docker-compose logs -f go-api
+docker-compose logs -f rails-api
+
+# Rebuild containers after code changes
+docker-compose up -d --build
+
+# Connect to PostgreSQL container
+docker exec -it reading-log-db psql -U postgres -d reading_log
 ```
 
 ## Related Files

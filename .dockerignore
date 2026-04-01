@@ -1,0 +1,60 @@
+# Git files
+.git
+.gitignore
+
+# Go build artifacts
+bin/
+*.so
+*.exe
+*.dylib
+
+# Test coverage reports
+coverage.out
+*.cov
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test and temp files
+tmp/
+temp/
+*.tmp
+
+# Documentation (optional - include if not needed in container)
+docs/
+*.md
+!README.md
+
+# Build cache
+go.sum
+go.mod
+
+# Docker files (not needed in container)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Logs
+logs/
+*.log
+
+# Test directories
+test/
+*_test.go
+
+# Go build cache
+.gccgo
+
+# Vendor directory (if using Go modules, vendor is not needed)
+vendor/
+
+# Backup files
+*.bak
+*.backup

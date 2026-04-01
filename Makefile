@@ -23,7 +23,7 @@ BLUE := $(shell tput -Txterm setaf 4 2>/dev/null || echo "")
 RED := $(shell tput -Txterm setaf 1 2>/dev/null || echo "")
 NC := $(shell tput -Txterm sgr0 2>/dev/null || echo "")
 
-.PHONY: all help run build test clean fmt vet docker-start-pg start-pg test-coverage test-verbose
+.PHONY: all help run build test clean fmt vet docker-start-pg start-pg test-coverage test-verbose docker-up docker-down docker-logs docker-ps docker-stop-pg
 
 # Default target
 all: help
@@ -48,6 +48,11 @@ help:
 	@echo "$(GREEN)Database Commands:$(NC)"
 	@echo "  make start-pg     Start PostgreSQL via Docker (if available)"
 	@echo "  make docker-start-pg  Start PostgreSQL via Docker (explicit)"
+	@echo "  make docker-up    Start all services via docker-compose"
+	@echo "  make docker-down  Stop all services via docker-compose"
+	@echo "  make docker-logs  Show logs from all services"
+	@echo "  make docker-ps    List running containers"
+	@echo "  make docker-stop-pg Stop PostgreSQL container"
 	@echo ""
 	@echo "$(GREEN)Testing Commands:$(NC)"
 	@echo "  make test              Run all tests"
@@ -133,15 +138,15 @@ docker-start-pg:
 		docker run -d \
 			--name reading-log-db \
 			-p 5432:5432 \
-			-e POSTGRES_USER=postgres \
-			-e POSTGRES_PASSWORD=postgres \
-			-e POSTGRES_DB=reading_log \
-			-e PGDATA=/var/lib/postgresql/data/pgdata \
-			--health-cmd="pg_isready -U postgres" \
-			--health-interval=10s \
-			--health-timeout=5s \
-			--health-retries=5 \
-			postgres:15
+		-e POSTGRES_USER=postgres \
+		-e POSTGRES_PASSWORD=postgres \
+		-e POSTGRES_DB=reading_log \
+		-e PGDATA=/var/lib/postgresql/data/pgdata \
+		--health-cmd="pg_isready -U postgres" \
+		--health-interval=10s \
+		--health-timeout=5s \
+		--health-retries=5 \
+		postgres:15
 	@echo "$(GREEN)PostgreSQL container started$(NC)"
 	@echo "$(YELLOW)To connect to the database:$(NC)"
 	@echo "  docker exec -it reading-log-db psql -U postgres -d reading_log"
@@ -149,3 +154,37 @@ docker-start-pg:
 	@echo "  docker stop reading-log-db"
 	@echo "$(YELLOW)To remove the container:$(NC)"
 	@echo "  docker rm reading-log-db"
+
+# Docker Compose Commands
+docker-up:
+	@echo "$(BLUE)Starting services with docker-compose...$(NC)"
+	@if ! command -v docker-compose &> /dev/null && ! command -v docker &> /dev/null; then \
+		echo "$(RED)Error: Docker or docker-compose not installed or not in PATH$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(GREEN)Starting PostgreSQL, Go API, and Rails API...$(NC)"
+	docker-compose up -d --build
+	@echo "$(GREEN)Services started$(NC)"
+	@echo "$(YELLOW)Go API: http://localhost:3000$(NC)"
+	@echo "$(YELLOW)Rails API: http://localhost:3001$(NC)"
+	@echo "$(YELLOW)Logs: make docker-logs$(NC)"
+
+docker-down:
+	@echo "$(BLUE)Stopping services...$(NC)"
+	docker-compose down
+	@echo "$(GREEN)Services stopped$(NC)"
+
+docker-logs:
+	@echo "$(BLUE)Showing logs...$(NC)"
+	docker-compose logs -f
+
+docker-ps:
+	@echo "$(BLUE)Listing containers...$(NC)"
+	docker-compose ps
+
+docker-stop-pg:
+	@echo "$(BLUE)Stopping PostgreSQL container...$(NC)"
+	@docker ps -a --format "{{.Names}}" | grep -q reading-log-db && \
+		docker stop reading-log-db && \
+		docker rm reading-log-db || \
+		echo "$(YELLOW)No reading-log-db container found$(NC)"
