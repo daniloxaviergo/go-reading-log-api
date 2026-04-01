@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-01 17:19'
-updated_date: '2026-04-01 17:23'
+updated_date: '2026-04-01 17:29'
 labels: []
 dependencies: []
 ---
@@ -48,13 +48,13 @@ Create a comprehensive `README.md` file in the project root that serves as the p
 - Go developers expect README.md at project root
 - `docs/README.go-project.md` exists but is developer-facing
 - `QWEN.md` is AI-specific context, not user-facing
--需要快速参考指南，而不是详细技术文档
+- Need quick reference guide rather than detailed technical documentation
 - Follows Go community best practices (badges, clear sections)
 
 ### 2. Files to Modify
 
 | File | Action | Reason |
-|------|--------|--------|
+|------|--|------|
 | `README.md` | **Create** | New primary documentation file for developers |
 | `backlog/tasks/rdl-013 - Add-readme-to-project.md` | **Edit** | Update task description and DoD to be accurate for README task |
 
@@ -86,7 +86,7 @@ Create a comprehensive `README.md` file in the project root that serves as the p
 
 **README.md Style Conventions:**
 - Use clear, conversational language
-- Include code blocks with language identifiers (```go, ```bash, ```sql)
+- Include code blocks with language identifiers (``go, ``bash, ``sql)
 - Use tables for reference data (configuration, endpoints, environment variables)
 - Include emojis sparingly for visual scannability (optional)
 - Use badges for CI/coverage status (when available)
@@ -135,18 +135,6 @@ Create a comprehensive `README.md` file in the project root that serves as the p
    - README validation is manual peer review
    - Command examples should be copy-paste friendly
 
-**Acceptance Criteria for This Task:**
-- [x] README.md created with all required sections
-- [x] Prerequisites clearly documented (Go, PostgreSQL)
-- [x] Installation steps detailed and accurate
-- [x] Environment variables documented with examples
-- [x] Run commands verified working
-- [x] API endpoints documented with examples
-- [x] Cross-referenced with `docs/README.go-project.md`
-- [x] All code blocks syntax-highlighted
-- [x] Table formatting for configuration
-- [x] No technical inaccuracies
-
 ### 6. Risks and Considerations
 
 **Potential Issues:**
@@ -183,21 +171,14 @@ Create a comprehensive `README.md` file in the project root that serves as the p
 
 **Post-Implementation:**
 - Review by developers unfamiliar with project
-- Verify " Getting Started" section from scratch
+- Verify "Getting Started" section from scratch
 - Update any broken links or references
 - Add TODO comment for future features (Phase 2)
 
 ---
 
-### 7. Acceptance Criteria Update
+### 7. Acceptance Criteria
 
-**Current DoD (inaccurate - copied from testing task):**
-- ❌ #1-#2: Unit/integration tests passing (not applicable to README)
-- ❌ #3: go fmt/vet (not applicable to README)
-- ❌ #4-#7: Architecture/database patterns (not applicable to README)
-- ❌ #9-#12: Test coverage (not applicable to README)
-
-**Revised Acceptance Criteria:**
 - [ ] README.md created in project root
 - [ ] Prerequisites clearly documented (Go 1.21+, PostgreSQL 13+)
 - [ ] Installation steps detailed and copy-paste friendly
@@ -210,39 +191,44 @@ Create a comprehensive `README.md` file in the project root that serves as the p
 - [ ] All technical details verified against implementation
 - [ ] No broken links or outdated information
 
-**Definition of Done (Updated for README task):**
+**Definition of Done:**
 - [ ] README.md file created with all required sections
 - [ ] All commands tested and verified working
 - [ ] Documentation reviewed by at least one other developer
 - [ ] Cross-referenced with existing documentation files
 - [ ] Marked as "Phase 1 - Read-Only API" to set expectations
 - [ ] Linked to detailed documentation in `docs/`
-- [ ] Updated backlog task with accurate DoD
-<!-- SECTION:PLAN:END -->
+
+## Acceptance Criteria
+No acceptance criteria defined
 
 ## Definition of Done
-<!-- DOD:BEGIN -->
 - [ ] README.md file created in project root
 - [ ] All commands tested and verified working (make run, go build, curl endpoints)
 - [ ] Documentation reviewed by at least one other developer
 - [ ] Cross-referenced with docs/README.go-project.md for consistency
 - [ ] Clear indication that this is Phase 1 (read-only API)
 - [ ] Linked to detailed documentation in docs/ directory
-<!-- DOD:END -->
 <!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 All unit tests pass use testing-expert subagent for test execution and verification
-- [ ] #2 All integration tests pass use testing-expert subagent for test execution and verification
-- [ ] #3 go fmt and go vet pass with no errors
-- [ ] #4 Clean Architecture layers properly followed
-- [ ] #5 Error responses consistent with existing patterns
-- [ ] #6 HTTP status codes correct for response type
-- [ ] #7 Database queries optimized with proper indexes
-- [ ] #8 Documentation updated in QWEN.md
-- [ ] #9 New code paths include error path tests
-- [ ] #10 HTTP handlers test both success and error responses
-- [ ] #11 Integration tests verify actual database interactions
-- [ ] #12 Tests use testing-expert subagent for test execution and verification
+- [ ] #1 README.md file created in project root
+- [ ] #2 All commands tested and verified working (make run, go build, curl endpoints)
+- [ ] #3 Documentation reviewed by at least one other developer
+- [ ] #4 Cross-referenced with docs/README.go-project.md for consistency
+- [ ] #5 Clear indication that this is Phase 1 (read-only API)
+- [ ] #6 Linked to detailed documentation in docs/ directory
+- [ ] #7 All unit tests pass use testing-expert subagent for test execution and verification
+- [ ] #8 All integration tests pass use testing-expert subagent for test execution and verification
+- [ ] #9 go fmt and go vet pass with no errors
+- [ ] #10 Clean Architecture layers properly followed
+- [ ] #11 Error responses consistent with existing patterns
+- [ ] #12 HTTP status codes correct for response type
+- [ ] #13 Database queries optimized with proper indexes
+- [ ] #14 Documentation updated in QWEN.md
+- [ ] #15 New code paths include error path tests
+- [ ] #16 HTTP handlers test both success and error responses
+- [ ] #17 Integration tests verify actual database interactions
+- [ ] #18 Tests use testing-expert subagent for test execution and verification
 <!-- DOD:END -->
