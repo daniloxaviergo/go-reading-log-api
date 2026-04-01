@@ -5,9 +5,9 @@ title: >-
   structure
 status: Done
 assignee:
-  - next-task
+  - workflow
 created_date: '2026-04-01 00:57'
-updated_date: '2026-04-01 01:06'
+updated_date: '2026-04-01 01:20'
 labels: []
 dependencies: []
 references:
