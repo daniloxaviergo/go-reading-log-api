@@ -2,8 +2,10 @@
 id: RDL-010
 title: '[doc-001 Phase 5] Create documentation for Go project structure'
 status: To Do
-assignee: []
+assignee:
+  - workflow
 created_date: '2026-04-01 00:58'
+updated_date: '2026-04-01 06:42'
 labels: []
 dependencies: []
 references:
