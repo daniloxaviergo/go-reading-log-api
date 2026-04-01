@@ -4,8 +4,10 @@ title: >-
   [doc-001 Phase 2] Implement PostgreSQL repository interfaces and
   implementations
 status: To Do
-assignee: []
+assignee:
+  - catarina
 created_date: '2026-04-01 00:57'
+updated_date: '2026-04-01 01:30'
 labels: []
 dependencies: []
 references:
