@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "backlog": {
+      "command": "backlog",
+      "args": [
+        "mcp",
+        "start"
+      ],
+      "env": {
+        "BACKLOG_CWD": "/home/danilo/scripts/github/go-reading-log-api-next"
+      }
+    }
+  },
+  "$version": 3
+}
