@@ -3,9 +3,9 @@ id: RDL-009
 title: '[doc-001 Phase 4] Verify test coverage and run all tests'
 status: To Do
 assignee:
-  - next-task
+  - catarina
 created_date: '2026-04-01 00:58'
-updated_date: '2026-04-01 11:35'
+updated_date: '2026-04-01 11:52'
 labels: []
 dependencies: []
 references:
