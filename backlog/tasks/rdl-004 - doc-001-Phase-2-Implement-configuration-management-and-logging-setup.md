@@ -3,7 +3,7 @@ id: RDL-004
 title: '[doc-001 Phase 2] Implement configuration management and logging setup'
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-01 00:57'
 updated_date: '2026-04-01 02:20'
 labels: []
