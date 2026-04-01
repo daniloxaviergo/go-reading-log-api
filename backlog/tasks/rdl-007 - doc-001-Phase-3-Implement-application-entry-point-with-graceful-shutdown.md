@@ -3,7 +3,7 @@ id: RDL-007
 title: '[doc-001 Phase 3] Implement application entry point with graceful shutdown'
 status: To Do
 assignee:
-  - workflow
+  - thomas
 created_date: '2026-04-01 00:58'
 updated_date: '2026-04-01 02:39'
 labels: []
