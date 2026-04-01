@@ -3,9 +3,9 @@ id: RDL-013
 title: Add readme to project
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-01 17:19'
-updated_date: '2026-04-01 17:29'
+updated_date: '2026-04-01 17:30'
 labels: []
 dependencies: []
 ---
@@ -15,6 +15,9 @@ dependencies: []
 <!-- SECTION:DESCRIPTION:BEGIN -->
 Add readme to project
 <!-- SECTION:DESCRIPTION:END -->
+
+## Acceptance Criteria
+No acceptance criteria defined
 
 ## Implementation Plan
 
