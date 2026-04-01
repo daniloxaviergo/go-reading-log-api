@@ -2,8 +2,10 @@
 id: RDL-013
 title: Add readme to project
 status: To Do
-assignee: []
+assignee:
+  - workflow
 created_date: '2026-04-01 17:19'
+updated_date: '2026-04-01 17:20'
 labels: []
 dependencies: []
 ---
