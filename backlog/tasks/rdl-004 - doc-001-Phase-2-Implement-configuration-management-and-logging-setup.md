@@ -2,8 +2,10 @@
 id: RDL-004
 title: '[doc-001 Phase 2] Implement configuration management and logging setup'
 status: To Do
-assignee: []
+assignee:
+  - catarina
 created_date: '2026-04-01 00:57'
+updated_date: '2026-04-01 01:51'
 labels: []
 dependencies: []
 references:
