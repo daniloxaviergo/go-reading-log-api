@@ -4,9 +4,10 @@ title: >-
   [doc-001 Phase 1] Initialize Go module with dependencies and create directory
   structure
 status: Done
-assignee: []
+assignee:
+  - workflow
 created_date: '2026-04-01 00:57'
-updated_date: '2026-04-01 10:11'
+updated_date: '2026-04-01 10:12'
 labels: []
 dependencies: []
 references:
