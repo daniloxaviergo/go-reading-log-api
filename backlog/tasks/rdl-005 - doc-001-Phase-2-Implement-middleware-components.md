@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-01 00:58'
-updated_date: '2026-04-01 10:41'
+updated_date: '2026-04-01 10:54'
 labels: []
 dependencies: []
 references:
@@ -29,10 +29,10 @@ Ensure CORS allows all origins to match Rails app behavior.
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 CORS middleware implemented allowing all origins
-- [ ] #2 Request ID middleware generates unique IDs for each request
-- [ ] #3 Recovery middleware prevents panic propagation
-- [ ] #4 Context propagation with timeout working correctly
+- [x] #1 CORS middleware implemented allowing all origins
+- [x] #2 Request ID middleware generates unique IDs for each request
+- [x] #3 Recovery middleware prevents panic propagation
+- [x] #4 Context propagation with timeout working correctly
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -180,3 +180,8 @@ func makeRequest(req testRequest) *httptest.ResponseRecorder {
 4. Update server.go to use middleware.Chain() helper
 5. Final verification: run `go test ./internal/api/v1/middleware/... -v`
 <!-- SECTION:PLAN:END -->
+
+## Definition of Done
+<!-- DOD:BEGIN -->
+- [ ] #1 All middleware tests pass with >80% coverage
+<!-- DOD:END -->
