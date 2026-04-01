@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-01 00:58'
-updated_date: '2026-04-01 04:32'
+updated_date: '2026-04-01 04:34'
 labels: []
 dependencies: []
 references:
@@ -86,18 +86,7 @@ The implementation will focus on:
   - `DB_USER` (default: postgres)
   - `DB_PASS` (default: empty)
   - `DB_DATABASE` (default: reading_log)
-  - `DB_DATABASE_TEST` (optional, falls back to DB_DATABASE + _test)
-
-**Environment Setup**:
-```bash
-# Required for integration tests
-export DB_HOST=${DB_HOST:-localhost}
-export DB_PORT=${DB_PORT:-5432}
-export DB_USER=${DB_USER:-postgres}
-export DB_PASS=${DB_PASS:-}
-export DB_DATABASE=${DB_DATABASE:-reading_log}
-export DB_DATABASE_TEST=${DB_DATABASE_TEST:-${DB_DATABASE}_test}
-```
+  - `DB_DATABASE_TEST` (optional, falls back to DB_DATABASE with `_test` suffix)
 
 ### 4. Code Patterns
 
@@ -120,22 +109,16 @@ export DB_DATABASE_TEST=${DB_DATABASE_TEST:-${DB_DATABASE}_test}
 **Test Execution Plan**:
 
 1. **Unit Tests** (no database required):
-   ```bash
-   go test -v ./internal/config/...
-   go test -v ./internal/logger/...
-   go test -v ./internal/domain/...
-   ```
+   - `go test -v ./internal/config/...`
+   - `go test -v ./internal/logger/...`
+   - `go test -v ./internal/domain/...`
 
 2. **Integration Tests** (requires test database):
-   ```bash
-   go test -v ./test/...
-   ```
+   - `go test -v ./test/...`
 
 3. **Coverage Report**:
-   ```bash
-   go test -coverpkg=./... -coverprofile=coverage.out ./...
-   go tool cover -func=coverage.out
-   ```
+   - `go test -coverpkg=./... -coverprofile=coverage.out ./...`
+   - `go tool cover -func=coverage.out`
 
 4. **Per-Package Coverage**:
    - Target: >80% on core packages
