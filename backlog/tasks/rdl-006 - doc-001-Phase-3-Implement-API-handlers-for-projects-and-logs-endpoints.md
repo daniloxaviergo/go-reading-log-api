@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-01 00:58'
-updated_date: '2026-04-01 10:58'
+updated_date: '2026-04-01 11:01'
 labels: []
 dependencies: []
 references:
@@ -40,140 +40,179 @@ Implement error handling to return {"error": "<resource> not found"} for missing
 <!-- SECTION:PLAN:BEGIN -->
 ### 1. Technical Approach
 
-The implementation will create API handlers for projects and logs endpoints following Clean Architecture principles. The handlers will:
+**Analysis of Current State:**
 
-1. Use the existing repository interfaces (`ProjectRepository`, `LogRepository`) for data access
-2. Return JSON responses matching Rails API behavior
-3. Implement proper error handling with standard JSON error responses
+After thorough research of the codebase, I found that:
 
-**Key decisions:**
-- Use Go's standard `net/http` package for HTTP handling (consistent with existing middleware)
-- Return DTOs that match Rails API response format (from serializers)
-- Use error wrapping for proper error propagation
-- Use `json.NewEncoder` for JSON response encoding with `Content-Type` header
+1. **Most handler code already exists** - The handlers for projects, logs, and health check are already implemented in `internal/api/v1/handlers/`
+2. **Routes are configured** - `routes.go` uses `gorilla/mux` for routing with path parameters
+3. **Middleware chain is ready** - Includes recovery, CORS, request ID, and logging middleware
 
-**Endpoint behavior:**
-- `GET /api/v1/projects`: Returns all projects with eager-loaded logs, ordered by logs descending
-- `GET /api/v1/projects/:id`: Returns single project with eager-loaded logs
-- `GET /api/v1/projects/:project_id/logs`: Returns first 4 logs for project, with project eager-loaded
-- `GET /healthz`: Returns health check response
+**Issues Found (requires fixes):**
 
-**Response format mapping (from Rails serializers):**
-- ProjectSerializer: `id, name, started_at, progress, total_page, page, status, logs_count, days_unreading, median_day (show only), finished_at (show only)`
-- LogSerializer: `id, data, start_page, end_page, note, project`
-- Logs in projects: eager-loaded array of LogResponse
+1. **Missing `Logs` field in ProjectResponse** - The Rails API returns logs with projects (e.g., `GET /api/v1/projects` returns projects with `logs` array), but the current `ProjectResponse` doesn't include the `Logs []*LogResponse` field
+
+2. **Index endpoint doesn't eager-load logs** - `ProjectsHandler.Index` returns projects without logs, but Rails uses `Project.eager_load(:logs).order('logs.data DESC')`
+
+3. **Show endpoint doesn't eager-load logs properly** - `ProjectsHandler.Show` retrieves project separately from logs but doesn't include them in the response
+
+4. **ProjectRepository.GetWithLogs doesn't load logs** - The repository method exists but only fetches project data, not associated logs
+
+5. **Logs handler doesn't order by data DESC** - The Rails API orders logs by `logs.data DESC`, but current implementation returns logs in database order
+
+**Corrected Approach:**
+
+The implementation will:
+1. Add `Logs []*LogResponse` field to `ProjectResponse` DTO
+2. Implement `GetAllWithLogs` repository method that eager-loads logs ordered by `data DESC`
+3. Update `ProjectsHandler.Index` to use eager-loaded logs
+4. Update `ProjectsHandler.Show` to use eager-loaded logs
+5. Update `LogsHandler.Index` to order logs by `data DESC` before limiting to 4
+6. Fix `ProjectRepository.GetWithLogs` to include logs array
 
 ### 2. Files to Modify
 
 **New files to create:**
-- `internal/api/v1/handlers/projects_handler.go` - Project index/show handlers with repository injection
-- `internal/api/v1/handlers/logs_handler.go` - Logs index handler (returns first 4 logs for project)
-- `internal/api/v1/handlers/health_handler.go` - Health check handler
-- `internal/api/v1/routes.go` - Route registration and router setup
+- None (all handlers and infrastructure already exist)
 
-**Dto files to update:**
-- `internal/domain/dto/project_response.go` - Add `Logs []*LogResponse` field to match Rails serialization with eager loaded logs
+**Files to modify:**
 
-**No other files to modify** - existing middleware, domain models, and repositories are ready
+1. `internal/domain/dto/project_response.go` - Add `Logs []*LogResponse` field to store eager-loaded logs
+2. `internal/domain/dto/log_response.go` - Add `Data` field type fix (currently `*string`, should match DB `datetime`)
+3. `internal/repository/project_repository.go` - Add `GetAllWithLogs() []ProjectWithLogs` interface method (helper struct)
+4. `internal/adapter/postgres/project_repository.go` - Implement `GetAllWithLogs()` with eager-loaded logs ordered by `data DESC`
+5. `internal/api/v1/handlers/projects_handler.go` - Update `Index` and `Show` to include eager-loaded logs
+6. `internal/api/v1/handlers/logs_handler.go` - Update to order logs by `data DESC` before limiting
 
 ### 3. Dependencies
 
 **Prerequisites (all already implemented):**
-- ✅ Domain models (project.go, log.go)
-- ✅ DTOs (project_response.go, log_response.go, health_check_response.go)
-- ✅ Repository interfaces and implementations
-- ✅ Middleware stack (recovery, cors, request_id, logging)
+- ✅ Domain models (`project.go`, `log.go`)
+- ✅ DTOs (`project_response.go`, `log_response.go`, `health_check_response.go`)
+- ✅ Repository interfaces and PostgreSQL implementations
+- ✅ Middleware stack (recovery, CORS, request_id, logging)
 - ✅ Database connection infrastructure
+- ✅ Route registration with `gorilla/mux`
+- ✅ Application entry point with graceful shutdown
 
-**Required setup:**
-1. Database connection must be established
-2. Repository implementations must be instantiated with the connection
-3. Handlers must be created with repository dependencies injected
-4. Routes must be registered and server started
+**Required changes before implementation:**
+1. Add `Logs` field to `ProjectResponse` DTO
+2. Extend repository interface to return logs with projects
+3. Implement `GetAllWithLogs` in `ProjectRepositoryImpl`
 
 ### 4. Code Patterns
 
-**Handler structure:**
+**Existing patterns to follow:**
+
+1. **Handler structure** (already implemented):
 ```go
 type ProjectsHandler struct {
-    repo ProjectRepository
+    repo repository.ProjectRepository
 }
 
-func NewProjectsHandler(repo ProjectRepository) *ProjectsHandler {
+func NewProjectsHandler(repo repository.ProjectRepository) *ProjectsHandler {
     return &ProjectsHandler{repo: repo}
 }
+```
 
-func (h *ProjectsHandler) Index(w http.ResponseWriter, r *http.Request) {
-    // 1. Call repository
-    // 2. Handle errors
-    // 3. Encode JSON response
+2. **Error handling** (already implemented):
+```go
+if strings.Contains(err.Error(), "not found") {
+    http.Error(w, `{"error": "project not found"}`, http.StatusNotFound)
+    return
+}
+http.Error(w, `{"error": "Internal server error"}`, http.StatusInternalServerError)
+```
+
+3. **JSON response encoding** (already implemented):
+```go
+w.Header().Set("Content-Type", "application/json")
+json.NewEncoder(w).Encode(response)
+```
+
+4. **Path parameter extraction** (already implemented):
+```go
+idStr := mux.Vars(r)["id"]
+id, err := strconv.ParseInt(idStr, 10, 64)
+```
+
+**New patterns to add:**
+
+1. **Eager-loaded project with logs struct:**
+```go
+type ProjectWithLogs struct {
+    Project *dto.ProjectResponse
+    Logs    []*dto.LogResponse
 }
 ```
 
-**Handler function pattern (from Rails controllers):**
-```
-1. Call repository method with context
-2. Handle errors (404 for not found, 500 for internal)
-3. Encode JSON response using json.NewEncoder
-4. Set Content-Type: application/json header
-```
-
-**Error response format:**
-- Missing record: `{"error": "<resource> not found"}`
-- Unexpected error: `{"error": "Internal server error"}`
-
-**JSON encoding:**
+2. **Time formatting helper:**
 ```go
-w.Header().Set("Content-Type", "application/json")
-encoder := json.NewEncoder(w)
-encoder.Encode(response)
+func formatTimePtr(t *time.Time) *string {
+    if t == nil {
+        return nil
+    }
+    s := t.Format(time.RFC3339)
+    return &s
+}
 ```
-
-**Handling route parameters (with net/http):**
-- For `/api/v1/projects/:id`, parse path manually or use `http.ServeMux` with patterns
-- Extract project ID from URL path using `strings.TrimPrefix` or regex
 
 ### 5. Testing Strategy
 
-**Unit tests** (to be written as separate task per PRD checklist):
-- Test each handler method with mocked repository
-- Verify JSON response format matches Rails output
-- Test error cases (not found returns 404, internal errors return 500)
-- Test status codes (200 for success, 404 for not found, 500 for internal error)
+**Unit tests** (to be written as separate task per PRD):
+- Test `ProjectsHandler.Index` with mocked repository returning projects with logs
+- Test `ProjectsHandler.Show` with mocked repository returning project with logs
+- Test `LogsHandler.Index` with mocked repositories verifying log limit and ordering
+- Verify error handling for not found and internal errors
+- Test JSON response format matches Rails output
 
 **Integration tests** (referenced in PRD acceptance criteria):
-- Test against actual database with test data
-- Verify `GET /api/v1/projects` returns projects with eager-loaded logs
-- Verify logs ordering by `data DESC`
-- Verify logs first 4 limit for `/api/v1/projects/:project_id/logs`
+- Test `GET /api/v1/projects` returns projects with eager-loaded logs ordered by `data DESC`
+- Test `GET /api/v1/projects/:id` returns single project with logs
+- Test `GET /api/v1/projects/:project_id/logs` returns first 4 logs ordered by `data DESC`
+- Verify `ProjectResponse` includes `Logs []*LogResponse` array
 - Compare responses to Rails API output
 
 **Test coverage targets:**
 - Handler logic: 80%+ coverage
-- Integration tests: cover all 4 endpoints
+- Repository eager-loading: Verify SQL queries use `LEFT JOIN` for logs
+- Logs ordering: Verify `ORDER BY logs.data DESC` in SQL
 
 ### 6. Risks and Considerations
 
-**Potential issues:**
-1. **Missing database fields**: Rails schema doesn't have `progress`, `status`, `logs_count`, `days_unread`, `median_day`, `finished_at` columns in projects table. These may be calculated fields in Rails or require DB schema changes.
+**Blocking issues identified:**
 
-2. **Logs ordering**: Rails uses `order('logs.data DESC')` - logs table has `data` as datetime. Need to verify sorting behavior in Go/pgx.
+1. **Missing logs in ProjectResponse** - CRITICAL: The Rails API returns `logs` array with projects, but current DTO lacks this field. Without this fix, acceptance criteria #1, #2, #3 will fail.
 
-3. **Eager loading implementation**: The repository's `GetWithLogs` method returns a `ProjectResponse` DTO without logs array. This may need updating or a new method to properly eager-load logs.
+2. **GetWithLogs not loading logs** - CRITICAL: The repository method exists but doesn't fetch associated logs. Need to implement proper eager-loading with `LEFT JOIN`.
 
-4. **Route parameter parsing**: With `net/http` stdlib (no chi/mux), route parameters require manual path parsing. For simple patterns like `/api/v1/projects/:id`, can parse manually or use pattern matching.
+3. **Logs ordering** - HIGH: Rails uses `order('logs.data DESC')`, but current implementation doesn't order logs. Need to verify Go/PostgreSQL sorting matches Rails behavior.
 
-5. **Response structure mismatch**: Rails' `render json: @project, include: ['logs']` returns project with `logs` array. Need to ensure `ProjectResponse` DTO includes `Logs []*LogResponse` field.
+4. **Route parameter precision** - MEDIUM: `mux.Vars(r)["id"]` requires path to match route exactly. Need to verify route patterns in `routes.go` match expected patterns.
+
+**Potential pitfalls:**
+
+1. **N+1 query problem** - If `GetAll` returns projects and we loop to fetch logs per project, we'd have N+1 queries. The solution must use `LEFT JOIN` for single query with eager loading.
+
+2. **Null time handling** - Rails uses `DateTime` fields (nullable), Go uses `*time.Time`. Need consistent handling of null/nil values in DTO.
+
+3. **Logs ordering field** - Rails uses `logs.data DESC`. Need to verify this column exists in PostgreSQL schema (DB schema shows `data` as `datetime`).
 
 **Trade-offs:**
-- Using `net/http` stdlib (no router library) for simplicity, but routing requires manual path parsing
-- DTO pattern for response serialization (allows future flexibility)
-- Separate handlers per resource for clean separation of concerns
-- Repository dependency injection for testability
+
+1. **SQL approach** - Use `LEFT JOIN` with `ORDER BY logs.data DESC` for eager loading (single query, matches Rails `eager_load` behavior)
+
+2. **Response structure** - Keep `ProjectResponse` with optional `Logs` field (backwards compatible for single project without logs)
+
+3. **Error message format** - Use exact Rails format: `{"error": "project not found"}` (already implemented)
 
 **Action items to resolve gaps:**
 1. Add `Logs []*LogResponse` field to `ProjectResponse` DTO
-2. Implement `GetWithLogs` repository method to fetch logs for each project
-3. Add route parameter parsing helper or use pattern matching
-4. Verify DB schema matches DTO fields (may need Rails migration)
+2. Implement `ProjectWithLogs` struct for eager-loaded projects
+3. Implement `GetAllWithLogs` in `ProjectRepositoryImpl` with `LEFT JOIN`
+4. Update `ProjectsHandler.Index` to use eager-loaded logs
+5. Update `ProjectsHandler.Show` to use eager-loaded logs
+6. Add `ORDER BY logs.data DESC` to logs queries
+7. Implement helper function `formatTimePtr` for time conversion
+8. Verify `logs.data` column exists in DB schema (currently named `data datetime` in schema)
 <!-- SECTION:PLAN:END -->
