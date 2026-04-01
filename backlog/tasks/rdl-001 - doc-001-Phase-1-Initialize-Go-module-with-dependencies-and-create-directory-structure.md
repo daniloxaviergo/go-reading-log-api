@@ -5,7 +5,7 @@ title: >-
   structure
 status: To Do
 assignee:
-  - workflow
+  - catarina
 created_date: '2026-04-01 00:57'
 updated_date: '2026-04-01 00:59'
 labels: []
