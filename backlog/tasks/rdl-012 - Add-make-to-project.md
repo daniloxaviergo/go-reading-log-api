@@ -1,7 +1,7 @@
 ---
 id: RDL-012
 title: Add make to project
-status: To Do
+status: In Progress
 assignee:
   - thomas
 created_date: '2026-04-01 15:12'
@@ -19,11 +19,11 @@ Should be cover all aspects of project
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 All Makefile commands work correctly (help, build, run, test, fmt, vet, clean, start-pg)
-- [ ] #2 All 121 existing tests pass when using make test
-- [ ] #3 make test-coverage generates proper coverage reports
-- [ ] #4 go fmt and go vet work correctly with Go 1.25.7
-- [ ] #5 Docker integration for PostgreSQL works (with environment variable support)
+- [x] #1 All Makefile commands work correctly (help, build, run, test, fmt, vet, clean, start-pg)
+- [x] #2 All 121 existing tests pass when using make test
+- [x] #3 make test-coverage generates proper coverage reports
+- [x] #4 go fmt and go vet work correctly with Go 1.25.7
+- [x] #5 Docker integration for PostgreSQL works (with environment variable support)
 <!-- AC:END -->
 
 ## Implementation Plan
