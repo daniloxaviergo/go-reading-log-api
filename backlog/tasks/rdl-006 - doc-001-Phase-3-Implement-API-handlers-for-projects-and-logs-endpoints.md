@@ -2,8 +2,10 @@
 id: RDL-006
 title: '[doc-001 Phase 3] Implement API handlers for projects and logs endpoints'
 status: To Do
-assignee: []
+assignee:
+  - catarina
 created_date: '2026-04-01 00:58'
+updated_date: '2026-04-01 02:27'
 labels: []
 dependencies: []
 references:
