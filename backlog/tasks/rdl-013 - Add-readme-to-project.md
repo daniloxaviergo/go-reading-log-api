@@ -3,7 +3,7 @@ id: RDL-013
 title: Add readme to project
 status: To Do
 assignee:
-  - workflow
+  - catarina
 created_date: '2026-04-01 17:19'
 updated_date: '2026-04-01 17:20'
 labels: []
