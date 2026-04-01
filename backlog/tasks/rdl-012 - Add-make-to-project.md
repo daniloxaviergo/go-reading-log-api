@@ -210,9 +210,9 @@ This task added a comprehensive Makefile to the Go Reading Log API project, prov
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 All unit tests pass
-- [ ] #2 All integration tests pass
-- [ ] #3 go fmt and go vet pass with no errors
-- [ ] #4 Makefile created at project root
-- [ ] #5 Documentation in QWEN.md updated to reference Makefile commands
+- [x] #1 All unit tests pass
+- [x] #2 All integration tests pass
+- [x] #3 go fmt and go vet pass with no errors
+- [x] #4 Makefile created at project root
+- [x] #5 Documentation in QWEN.md updated to reference Makefile commands
 <!-- DOD:END -->
