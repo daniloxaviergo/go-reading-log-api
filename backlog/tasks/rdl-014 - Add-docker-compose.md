@@ -3,9 +3,9 @@ id: RDL-014
 title: Add docker-compose
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-01 19:36'
-updated_date: '2026-04-01 19:51'
+updated_date: '2026-04-01 19:52'
 labels: []
 dependencies: []
 ---
