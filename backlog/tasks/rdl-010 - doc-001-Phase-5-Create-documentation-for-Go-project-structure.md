@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-01 00:58'
-updated_date: '2026-04-01 12:41'
+updated_date: '2026-04-01 12:44'
 labels: []
 dependencies: []
 references:
@@ -29,10 +29,10 @@ Include run commands and any important notes for developers joining the project.
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 docs/README.go-project.md created with all required sections
-- [ ] #2 Environment variables documented with examples
+- [x] #1 docs/README.go-project.md created with all required sections
+- [x] #2 Environment variables documented with examples
 - [ ] #3 Database schema documented
-- [ ] #4 Run commands documented
+- [x] #4 Run commands documented
 <!-- AC:END -->
 
 ## Implementation Plan
