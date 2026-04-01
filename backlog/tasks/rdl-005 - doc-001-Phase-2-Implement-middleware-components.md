@@ -3,7 +3,7 @@ id: RDL-005
 title: '[doc-001 Phase 2] Implement middleware components'
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-01 00:58'
 updated_date: '2026-04-01 10:58'
 labels: []
