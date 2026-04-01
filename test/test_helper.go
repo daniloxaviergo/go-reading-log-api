@@ -13,7 +13,6 @@ import (
 	"go-reading-log-api-next/internal/domain/dto"
 	"go-reading-log-api-next/internal/domain/models"
 	"go-reading-log-api-next/internal/repository"
-
 )
 
 const testContextTimeout = 5 * time.Second

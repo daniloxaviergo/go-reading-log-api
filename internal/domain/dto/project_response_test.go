@@ -129,7 +129,7 @@ func TestProjectResponse_EmptyContext(t *testing.T) {
 // TestProjectResponse_SetContext tests SetContext method
 func TestProjectResponse_SetContext(t *testing.T) {
 	response := &ProjectResponse{}
-	
+
 	newCtx := context.WithValue(context.Background(), "test_key", "test_value")
 	response.SetContext(newCtx)
 
