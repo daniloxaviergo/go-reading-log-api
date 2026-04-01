@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"sort"
 	"testing"
 	"time"
 
@@ -11,6 +12,8 @@ import (
 	"go-reading-log-api-next/internal/config"
 	"go-reading-log-api-next/internal/domain/dto"
 	"go-reading-log-api-next/internal/domain/models"
+	"go-reading-log-api-next/internal/repository"
+
 )
 
 const testContextTimeout = 5 * time.Second
@@ -301,11 +304,62 @@ func (m *MockProjectRepository) GetAll(ctx context.Context) ([]*models.Project, 
 		projects = append(projects, project)
 	}
 
+	// Sort by ID for deterministic ordering
+	sort.Slice(projects, func(i, j int) bool {
+		return projects[i].ID < projects[j].ID
+	})
+
 	return projects, nil
 }
 
+// GetAllWithLogs retrieves all projects with their associated logs
+func (m *MockProjectRepository) GetAllWithLogs(ctx context.Context) ([]*repository.ProjectWithLogs, error) {
+	m.GetAllCalls++
+
+	if m.Err != nil {
+		return nil, m.Err
+	}
+
+	result := make([]*repository.ProjectWithLogs, 0, len(m.Projects))
+	for id, project := range m.Projects {
+		var response *dto.ProjectResponse
+
+		// Check if we have a pre-configured response with logs
+		if resp, ok := m.WithLogsMap[id]; ok {
+			response = resp
+		} else {
+			// Build response from project
+			response = &dto.ProjectResponse{
+				ID:         project.ID,
+				Name:       project.Name,
+				StartedAt:  formatTimePtr(project.StartedAt),
+				Progress:   project.Progress,
+				TotalPage:  project.TotalPage,
+				Page:       project.Page,
+				Status:     project.Status,
+				LogsCount:  project.LogsCount,
+				DaysUnread: project.DaysUnread,
+				MedianDay:  formatTimePtr(project.MedianDay),
+				FinishedAt: formatTimePtr(project.FinishedAt),
+			}
+		}
+
+		result = append(result, &repository.ProjectWithLogs{
+			Project: response,
+			Logs:    []*dto.LogResponse{}, // Empty logs for now
+		})
+	}
+
+	// Sort by project ID for deterministic ordering
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Project.ID < result[j].Project.ID
+	})
+
+	return result, nil
+}
+
 // GetWithLogs retrieves a project with its associated logs
-func (m *MockProjectRepository) GetWithLogs(ctx context.Context, id int64) (*dto.ProjectResponse, error) {
+func (m *MockProjectRepository) GetWithLogs(ctx context.Context, id int64) (*repository.ProjectWithLogs, error) {
 	m.GetWithLogsCalls = append(m.GetWithLogsCalls, id)
 
 	if m.Err != nil {
@@ -313,7 +367,10 @@ func (m *MockProjectRepository) GetWithLogs(ctx context.Context, id int64) (*dto
 	}
 
 	if response, ok := m.WithLogsMap[id]; ok {
-		return response, nil
+		return &repository.ProjectWithLogs{
+			Project: response,
+			Logs:    []*dto.LogResponse{},
+		}, nil
 	}
 
 	if project, ok := m.Projects[id]; ok {
@@ -330,7 +387,10 @@ func (m *MockProjectRepository) GetWithLogs(ctx context.Context, id int64) (*dto
 			MedianDay:  formatTimePtr(project.MedianDay),
 			FinishedAt: formatTimePtr(project.FinishedAt),
 		}
-		return response, nil
+		return &repository.ProjectWithLogs{
+			Project: response,
+			Logs:    []*dto.LogResponse{},
+		}, nil
 	}
 
 	return nil, fmt.Errorf("project with ID %d not found", id)
@@ -432,6 +492,21 @@ func (m *MockLogRepository) GetByProjectID(ctx context.Context, projectID int64)
 	return []*models.Log{}, nil
 }
 
+// GetByProjectIDOrdered retrieves all logs for a project ordered
+func (m *MockLogRepository) GetByProjectIDOrdered(ctx context.Context, projectID int64) ([]*models.Log, error) {
+	m.GetByProjectIDCalls = append(m.GetByProjectIDCalls, projectID)
+
+	if m.Err != nil {
+		return nil, m.Err
+	}
+
+	if logs, ok := m.ByProjectID[projectID]; ok {
+		return logs, nil
+	}
+
+	return []*models.Log{}, nil
+}
+
 // GetAll retrieves all logs
 func (m *MockLogRepository) GetAll(ctx context.Context) ([]*models.Log, error) {
 	m.GetAllCalls++
@@ -444,6 +519,11 @@ func (m *MockLogRepository) GetAll(ctx context.Context) ([]*models.Log, error) {
 	for _, log := range m.Logs {
 		logs = append(logs, log)
 	}
+
+	// Sort by ID for deterministic ordering
+	sort.Slice(logs, func(i, j int) bool {
+		return logs[i].ID < logs[j].ID
+	})
 
 	return logs, nil
 }
