@@ -2,8 +2,10 @@
 id: RDL-008
 title: '[doc-001 Phase 4] Create test infrastructure and integration tests'
 status: To Do
-assignee: []
+assignee:
+  - workflow
 created_date: '2026-04-01 00:58'
+updated_date: '2026-04-01 03:05'
 labels: []
 dependencies: []
 references:
