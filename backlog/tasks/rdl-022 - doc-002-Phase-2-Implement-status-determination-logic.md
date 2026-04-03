@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-03 14:02'
-updated_date: '2026-04-03 17:58'
+updated_date: '2026-04-03 17:59'
 labels:
   - phase-2
   - status-logic
@@ -264,6 +264,53 @@ func (p *Project) CalculateStatus(logs []*dto.LogResponse, config *config.Config
 
 All 148 tests pass, go fmt and go vet pass, build succeeds
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Implemented status determination logic in Go matching Rails ActiveModelSerializer status method.
+
+## Changes Made
+
+### Core Implementation
+- **`internal/domain/models/project.go`**: Added status constants and two methods:
+  - `CalculateDaysUnreading(logs []*dto.LogResponse) *int` - Calculates days since last reading activity using log data or started_at
+  - `CalculateStatus(logs []*dto.LogResponse, config *config.Config) *string` - Determines project status based on logs and days_unreading
+
+### Repository Integration
+- **`internal/adapter/postgres/project_repository.go`**: Updated `GetWithLogs` and `GetAllWithLogs` to call `CalculateStatus()` when building responses, ensuring status is calculated on-demand
+
+### Tests
+- **`internal/domain/models/project_test.go`**: Added 14 comprehensive unit tests covering:
+  - All 5 status types: unstarted, finished, running, sleeping, stopped
+  - Edge cases: boundary conditions (7 and 14 days), nil logs, nil logs with no started_at
+  - Configuration verification: custom ranges work correctly
+
+## Verification
+
+- ✅ All 148 tests pass (14 new status tests in models package)
+- ✅ go fmt and go vet pass with no errors
+- ✅ Application builds successfully
+- ✅ Clean Architecture layers properly followed (business logic in domain model)
+- ✅ Error path tests included in all status determination paths
+
+## Status Logic
+
+The status is determined in order:
+1. **unstarted**: No logs exist
+2. **finished**: page >= total_page (reading complete)
+3. **running**: days_unreading <= em_andamento_range (default 7)
+4. **sleeping**: days_unreading <= dormindo_range (default 14)
+5. **stopped**: All other cases
+
+## Risks & Follow-ups
+
+- **Time calculation**: Uses date-only comparison (`time.Now().Date()`) matching Rails `Date.today` behavior
+- **Configuration**: Status ranges are configurable via environment variables (EM_ANDAMENTO_RANGE, DORMINDO_RANGE)
+- **No database changes**: Status is calculated on-demand (not stored), ensuring always accurate values
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
