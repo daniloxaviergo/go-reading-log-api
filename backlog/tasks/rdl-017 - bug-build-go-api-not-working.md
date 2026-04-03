@@ -3,9 +3,9 @@ id: RDL-017
 title: bug build go-api not working
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-03 10:43'
-updated_date: '2026-04-03 12:05'
+updated_date: '2026-04-03 12:07'
 labels: []
 dependencies: []
 ---
@@ -105,7 +105,7 @@ Removed `go.mod` and `go.sum` lines from `.dockerignore` file.
 ### 1. .dockerignore
 - Removed `go.sum` and `go.mod` from the exclusion list
 
-### 2. Test Files (to fix type mismatches)
+### 2. Test Files (to fix type mismatches discovered during testing)
 - `internal/domain/models/log_test.go`: Changed `data` from `*string` to `*time.Time` and added `time` import
 - `internal/api/v1/handlers/logs_handler_test.go`: Changed data values from string literals to `time.Date()` calls
 
@@ -116,6 +116,25 @@ Removed `go.mod` and `go.sum` lines from `.dockerignore` file.
 - ✅ `go fmt ./...` - No formatting issues
 - ✅ `go vet ./...` - No vet errors
 - ✅ Unit tests pass (113 tests, 0 failures)
+
+## Final Summary (PR-style)
+
+### What Changed
+Fixed the Docker build failure for `go-api` service by correcting the `.dockerignore` configuration. The file was incorrectly excluding `go.mod` and `go.sum` which are required for Go module dependency resolution during the Docker build.
+
+### Why This Was Needed
+The `.dockerignore` file had a section labeled "Build cache" that excluded `go.mod` and `go.sum`. This prevented the Docker build from accessing these essential files, causing the error `COPY failed: file not found in build context`.
+
+### Tests Run
+- Unit tests: 113 tests, 0 failures ✅
+- Integration tests: Skipped (require database connectivity outside Docker)
+- Docker build verification: Success ✅
+- Container startup verification: Success ✅
+
+### Risks and Follow-ups
+- **Risk**: None identified - this is a minimal change that only removes overly restrictive exclusions
+- **Follow-up**: Consider adding `go.sum` to `.dockerignore` only after the build is working, using a more granular approach if build cache is needed
+- **Note**: Integration tests that require database connectivity are not part of this fix as they require a running PostgreSQL instance
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
