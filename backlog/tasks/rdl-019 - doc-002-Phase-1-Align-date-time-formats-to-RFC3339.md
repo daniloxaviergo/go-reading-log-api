@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - Thomas
 created_date: '2026-04-03 14:02'
-updated_date: '2026-04-03 15:24'
+updated_date: '2026-04-03 15:51'
 labels:
   - phase-1
   - date-format
@@ -28,9 +28,9 @@ Update all date/time fields in `log_response.go` to use RFC3339 format for times
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 Timestamp fields formatted as RFC3339 (e.g. 2024-01-15T10:30:00Z)
-- [ ] #2 Date fields formatted as ISO date (e.g. 2024-01-15)
+- [x] #2 Date fields formatted as ISO date (e.g. 2024-01-15)
 - [x] #3 NULL database values serialize to JSON null
-- [ ] #4 Format matches Rails API output exactly
+- [x] #4 Format matches Rails API output exactly
 <!-- AC:END -->
 
 ## Implementation Plan
