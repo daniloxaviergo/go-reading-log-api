@@ -3,9 +3,9 @@ id: RDL-021
 title: '[doc-002 Phase 2] Create app configuration for status ranges'
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-03 14:02'
-updated_date: '2026-04-03 16:27'
+updated_date: '2026-04-03 16:28'
 labels:
   - phase-2
   - configuration
