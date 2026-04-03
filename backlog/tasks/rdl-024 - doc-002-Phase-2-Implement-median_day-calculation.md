@@ -2,8 +2,10 @@
 id: RDL-024
 title: '[doc-002 Phase 2] Implement median_day calculation'
 status: To Do
-assignee: []
+assignee:
+  - workflow
 created_date: '2026-04-03 14:03'
+updated_date: '2026-04-03 21:02'
 labels:
   - phase-2
   - derived-calculation
