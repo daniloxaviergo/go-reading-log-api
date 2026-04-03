@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-03 09:36'
-updated_date: '2026-04-03 09:39'
+updated_date: '2026-04-03 09:40'
 labels: []
 dependencies: []
 ---
@@ -24,26 +24,27 @@ Create a command make reload when drop database of docker-compose and up the doc
 The `make reload` command will drop and recreate the database using the existing `docs/database.sql` file. The implementation will:
 
 1. **Add a new Makefile target** `reload` that:
-   - Stops the PostgreSQL container
-   - Drops the existing database volume (or executes DROP DATABASE)
-   - Starts PostgreSQL fresh
-   - Waits for database to be ready
-   - Restores the database from `docs/database.sql` using `pg_restore` or `psql`
-   - Verifies the restoration
+   - Displays a WARNING prompt requiring user confirmation (to prevent accidental data loss)
+   - Stops the Docker Compose services using `docker-compose down`
+   - Removes the PostgreSQL data volume using `docker-compose down -v`
+   - Starts the services again using `docker-compose up -d`
+   - Waits for PostgreSQL to be ready using `pg_isready`
+   - Restores the database from `docs/database.sql` using `psql` inside the PostgreSQL container
+   - Verifies the restoration by checking table existence
 
-2. **Database SQL format**: The `docs/database.sql` is a plain PostgreSQL dump (not custom format), so we'll use `psql` instead of `pg_restore` for restoration.
+2. **Database restoration method**: The `docs/database.sql` is a plain PostgreSQL dump (not custom format), so we'll use `psql` instead of `pg_restore`. We'll use `docker exec` to run `psql` inside the PostgreSQL container.
 
-3. **Integration with existing Docker setup**: Use the same container name (`reading-log-db`) and environment variables from `.env` file.
+3. **Integration with existing Docker setup**: Use `docker-compose` commands to manage services consistently with existing commands.
 
 ### 2. Files to Modify
 
-- **Makefile**: Add the `reload` target and supporting functions
+- **Makefile**: Add the `reload` target, confirmation prompt, and helper functions
 - **docs/database.sql**: No changes needed (already exists with database schema and data)
-- **.env**: No changes needed (configuration already exists)
+- **docker-compose.yml**: No changes needed (already configured properly)
 
 ### 3. Dependencies
 
-- Docker must be installed and running
+- Docker and Docker Compose must be installed and running
 - Existing `docs/database.sql` file must exist
 - Environment variables must be configured in `.env` (or use defaults from `.env.example`)
 
@@ -51,44 +52,48 @@ The `make reload` command will drop and recreate the database using the existing
 
 Follow existing Makefile patterns:
 - UseColors for output formatting (GREEN, RED, YELLOW, BLUE)
-- Check for Docker installation
-- Print helpful messages for user
-- Use the same environment variable pattern (load from .env)
-- Follow the naming convention: `reload` (not `db-reload` or `database-reload`)
+- Check for Docker installation with helpful error messages
+- Print progress messages with appropriate colors
+- Use `-v` flag for volume removal in `docker-compose down`
+- Follow the naming convention: `reload` (simple and clear)
 
 ### 5. Testing Strategy
 
-1. **Unit test the Makefile syntax**: Verify the Makefile is valid
-2. **Integration test**: Run `make reload` in a test environment
-3. **Verify database restoration**: Check that tables and data are restored correctly
-4. **Test error handling**: Verify proper error messages when Docker is not available
+1. **Makefile syntax validation**: Verify the Makefile is valid with `make help`
+2. **Integration test**: Run `make reload` in a test environment with dummy data
+3. **Verify database restoration**: Check that tables and data are restored correctly by querying the database
+4. **Test error handling**: Verify proper error messages when:
+   - Docker is not available
+   - `.env` file is missing or has invalid values
+   - `docs/database.sql` doesn't exist
 
 ### 6. Risks and Considerations
 
-**Data Loss**: The command will permanently delete all database data. A warning message will be displayed before proceeding.
+**Data Loss**: The command will permanently delete all database data. A warning message with confirmation prompt will be displayed before proceeding.
 
 **Dependencies**: 
-- Requires Docker to be installed
+- Requires Docker and Docker Compose to be installed
 - Requires the `docs/database.sql` file to exist
 - Requires proper environment variables in `.env`
 
 **Error handling**:
-- Docker not installed
+- Docker not installed or not running
 - Database restoration fails (SQL syntax errors)
-- Container startup fails
-- Database connection timeout
+- Container startup fails or health check times out
+- Environment variable configuration issues
 
 **User experience**:
 - Clear warning about data loss before proceeding
+- User confirmation required before executing
 - Helpful success messages
 - Troubleshooting suggestions for common failures
 
 **Implementation details**:
-- Use `docker-compose down` to stop services first (safer than stopping just the database)
-- Use volume removal to ensure clean slate
-- Wait for PostgreSQL to be ready using `pg_isready`
-- Use environment variables from `.env` for database credentials
-- Provide helpful error messages with resolution suggestions
+- Use `docker-compose down -v` to remove volumes (clean slate)
+- Wait for PostgreSQL to be ready using `pg_isready` in a loop
+- Use `docker exec` to run `psql` inside the PostgreSQL container
+- Pass environment variables from `.env` to the container via `docker exec -e`
+- Validate `docs/database.sql` exists before attempting restoration
 <!-- SECTION:PLAN:END -->
 
 ## Definition of Done
