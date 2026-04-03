@@ -3,9 +3,9 @@ id: RDL-026
 title: '[doc-002 Phase 2] Implement logs_count derivation'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-03 14:03'
-updated_date: '2026-04-03 23:00'
+updated_date: '2026-04-03 23:01'
 labels:
   - phase-2
   - derived-calculation
