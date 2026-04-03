@@ -3,7 +3,7 @@ id: RDL-017
 title: bug build go-api not working
 status: To Do
 assignee:
-  - workflow
+  - thomas
 created_date: '2026-04-03 10:43'
 updated_date: '2026-04-03 10:45'
 labels: []
