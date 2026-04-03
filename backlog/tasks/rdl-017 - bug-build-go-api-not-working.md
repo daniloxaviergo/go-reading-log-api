@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-03 10:43'
-updated_date: '2026-04-03 10:44'
+updated_date: '2026-04-03 10:45'
 labels: []
 dependencies: []
 ---
@@ -43,14 +43,13 @@ The Docker build is failing because the `.dockerignore` file explicitly excludes
 
 The fix involves:
 1. Removing the `go.mod` and `go.sum` lines from `.dockerignore`
-2. Keeping the `go.sum` line since it's needed for dependency verification (Docker needs it to run `go mod verify`)
-3. The `go.mod` file must be included for `go mod download` to work
-4. Alternatively, we could restructure to copy only necessary files to the build context
+2. The `go.mod` file must be included for `go mod download` to work
+3. The `go.sum` file is also needed for dependency verification
 
 ### 2. Files to Modify
 
-- `.dockerignore` - Remove `go.mod` and `go.sum` from the exclusion list (or comment them out)
-- `docker-compose.yml` - Remove the `version: "3.8"` line (optional, just a warning)
+- `.dockerignore` - Remove `go.mod` and `go.sum` from the exclusion list
+- `docker-compose.yml` - Remove the deprecated `version: "3.8"` line (optional, just a warning)
 
 ### 3. Dependencies
 
@@ -69,7 +68,7 @@ The fix involves:
 - Run `docker-compose build go-api` to verify the build completes successfully
 - Run `docker-compose up go-api` to verify the container starts
 - Check that the application logs appear indicating successful startup
-- Verify the server is listening on the configured port
+- Verify the server is listening on the configured port (3000)
 
 ### 6. Risks and Considerations
 
@@ -77,6 +76,14 @@ The fix involves:
 - The `go.mod` exclusion prevents dependency resolution entirely
 - This is a straightforward fix with minimal risk
 - After the fix, Docker builds should be faster due to proper layer caching with `go.mod`/`go.sum`
+
+### 7. Corrected Definition of Done for This Bug Fix
+
+- [ ] `docker-compose build go-api` completes successfully without errors
+- [ ] `docker-compose up go-api` starts the container without the "file does not exist" error
+- [ ] Application logs show successful startup (database connection established, server starting)
+- [ ] The `go.mod` and `go.sum` files are correctly copied into the Docker build context
+- [ ] No regression in existing Docker build optimizations
 <!-- SECTION:PLAN:END -->
 
 ## Definition of Done
