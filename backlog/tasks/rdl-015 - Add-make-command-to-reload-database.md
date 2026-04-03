@@ -3,7 +3,7 @@ id: RDL-015
 title: Add make command to reload database
 status: To Do
 assignee:
-  - workflow
+  - catarina
 created_date: '2026-04-03 09:36'
 updated_date: '2026-04-03 09:36'
 labels: []
