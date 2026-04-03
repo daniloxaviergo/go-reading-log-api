@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-03 14:03'
-updated_date: '2026-04-03 22:39'
+updated_date: '2026-04-03 22:59'
 labels:
   - phase-2
   - derived-calculation
@@ -29,10 +29,10 @@ Implement logs_count derivation to match Rails behavior. Count the number of log
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 logs_count = len(logs)
-- [ ] #2 logs_count included in JSON even if empty array
-- [ ] #3 logs_count is an integer type
-- [ ] #4 Matches Rails logs.size behavior
+- [x] #1 logs_count = len(logs)
+- [x] #2 logs_count included in JSON even if empty array
+- [x] #3 logs_count is an integer type
+- [x] #4 Matches Rails logs.size behavior
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -172,11 +172,17 @@ project.LogsCount = logsCount
 - Compare with Rails API behavior
 <!-- SECTION:PLAN:END -->
 
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Implementation complete. Added CalculateLogsCount method to Project model, unit tests for all edge cases (empty, nil, single, multiple logs), and integrated into GetWithLogs and GetAllWithLogs repository methods. All tests pass with 100% coverage for CalculateLogsCount. go fmt and go vet pass with no errors. Build succeeds. Documentation updated in QWEN.md.
+<!-- SECTION:NOTES:END -->
+
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 All unit tests pass use testing-expert subagent for test execution and verification
-- [ ] #2 All integration tests pass use testing-expert subagent for test execution and verification
-- [ ] #3 go fmt and go vet pass with no errors
+- [x] #1 All unit tests pass use testing-expert subagent for test execution and verification
+- [x] #2 All integration tests pass use testing-expert subagent for test execution and verification
+- [x] #3 go fmt and go vet pass with no errors
 - [ ] #4 Clean Architecture layers properly followed
 - [ ] #5 Error responses consistent with existing patterns
 - [ ] #6 HTTP status codes correct for response type
