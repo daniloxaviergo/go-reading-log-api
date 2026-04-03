@@ -3,9 +3,9 @@ id: RDL-023
 title: '[doc-002 Phase 2] Implement days_unreading calculation'
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-03 14:03'
-updated_date: '2026-04-03 20:21'
+updated_date: '2026-04-03 20:22'
 labels:
   - phase-2
   - derived-calculation
