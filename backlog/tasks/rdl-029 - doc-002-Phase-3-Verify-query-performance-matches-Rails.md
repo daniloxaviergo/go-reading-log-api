@@ -3,9 +3,9 @@ id: RDL-029
 title: '[doc-002 Phase 3] Verify query performance matches Rails'
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-03 14:04'
-updated_date: '2026-04-03 23:18'
+updated_date: '2026-04-03 23:24'
 labels:
   - phase-3
   - performance-test
