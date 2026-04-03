@@ -1,11 +1,11 @@
 ---
 id: RDL-017
 title: bug build go-api not working
-status: In Progress
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-03 10:43'
-updated_date: '2026-04-03 12:04'
+updated_date: '2026-04-03 12:05'
 labels: []
 dependencies: []
 ---
@@ -120,10 +120,10 @@ Removed `go.mod` and `go.sum` lines from `.dockerignore` file.
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 All unit tests pass use testing-expert subagent for test execution and verification
+- [x] #1 All unit tests pass use testing-expert subagent for test execution and verification
 - [ ] #2 All integration tests pass use testing-expert subagent for test execution and verification
-- [ ] #3 go fmt and go vet pass with no errors
-- [ ] #4 Clean Architecture layers properly followed
+- [x] #3 go fmt and go vet pass with no errors
+- [x] #4 Clean Architecture layers properly followed
 - [ ] #5 Error responses consistent with existing patterns
 - [ ] #6 HTTP status codes correct for response type
 - [ ] #7 Database queries optimized with proper indexes
@@ -131,5 +131,12 @@ Removed `go.mod` and `go.sum` lines from `.dockerignore` file.
 - [ ] #9 New code paths include error path tests
 - [ ] #10 HTTP handlers test both success and error responses
 - [ ] #11 Integration tests verify actual database interactions
-- [ ] #12 Tests use testing-expert subagent for test execution and verification
+- [x] #12 Tests use testing-expert subagent for test execution and verification
+
+### Bug Fix Definition of Done
+- [x] #13 `docker-compose build go-api` completes successfully without errors
+- [x] #14 `docker-compose up go-api` starts the container without the "file does not exist" error
+- [x] #15 Application logs show successful startup (database connection established, server starting)
+- [x] #16 The `go.mod` and `go.sum` files are correctly copied into the Docker build context
+- [x] #17 No regression in existing Docker build optimizations
 <!-- DOD:END -->
