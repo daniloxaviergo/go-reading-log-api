@@ -3,7 +3,7 @@ id: RDL-024
 title: '[doc-002 Phase 2] Implement median_day calculation'
 status: To Do
 assignee:
-  - workflow
+  - thomas
 created_date: '2026-04-03 14:03'
 updated_date: '2026-04-03 21:08'
 labels:
