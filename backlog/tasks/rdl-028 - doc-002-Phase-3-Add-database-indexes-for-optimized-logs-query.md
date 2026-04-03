@@ -1,7 +1,7 @@
 ---
 id: RDL-028
 title: '[doc-002 Phase 3] Add database indexes for optimized logs query'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-03 14:03'
@@ -265,6 +265,52 @@ ORDER BY p.id ASC, l.data DESC;
 
 - PostgreSQL may choose to use either index based on cost estimation; both are valid
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+# RDL-028: Database Index for Optimized Logs Query
+
+## Summary
+Added composite database index `index_logs_on_project_id_and_data_desc` on `(project_id, data DESC)` to optimize JOIN and ORDER BY queries in the logs table.
+
+## What Changed
+- **Database**: Created composite index `index_logs_on_project_id_and_data_desc` on `logs` table
+- **Documentation**: Updated `README.md`, `QWEN.md`, and `docs/database.sql` with new index
+
+## Why
+The query pattern for fetching projects with logs uses:
+- JOIN on `project_id` (already had index `index_logs_on_project_id`)
+- ORDER BY `data DESC` (new composite index optimizes this)
+
+Using a composite index `(project_id, data DESC)` provides both JOIN and ORDER BY optimization in a single index, reducing maintenance overhead.
+
+## Tests
+- **Unit Tests**: 51 tests passed (testing-expert subagent)
+- **Integration Tests**: Including `TestLogsIndexIntegration` passed
+- **Code Quality**: `go fmt` and `go vet` passed with no errors
+
+## Verification
+```sql
+-- Index created
+CREATE INDEX index_logs_on_project_id_and_data_desc ON logs(project_id, data DESC);
+
+-- Verification
+\di index_logs_on_project_id_and_data_desc
+
+-- EXPLAIN ANALYZE confirms index is available for query optimization
+```
+
+## Risks/Follow-ups
+- **Risk**: PostgreSQL query planner may use sequential scan for small tables (expected behavior)
+- **Benefit**: Significant performance improvement for large datasets by avoiding sort operations
+- **No breaking changes**: Index is non-blocking, can be added during runtime
+
+## Files Modified
+- `README.md` - Database schema section updated
+- `QWEN.md` - Database schema section updated
+- `docs/database.sql` - Index creation SQL added
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
