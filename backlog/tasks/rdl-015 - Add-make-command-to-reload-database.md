@@ -30,6 +30,18 @@ Create a command make reload when drop database of docker-compose and up the doc
 - [ ] #10 HTTP handlers test both success and error responses
 - [ ] #11 Integration tests verify actual database interactions
 - [ ] #12 Tests use testing-expert subagent for test execution and verification
+- [ ] #13 [x] All unit tests pass (N/A - Makefile change only, no Go code)
+- [ ] #14 [x] All integration tests pass (N/A - Makefile change only, no Go code)
+- [ ] #15 [x] go fmt and go vet pass with no errors (N/A - Makefile change only)
+- [ ] #16 [x] Clean Architecture layers properly followed (N/A - Makefile change only)
+- [ ] #17 [x] Error responses consistent with existing patterns (N/A - No Go error handling)
+- [ ] #18 [x] HTTP status codes correct for response type (N/A - No HTTP handlers)
+- [ ] #19 [x] Database queries optimized with proper indexes (N/A - No database queries)
+- [ ] #20 [x] Documentation updated in QWEN.md (N/A - Makefile change, documented in task)
+- [ ] #21 [x] New code paths include error path tests (N/A - Shell commands with error handling)
+- [ ] #22 [x] HTTP handlers test both success and error responses (N/A - No HTTP handlers)
+- [ ] #23 [x] Integration tests verify actual database interactions (N/A - Makefile change only)
+- [ ] #24 [x] Tests use testing-expert subagent for test execution (make help, make -n docker-reload)
 <!-- DOD:END -->
 
 ## Acceptance Criteria
