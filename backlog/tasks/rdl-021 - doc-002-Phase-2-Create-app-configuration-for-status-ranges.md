@@ -2,8 +2,10 @@
 id: RDL-021
 title: '[doc-002 Phase 2] Create app configuration for status ranges'
 status: To Do
-assignee: []
+assignee:
+  - catarina
 created_date: '2026-04-03 14:02'
+updated_date: '2026-04-03 16:25'
 labels:
   - phase-2
   - configuration
