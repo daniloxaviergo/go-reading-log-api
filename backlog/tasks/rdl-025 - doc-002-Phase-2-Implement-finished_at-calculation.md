@@ -3,7 +3,7 @@ id: RDL-025
 title: '[doc-002 Phase 2] Implement finished_at calculation'
 status: To Do
 assignee:
-  - workflow
+  - catarina
 created_date: '2026-04-03 14:03'
 updated_date: '2026-04-03 22:02'
 labels:
