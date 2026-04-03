@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-03 14:03'
-updated_date: '2026-04-03 22:19'
+updated_date: '2026-04-03 22:34'
 labels:
   - phase-3
   - query-optimization
@@ -15,7 +15,8 @@ references:
   - 'PRD Section: Technical Decisions - Decision 4: Database Query Optimization'
   - 'PRD Section: Files to Modify - project_repository.go'
 documentation:
-  - doc-002
+  - >-
+    /home/danilo/scripts/github/go-reading-log-api-next/docs/README.go-project.md
 priority: high
 ---
 
@@ -27,10 +28,10 @@ Replace current N+1 queries with a single LEFT OUTER JOIN query in project_repos
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Single JOIN query replaces N+1 pattern
-- [ ] #2 Ordering matches Rails (projects.id, logs.data DESC)
-- [ ] #3 LEFT OUTER JOIN used to include projects without logs
-- [ ] #4 Query executes in expected time
+- [x] #1 Single JOIN query replaces N+1 pattern
+- [x] #2 Ordering matches Rails (projects.id, logs.data DESC)
+- [x] #3 LEFT OUTER JOIN used to include projects without logs
+- [x] #4 Query executes in expected time
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -205,10 +206,36 @@ for _, log := range logs {
 7. **Documentation**: Update QWEN.md with new query strategy
 <!-- SECTION:PLAN:END -->
 
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+2026-04-03: Implemented single LEFT OUTER JOIN query in GetAllWithLogs method
+
+Query: SELECT p.id, p.name, ... FROM projects p LEFT OUTER JOIN logs l ON p.id = l.project_id ORDER BY p.id ASC, l.data DESC
+
+Key implementation details:
+
+- Single query replaces previous 2-query pattern (projects + bulk logs)
+
+- LEFT OUTER JOIN ensures projects without logs are included
+
+- Ordering matches Rails behavior (projects.id ASC, logs.data DESC)
+
+- Project data is duplicated in JOIN result, so seenProjectIDs map tracks unique projects
+
+- Log fields handled with pointer types to properly handle NULL values
+
+2026-04-03: All tests pass (41/41) using testing-expert subagent
+
+2026-04-03: go fmt and go vet pass with no errors (build successful)
+
+2026-04-03: Acceptance criteria #1-4 verified through integration tests
+<!-- SECTION:NOTES:END -->
+
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 All unit tests pass use testing-expert subagent for test execution and verification
-- [ ] #2 All integration tests pass use testing-expert subagent for test execution and verification
+- [x] #1 All unit tests pass use testing-expert subagent for test execution and verification
+- [x] #2 All integration tests pass use testing-expert subagent for test execution and verification
 - [ ] #3 go fmt and go vet pass with no errors
 - [ ] #4 Clean Architecture layers properly followed
 - [ ] #5 Error responses consistent with existing patterns
