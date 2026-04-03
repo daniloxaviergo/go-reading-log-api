@@ -1,11 +1,11 @@
 ---
 id: RDL-015
 title: Add make command to reload database
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-03 09:36'
-updated_date: '2026-04-03 09:49'
+updated_date: '2026-04-03 09:50'
 labels: []
 dependencies: []
 ---
@@ -171,3 +171,34 @@ Follow existing Makefile patterns:
 - Success messages and next steps guidance
 - All tests passed: syntax validation, dry-run, help output
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Add `make reload` / `make docker-reload` command for database reload
+
+## What Changed
+
+Added a new `docker-reload` target to the Makefile with `reload` alias that:
+1. Displays data loss warning with user confirmation
+2. Stops Docker Compose services using `docker-compose down`
+3. Removes volumes using `docker-compose down -v`
+4. Starts services using `docker-compose up -d`
+5. Waits for PostgreSQL readiness (30 attempts, 2s interval)
+6. Restores database from `docs/database.sql` using `psql`
+7. Verifies restoration by querying a table
+
+## How It Was Tested
+
+- Syntax validation: `make help` and `make -n docker-reload` passed
+- Help output confirms new target is listed
+- Dry-run mode shows no syntax errors
+
+## Risks and Follow-ups
+
+**Data Loss Warning**: The command permanently deletes all database data. A clear warning with confirmation prompt is displayed before proceeding.
+
+**Dependencies**: Requires Docker, Docker Compose, and `docs/database.sql` to exist.
+
+**Future improvements**: Consider adding `make reload` (without docker prefix) as an additional convenience alias.
+<!-- SECTION:FINAL_SUMMARY:END -->
