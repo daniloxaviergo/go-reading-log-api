@@ -3,7 +3,7 @@ id: RDL-022
 title: '[doc-002 Phase 2] Implement status determination logic'
 status: To Do
 assignee:
-  - workflow
+  - thomas
 created_date: '2026-04-03 14:02'
 updated_date: '2026-04-03 17:22'
 labels:
