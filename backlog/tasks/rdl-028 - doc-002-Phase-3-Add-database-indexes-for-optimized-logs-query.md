@@ -2,8 +2,10 @@
 id: RDL-028
 title: '[doc-002 Phase 3] Add database indexes for optimized logs query'
 status: To Do
-assignee: []
+assignee:
+  - catarina
 created_date: '2026-04-03 14:03'
+updated_date: '2026-04-03 23:01'
 labels:
   - phase-3
   - database-index
