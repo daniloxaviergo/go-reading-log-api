@@ -2,8 +2,10 @@
 id: RDL-026
 title: '[doc-002 Phase 2] Implement logs_count derivation'
 status: To Do
-assignee: []
+assignee:
+  - catarina
 created_date: '2026-04-03 14:03'
+updated_date: '2026-04-03 22:35'
 labels:
   - phase-2
   - derived-calculation
