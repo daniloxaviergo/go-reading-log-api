@@ -1,11 +1,11 @@
 ---
 id: RDL-029
 title: '[doc-002 Phase 3] Verify query performance matches Rails'
-status: To Do
+status: In Progress
 assignee:
-  - thomas
+  - Qwen Code
 created_date: '2026-04-03 14:04'
-updated_date: '2026-04-03 23:24'
+updated_date: '2026-04-03 23:26'
 labels:
   - phase-3
   - performance-test
