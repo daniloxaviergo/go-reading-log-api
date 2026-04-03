@@ -3,7 +3,7 @@ id: RDL-016
 title: Error make reload
 status: To Do
 assignee:
-  - workflow
+  - catarina
 created_date: '2026-04-03 10:02'
 updated_date: '2026-04-03 10:02'
 labels: []
