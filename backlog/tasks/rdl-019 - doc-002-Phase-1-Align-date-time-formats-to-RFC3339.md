@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - Thomas
 created_date: '2026-04-03 14:02'
-updated_date: '2026-04-03 15:18'
+updated_date: '2026-04-03 15:24'
 labels:
   - phase-1
   - date-format
@@ -212,6 +212,53 @@ However, the current `LogResponse.Data` is already `*string` with no formatting 
 - Risk is low as changes are contained to response formatting
 - Backward compatibility note: JSON output changes from unformatted string to RFC3339 formatted string
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Research Findings - 2026-04-03
+
+### Current State Analysis
+
+After reviewing the codebase, I found that:
+
+1. **Log Model (`internal/domain/models/log.go`)**: `Data` field is already `*time.Time` type
+2. **Log DTO (`internal/domain/dto/log_response.go`)**: `Data` field is `*time.Time` type
+3. **Database Schema**: `data` column is `VARCHAR(255)`, NOT `TIMESTAMP`
+
+### Root Cause of Integration Test Failures
+
+The integration tests fail because:
+- Database stores `data` as `VARCHAR(255)` (e.g., "2024-01-01")
+- Go code tries to scan into `*time.Time` causing error:
+  `can't scan varchar (OID 1043) in text format into *time.Time`
+
+### Test Data Pattern
+
+From `test/integration/test_context.go`:
+```go
+INSERT INTO logs (project_id, data, start_page, end_page, wday)
+VALUES ($1, $2, $3, $4, $5)
+Values: projectID, "2024-01-01", 1, 10, 1
+```
+
+The `data` value is a string in "YYYY-MM-DD" format (ISO date, not RFC3339 timestamp).
+
+### Required Implementation Change
+
+**Option A: Change database schema to use TIMESTAMP**
+- Pros: Aligns with Go's `time.Time`, modern standard
+- Cons: Requires migration, breaks existing data
+
+**Option B: Change Go code to handle VARCHAR string format**
+- Pros: No database changes, works with existing data
+- Cons: Need to parse string to format as RFC3339
+
+**Decision: Option B** - The task description says "Format matches Rails API output exactly" and Rails API outputs ISO date format for date fields. Since the database stores `data` as VARCHAR with "YYYY-MM-DD" format, we should:
+1. Keep `Log.Data` as `*string` in model
+2. Add helper to format as RFC3339 in handler for JSON response
+3. Handle both ISO date ("2024-01-15") and full RFC3339 strings
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
