@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-03 14:03'
-updated_date: '2026-04-03 23:09'
+updated_date: '2026-04-03 23:17'
 labels:
   - phase-3
   - database-index
@@ -280,4 +280,16 @@ ORDER BY p.id ASC, l.data DESC;
 - [ ] #10 HTTP handlers test both success and error responses
 - [ ] #11 Integration tests verify actual database interactions
 - [ ] #12 Tests use testing-expert subagent for test execution and verification
+- [ ] #13 #1 All unit tests pass - verified with testing-expert subagent: 51 tests passed
+- [ ] #14 #2 All integration tests pass - verified with testing-expert subagent: integration tests including TestLogsIndexIntegration passed
+- [ ] #15 #3 go fmt and go vet pass with no errors - verified with no output
+- [ ] #16 #4 Clean Architecture layers properly followed - no code changes needed for this index task
+- [ ] #17 #5 Error responses consistent with existing patterns - N/A (no code changes)
+- [ ] #18 #6 HTTP status codes correct for response type - N/A (no code changes)
+- [ ] #19 #7 Database queries optimized with proper indexes - composite index index_logs_on_project_id_and_data_desc created on (project_id, data DESC)
+- [ ] #20 #8 Documentation updated in QWEN.md - updated database schema section
+- [ ] #21 #9 New code paths include error path tests - N/A (no code changes)
+- [ ] #22 #10 HTTP handlers test both success and error responses - N/A (no code changes)
+- [ ] #23 #11 Integration tests verify actual database interactions - verified with TestLogsIndexIntegration passing
+- [ ] #24 #12 Tests use testing-expert subagent for test execution and verification - completed
 <!-- DOD:END -->
