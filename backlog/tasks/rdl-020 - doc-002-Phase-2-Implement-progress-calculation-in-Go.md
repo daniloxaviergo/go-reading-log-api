@@ -3,7 +3,7 @@ id: RDL-020
 title: '[doc-002 Phase 2] Implement progress calculation in Go'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-03 14:02'
 updated_date: '2026-04-03 16:25'
 labels:
