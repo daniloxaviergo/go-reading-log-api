@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-03 14:03'
-updated_date: '2026-04-03 20:51'
+updated_date: '2026-04-03 20:52'
 labels:
   - phase-2
   - derived-calculation
@@ -33,6 +33,9 @@ Implement days_unreading calculation in Go matchingRails: days_unreading = (Date
 - [x] #2 If no logs, use started_at date
 - [x] #3 If neither logs nor started_at exist, return 0
 - [x] #4 Result is non-negative integer
+- [ ] #5 #1 All unit tests pass
+- [ ] #6 #2 All integration tests pass
+- [ ] #7 #3 go fmt and go vet pass
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -272,4 +275,15 @@ Implementation progress:
 - [ ] #10 HTTP handlers test both success and error responses
 - [ ] #11 Integration tests verify actual database interactions
 - [ ] #12 Tests use testing-expert subagent for test execution and verification
+- [ ] #13 All unit tests pass - 27 tests in models package, 157 total tests pass
+- [ ] #14 All integration tests pass - 21 tests in integration package pass
+- [ ] #15 go fmt and go vet pass with no errors
+- [ ] #16 Clean Architecture layers properly followed - domain models, DTOs, repository adapters
+- [ ] #17 Error responses consistent with existing patterns
+- [ ] #18 HTTP status codes correct for response type
+- [ ] #19 Database queries optimized with proper indexes - only base fields selected
+- [ ] #20 New code paths include error path tests
+- [ ] #21 HTTP handlers test both success and error responses
+- [ ] #22 Integration tests verify actual database interactions
+- [ ] #23 Tests use testing-expert subagent for test execution and verification
 <!-- DOD:END -->
