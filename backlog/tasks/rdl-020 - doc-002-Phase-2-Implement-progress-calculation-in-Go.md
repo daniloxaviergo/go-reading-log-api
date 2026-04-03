@@ -29,10 +29,10 @@ Implement the progress calculation method in Go matching Rails behavior: progres
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 progress = (page / total_page) * 100 rounded to 2 decimal places
-- [ ] #2 Result clamped to 0.00-100.00 range
-- [ ] #3 Zero total_page edge case returns 0.00
-- [ ] #4 Calculate method added to Project model or calculations package
+- [x] #1 progress = (page / total_page) * 100 rounded to 2 decimal places
+- [x] #2 Result clamped to 0.00-100.00 range
+- [x] #3 Zero total_page edge case returns 0.00
+- [x] #4 Calculate method added to Project model or calculations package
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -161,10 +161,10 @@ func floatPtr(f float64) *float64 {
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 All unit tests pass use testing-expert subagent for test execution and verification
+- [x] #1 All unit tests pass use testing-expert subagent for test execution and verification
 - [ ] #2 All integration tests pass use testing-expert subagent for test execution and verification
-- [ ] #3 go fmt and go vet pass with no errors
-- [ ] #4 Clean Architecture layers properly followed
+- [x] #3 go fmt and go vet pass with no errors
+- [x] #4 Clean Architecture layers properly followed
 - [ ] #5 Error responses consistent with existing patterns
 - [ ] #6 HTTP status codes correct for response type
 - [ ] #7 Database queries optimized with proper indexes
