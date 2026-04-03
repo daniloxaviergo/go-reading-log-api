@@ -1,7 +1,7 @@
 ---
 id: RDL-021
 title: '[doc-002 Phase 2] Create app configuration for status ranges'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-03 14:02'
