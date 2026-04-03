@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-03 14:03'
-updated_date: '2026-04-03 23:04'
+updated_date: '2026-04-03 23:08'
 labels:
   - phase-3
   - database-index
@@ -245,6 +245,26 @@ ORDER BY p.id ASC, l.data DESC;
 4. Document index creation SQL for future reference
 5. Consider running `ANALYZE` after index creation to update statistics
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+- Index created successfully: `index_logs_on_project_id_and_data_desc` on `(project_id, data DESC)`
+
+- Index verification passed via \di in psql
+
+- EXPLAIN ANALYZE shows the index exists and PostgreSQL can use it for query optimization
+
+- For small tables (< 10000 rows), PostgreSQL's query planner may still choose sequential scan as it's more efficient
+
+- The composite index will provide significant benefits for larger datasets by avoiding sort operations
+
+- Index follows naming convention: `index_` prefix, table name, columns, ordering suffix
+
+- The existing `index_logs_on_project_id` covers JOIN condition, the new index optimizes ORDER BY
+
+- PostgreSQL may choose to use either index based on cost estimation; both are valid
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
