@@ -2,7 +2,8 @@
 id: RDL-023
 title: '[doc-002 Phase 2] Implement days_unreading calculation'
 status: To Do
-assignee: []
+assignee:
+  - catarina
 created_date: '2026-04-03 14:03'
 updated_date: '2026-04-03 20:15'
 labels:
