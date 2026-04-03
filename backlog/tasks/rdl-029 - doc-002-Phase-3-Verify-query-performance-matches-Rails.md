@@ -3,7 +3,7 @@ id: RDL-029
 title: '[doc-002 Phase 3] Verify query performance matches Rails'
 status: To Do
 assignee:
-  - workflow
+  - thomas
 created_date: '2026-04-03 14:04'
 updated_date: '2026-04-03 23:24'
 labels:
