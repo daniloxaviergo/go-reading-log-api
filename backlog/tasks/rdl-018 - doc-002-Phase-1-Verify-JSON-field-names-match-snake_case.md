@@ -2,8 +2,10 @@
 id: RDL-018
 title: '[doc-002 Phase 1] Verify JSON field names match (snake_case)'
 status: To Do
-assignee: []
+assignee:
+  - workflow
 created_date: '2026-04-03 14:02'
+updated_date: '2026-04-03 14:08'
 labels:
   - phase-1
   - field-alignment
