@@ -1,7 +1,7 @@
 ---
 id: RDL-019
 title: '[doc-002 Phase 1] Align date time formats to RFC3339'
-status: Done
+status: In Progress
 assignee:
   - thomas
 created_date: '2026-04-03 14:02'
