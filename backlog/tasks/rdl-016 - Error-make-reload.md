@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-03 10:02'
-updated_date: '2026-04-03 10:02'
+updated_date: '2026-04-03 10:05'
 labels: []
 dependencies: []
 ---
@@ -81,6 +81,70 @@ Database verification successful
 
 ```
 <!-- SECTION:DESCRIPTION:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+### 1. Technical Approach
+
+Fix the database reload confirmation prompt to accept both "yes" and "y" as valid confirmation responses. The current implementation only accepts "yes" in the Makefile's `docker-reload` target, but users commonly enter "y" for yes. The fix will use `grep` or pattern matching to accept either "yes" or "y" (case-insensitive).
+
+**Technical approach:**
+- Modify the confirmation prompt in the `docker-reload` target in Makefile
+- Change from strict string comparison `$$ans != "yes"` to pattern matching with `y(es)?`
+- Use `grep -qE '^y(es)?$'` to validate the input
+
+**Why this approach:**
+- Backward compatible: still accepts "yes"
+- User-friendly: accepts common "y" shorthand
+- Pattern matching is portable across shells
+- Minimal code change with maximum usability
+
+### 2. Files to Modify
+
+- **Makefile** - Modified
+  - Line ~290-296: `docker-reload` target confirmation prompt
+  - Change the shell conditional for response validation
+
+### 3. Dependencies
+
+- Docker must be installed (already checked before confirmation)
+- docker-compose must be available (already checked before confirmation)
+- docs/database.sql must exist (already verified)
+- No blocking prerequisites; this is a focused fix
+
+### 4. Code Patterns
+
+- Follow existing Makefile conventions for shell checks
+- Use `grep -qE` for regex pattern matching (already available in shell environment)
+- Maintain the same exit code behavior (0 for success, 1 for failure)
+- Keep color output formatting consistent with existing code
+
+### 5. Testing Strategy
+
+**Manual testing steps:**
+1. Run `make reload` and enter "y" - should proceed with reload
+2. Run `make reload` and enter "yes" - should proceed with reload
+3. Run `make reload` and enter "n" or "no" - should cancel with "Reload cancelled"
+4. Run `make reload` and enter any other input - should cancel
+
+**Verification:**
+- Database should be deleted and restored from docs/database.sql
+- Tables (projects, logs, users, watsons) should be recreated
+- Sample data should be present after reload
+
+### 6. Risks and Considerations
+
+- **Risk**: The fix might behave differently on non-GNU systems (BusyBox grep uses different regex syntax)
+  - **Mitigation**: Use basic pattern `-E '^y(es)?$'` which is widely supported, or fall back to simpler check with `case` statement
+
+- **Risk**: User might be confused if "ye" or "YES" is accepted vs rejected
+  - **Mitigation**: Clarify expected input in the prompt question
+  - **Solution**: Update prompt to say "(yes/no) or (y/n)" to set expectations
+
+- **Risk**: Current implementation might be intentionally strict (requiring full "yes")
+  - **Mitigation**: The task description clearly indicates the "y" input is common and should be accepted based on the error report
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
