@@ -29,12 +29,12 @@ Implement status determination logic in Go matching Rails ActiveModelSerializer 
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Unstarted: No logs or no log with data
-- [ ] #2 Finished: Logs count equals total_page
-- [ ] #3 Running: days_unreading ≤ em_andamento_range
-- [ ] #4 Sleeping: days_unreading ≤ dormindo_range
-- [ ] #5 Stopped: All other cases
-- [ ] #6 Method implemented in Project model or calculations package
+- [x] #1 Unstarted: No logs or no log with data
+- [x] #2 Finished: Logs count equals total_page
+- [x] #3 Running: days_unreading ≤ em_andamento_range
+- [x] #4 Sleeping: days_unreading ≤ dormindo_range
+- [x] #5 Stopped: All other cases
+- [x] #6 Method implemented in Project model or calculations package
 <!-- AC:END -->
 
 ## Implementation Plan
