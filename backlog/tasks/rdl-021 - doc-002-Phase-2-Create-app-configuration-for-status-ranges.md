@@ -188,4 +188,8 @@ This task adds application configuration for status range values to the Go codeb
 - [ ] #10 HTTP handlers test both success and error responses
 - [ ] #11 Integration tests verify actual database interactions
 - [ ] #12 Tests use testing-expert subagent for test execution and verification
+- [ ] #13 Clean Architecture layers properly followed - config is in internal/config package with no cross-package dependencies
+- [ ] #14 Documentation updated in QWEN.md and .env.example with new configuration variables
+- [ ] #15 New code paths include error path tests - negative values fall back to defaults
+- [ ] #16 Tests use testing-expert subagent for test execution and verification
 <!-- DOD:END -->
