@@ -2,7 +2,7 @@
 id: doc-002
 title: 'PRD: Align Go API JSON Responses with Rails API'
 type: other
-created_date: '2026-04-03 13:51'
+created_date: '2026-04-03 13:58'
 ---
 
 
@@ -14,7 +14,7 @@ This PRD addresses the requirement to make the Go and Rails API applications ret
 
 **Why necessary**: To enable gradual migration from Rails to Go without breaking client applications that depend on consistent API responses.
 
-**Scope**: Align `GET /v1/projects`, `GET /v1/projects/{project_id}`, and `GET /v1/projects/{project_id}/logs` endpoints to return identical JSON structure, field names, data types, and values.
+**Scope**: Align `GET /v1/projects.json`, `GET /v1/projects/{project_id}.json`, and `GET /v1/projects/{project_id}/logs.json` endpoints to return identical JSON structure, field names, data types, and values.
 
 **Value**: Enables rollback strategy, A/B testing, and smooth deprecation of Rails API.
 
@@ -59,42 +59,29 @@ This PRD addresses the requirement to make the Go and Rails API applications ret
 
 **Problem**: Rails `status` calculation depends on configuration values (`em_andamento_range`, `dormindo_range`) from `V1::UserConfig`.
 
-**Decision**: Create Go config structure with default values matching Rails defaults.
+**Decision**: Create Go config structure with default values matching Rails defaults (7 days running, 14 days sleeping).
 
 **Rationale**:
 - Ensures consistent status determination
 - Maintainable configuration approach
 - Prevents hardcoded magic numbers
 
-**Implementation**:
-```go
-type AppConfig struct {
-    EmAndamentoRange int // Default: 7 (days)
-    DormindoRange    int // Default: 14 (days)
-}
-```
-
 ### Decision 3: Date/Time Format Alignment
 
 **Problem**: Date format inconsistencies between Rails and Go implementations.
 
-**Decision**: Format all dates as RFC3339 strings (ISO 8601 with timezone) in JSON output.
+**Decision**: Format all dates as RFC3339 strings (ISO 8601 with timezone) in JSON output using `time.Now()` matching Rails `Date.today` behavior.
 
 **Rationale**:
 - Modern standard for API responses
 - Consistent with `logs.data` (TIMESTAMP) and `started_at` (DATE)
 - Compatible with `pgx` PostgreSQL driver
 
-**Implementation**:
-- `started_at`: Convert Rails DATE to RFC3339 (date only)
-- `logs.data`: Already RFC3339 in Rails, maintain same in Go
-- `nil` dates become JSON `null`
-
 ### Decision 4: Database Query Optimization
 
 **Problem**: Go implementation uses separate queries for each project (potential N+1).
 
-**Decision**: Use single LEFT OUTER JOIN query with ordering matching Rails.
+**Decision**: Use single LEFT OUTER JOIN query with ordering matching Rails (`ORDER BY projects.id, logs.data DESC`).
 
 **Rationale**:
 - Matches Rails eager loading behavior
@@ -116,11 +103,6 @@ ORDER BY p.id, l.data DESC
 
 **Decision**: Define shared validation rules as database-level constraints + Go validation package.
 
-**Rationale**:
-- DRY principle
-- Single source of truth
-- Easier to test and maintain
-
 **Rules**:
 - `page ≤ total_page` (store as constraint)
 - `start_page ≤ end_page` (validate in both apps)
@@ -135,9 +117,9 @@ ORDER BY p.id, l.data DESC
 
 | AC | Description | Test |
 |----|-------------|------|
-| AC1 | `GET /v1/projects` returns identical JSON structure and values | Compare JSON with `jq` |
-| AC2 | `GET /v1/projects/{project_id}` returns identical JSON structure and values | Compare JSON with `jq` |
-| AC3 | `GET /v1/projects/{project_id}/logs` returns identical JSON structure and values | Compare JSON with `jq` |
+| AC1 | GET /v1/projects.json returns identical JSON structure and values | Compare JSON with jq |
+| AC2 | GET /v1/projects/{project_id}.json returns identical JSON structure and values | Compare JSON with jq |
+| AC3 | GET /v1/projects/{project_id}/logs.json returns identical JSON structure and values | Compare JSON with jq |
 | AC4 | Derived fields (progress, status, median_day, finished_at, logs_count, days_unreading) present in Go response | Check JSON output |
 | AC5 | Date formats match (RFC3339 for timestamps, ISO date for started_at) | Verify JSON string format |
 | AC6 | Null values handled identically (database NULL → JSON null) | Verify JSON output with NULL database values |
@@ -166,6 +148,7 @@ ORDER BY p.id, l.data DESC
 | `internal/api/v1/handlers/logs_handler.go` | Modify | Ensure logs ordering and formatting matches Rails |
 | `internal/config/config.go` | Modify | Add app config fields (em_andamento_range, dormindo_range) |
 | `internal/domain/models/project.go` | Create | Add calculation methods to match Rails model |
+| `internal/domain/models/calculations.go` | Create | Shared calculation methods |
 
 ---
 
@@ -173,10 +156,7 @@ ORDER BY p.id, l.data DESC
 
 | File | Purpose |
 |------|---------|
-| `internal/validation/validation.go` | Shared validation rules |
-| `internal/domain/models/calculations.go` | Derived calculation methods |
-| `test/compare_responses.sh` | Script to compare JSON responses |
-| `docs/json-comparison.md` | Documentation of response format |
+| `test/compare_responses.sh` | Script to compare JSON responses using curl + jq |
 
 ---
 

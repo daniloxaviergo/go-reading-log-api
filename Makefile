@@ -23,7 +23,7 @@ BLUE := $(shell tput -Txterm setaf 4 2>/dev/null || echo "")
 RED := $(shell tput -Txterm setaf 1 2>/dev/null || echo "")
 NC := $(shell tput -Txterm sgr0 2>/dev/null || echo "")
 
-.PHONY: all help run build test clean fmt vet docker-start-pg start-pg test-coverage test-verbose docker-up docker-down docker-logs docker-ps docker-stop-pg
+.PHONY: all help run build test clean fmt vet docker-start-pg start-pg test-coverage test-verbose docker-up docker-down docker-logs docker-ps docker-stop-pg docker-reload
 
 # Default target
 all: help
@@ -53,6 +53,7 @@ help:
 	@echo "  make docker-logs  Show logs from all services"
 	@echo "  make docker-ps    List running containers"
 	@echo "  make docker-stop-pg Stop PostgreSQL container"
+	@echo "  make docker-reload  Drop and recreate database from docs/database.sql"
 	@echo ""
 	@echo "$(GREEN)Testing Commands:$(NC)"
 	@echo "  make test              Run all tests"
@@ -188,3 +189,90 @@ docker-stop-pg:
 		docker stop reading-log-db && \
 		docker rm reading-log-db || \
 		echo "$(YELLOW)No reading-log-db container found$(NC)"
+
+# Reload database from docs/database.sql
+reload: docker-reload
+
+docker-reload:
+	@echo "$(YELLOW)========================================$(NC)"
+	@echo "$(YELLOW)       DATABASE RELOAD WARNING$(NC)"
+	@echo "$(YELLOW)========================================$(NC)"
+	@echo ""
+	@echo "$(RED)This will permanently delete all database data!$(NC)"
+	@echo ""
+	@echo "$(YELLOW)Database to be reloaded: $(DB_DATABASE)$(NC)"
+	@echo "$(YELLOW)SQL file: docs/database.sql$(NC)"
+	@echo ""
+	@read -p "Are you sure you want to continue? (yes/no): " ans && \
+		if ! echo "$$ans" | grep -qE "^[yY](es)?"; then echo "Reload cancelled"; exit 0; fi
+	@echo ""
+	@echo "$(BLUE)Checking for Docker...$(NC)"
+	@if ! command -v docker &> /dev/null; then \
+		echo "$(RED)Error: Docker is not installed or not in PATH$(NC)"; \
+		echo "$(YELLOW)Please install Docker$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(GREEN)Docker found$(NC)"
+	@echo ""
+	@echo "$(BLUE)Checking for docs/database.sql...$(NC)"
+	@if [ ! -f docs/database.sql ]; then \
+		echo "$(RED)Error: docs/database.sql not found$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(GREEN)Database SQL file found$(NC)"
+	@echo ""
+	@echo "$(BLUE)Stopping services...$(NC)"
+	docker-compose down
+	@echo "$(GREEN)Services stopped$(NC)"
+	@echo ""
+	@echo "$(BLUE)Removing volumes...$(NC)"
+	docker-compose down -v
+	@echo "$(GREEN)Volumes removed$(NC)"
+	@echo ""
+	@echo "$(BLUE)Starting services...$(NC)"
+	docker-compose up postgres -d
+	@echo "$(GREEN)Services started$(NC)"
+	@echo ""
+	@echo "$(BLUE)Waiting for PostgreSQL to be ready...$(NC)"
+	@for i in $$(seq 1 30); do \
+		if docker exec reading-log-db pg_isready -U $${DB_USER:-postgres} > /dev/null 2>&1; then \
+			echo "$(GREEN)PostgreSQL is ready$(NC)"; \
+			break; \
+		fi; \
+		if [ $$i -eq 30 ]; then \
+			echo "$(RED)Error: PostgreSQL did not become ready in time$(NC)"; \
+			echo "$(YELLOW)Check logs with: make docker-logs$(NC)"; \
+			exit 1; \
+		fi; \
+		echo "$(YELLOW)Waiting...$$i$(NC)"; \
+		sleep 2; \
+	done
+	@echo ""
+	@echo "$(BLUE)Restoring database from docs/database.sql...$(NC)"
+	@echo "$(YELLOW)Note: This may take a few moments...$(NC)"
+	docker exec -i reading-log-db psql -U $${DB_USER:-postgres} -d $${DB_DATABASE:-reading_log} -f /docker-entrypoint-initdb.d/database.sql > /dev/null 2>&1 || \
+		docker exec -i reading-log-db psql -U $${DB_USER:-postgres} -d $${DB_DATABASE:-reading_log} -c '\i /docker-entrypoint-initdb.d/database.sql' > /dev/null 2>&1 || \
+		( \
+			echo "$(YELLOW)Trying alternative method...$(NC)"; \
+			cat docs/database.sql | docker exec -i -e PGHOST=localhost -e PGPORT=$${DB_PORT:-5432} -e PGUSER=$${DB_USER:-postgres} -e PGDATABASE=$${DB_DATABASE:-reading_log} reading-log-db psql -U $${DB_USER:-postgres} -d $${DB_DATABASE:-reading_log} > /dev/null 2>&1 || \
+			( \
+				echo "$(RED)Error: Database restoration failed$(NC)"; \
+				exit 1; \
+			) \
+		)
+	@echo "$(GREEN)Database restored successfully$(NC)"
+	@echo ""
+	@echo "$(BLUE)Verifying database restoration...$(NC)"
+	@if docker exec reading-log-db psql -U $${DB_USER:-postgres} -d $${DB_DATABASE:-reading_log} -c "SELECT 1 FROM projects LIMIT 1" > /dev/null 2>&1; then \
+		echo "$(GREEN)Database verification successful$(NC)"; \
+		echo ""; \
+		echo "$(GREEN)========================================$(NC)"; \
+		echo "$(GREEN)       DATABASE RELOAD COMPLETE$(NC)"; \
+		echo "$(GREEN)========================================$(NC)"; \
+	else \
+		echo "$(YELLOW)Warning: Verification query failed, but restoration may still be complete$(NC)"; \
+	fi
+	@echo ""
+	@echo "$(BLUE)Next steps:$(NC)"
+	@echo "  make docker-logs    # View container logs"
+	@echo "  make docker-down    # Stop all services"

@@ -18,6 +18,8 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+    networks:
+      - reading-log-network
 
   go-api:
     build:
@@ -52,7 +54,7 @@ services:
       DB_PORT: ${DB_PORT}
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
-      DB_NAME: ${DB_DATABASE}
+      DB_DATABASE: ${DB_DATABASE}
       RAILS_ENV: development
       PORT: 3001
     ports:
