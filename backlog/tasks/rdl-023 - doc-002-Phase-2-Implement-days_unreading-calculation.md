@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-03 14:03'
-updated_date: '2026-04-03 20:23'
+updated_date: '2026-04-03 20:51'
 labels:
   - phase-2
   - derived-calculation
@@ -244,6 +244,18 @@ if days < 0 {
 
 <!-- SECTION:NOTES:BEGIN -->
 Updated task status to In Progress after reviewing implementation. Current CalculateDaysUnreading implementation has two issues: 1) Returns nil when no logs and no started_at, but task requires 0. 2) Does not clamp negative results to 0 for future dates. Need to fix both issues in project.go and update corresponding tests.
+
+Implementation progress:
+
+1. Fixed CalculateDaysUnreading in project.go: edge case returns 0 instead of nil, clamps negative values to 0
+
+2. Updated tests in project_test.go: added future date tests, updated edge case expectation
+
+3. Updated PostgreSQL repository: removed computed fields from SELECT queries, added calculation calls, added nil check for startedAt
+
+4. All 157 tests pass, go fmt and go vet pass, build succeeds
+
+5. Bug fix: fixed nil pointer dereference in GetWithLogs when startedAt is NULL
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
