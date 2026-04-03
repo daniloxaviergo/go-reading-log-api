@@ -174,6 +174,33 @@ This task adds application configuration for status range values to the Go codeb
 2026-04-03: Build succeeds with no errors or warnings
 <!-- SECTION:NOTES:END -->
 
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Implementation Complete: RDL-021
+
+### What Changed
+Added status range configuration to `internal/config/config.go` with two new fields:
+- `EmAndamentoRange` (default: 7 days)
+- `DormindoRange` (default: 14 days)
+
+### Key Implementation Details
+1. Added two integer fields to `Config` struct with documentation noting Rails uses 8/16 while task spec requires 7/14
+2. Implemented `getEnvAsInt` validation to reject non-positive values (negative/zero fall back to defaults)
+3. Added getter methods `GetEmAndamentoRange()` and `GetDormindoRange()`
+4. Added 5 comprehensive test functions covering defaults, env vars, getters, invalid values, and empty values
+
+### Tests Run
+- All 9 config tests pass (verified with testing-expert)
+- All 130 project tests pass across 11 packages
+- Build succeeds with no errors or warnings
+- `go fmt` and `go vet` pass with no issues
+
+### Risks/Follow-ups
+- Status determination logic (RDL-022) must use these config values to affect behavior
+- Consider runtime configuration if needed in future
+<!-- SECTION:FINAL_SUMMARY:END -->
+
 ## Definition of Done
 <!-- DOD:BEGIN -->
 - [x] #1 All unit tests pass use testing-expert subagent for test execution and verification
