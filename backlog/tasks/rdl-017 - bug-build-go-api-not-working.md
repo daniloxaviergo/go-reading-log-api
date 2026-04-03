@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-03 10:43'
-updated_date: '2026-04-03 10:45'
+updated_date: '2026-04-03 12:04'
 labels: []
 dependencies: []
 ---
@@ -85,6 +85,38 @@ The fix involves:
 - [ ] The `go.mod` and `go.sum` files are correctly copied into the Docker build context
 - [ ] No regression in existing Docker build optimizations
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+# Implementation Notes for RDL-017
+
+## Problem
+The Docker build was failing with: `COPY failed: file not found in build context or excluded by .dockerignore: stat go.mod: file does not exist`
+
+## Root Cause
+The `.dockerignore` file was excluding `go.mod` and `go.sum` in a "Build cache" section, preventing these essential files from being copied into the Docker build context.
+
+## Solution
+Removed `go.mod` and `go.sum` lines from `.dockerignore` file.
+
+## Changes Made
+
+### 1. .dockerignore
+- Removed `go.sum` and `go.mod` from the exclusion list
+
+### 2. Test Files (to fix type mismatches)
+- `internal/domain/models/log_test.go`: Changed `data` from `*string` to `*time.Time` and added `time` import
+- `internal/api/v1/handlers/logs_handler_test.go`: Changed data values from string literals to `time.Date()` calls
+
+## Verification
+- ✅ `docker-compose build go-api` - Build succeeds
+- ✅ `docker-compose up go-api` - Container starts successfully  
+- ✅ Application logs show: "Database connection established", "Server starting on 0.0.0.0:3000"
+- ✅ `go fmt ./...` - No formatting issues
+- ✅ `go vet ./...` - No vet errors
+- ✅ Unit tests pass (113 tests, 0 failures)
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
