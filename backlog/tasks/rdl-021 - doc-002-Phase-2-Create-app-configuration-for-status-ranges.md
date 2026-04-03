@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-03 14:02'
-updated_date: '2026-04-03 16:28'
+updated_date: '2026-04-03 16:39'
 labels:
   - phase-2
   - configuration
@@ -27,10 +27,10 @@ Create a Go configuration structure in `internal/config/config.go` with `em_anda
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 em_andamento_range = 7 days
-- [ ] #2 dormindo_range = 14 days
-- [ ] #3 Access methods for configuration values
-- [ ] #4 Configuration loads from environment variables or defaults
+- [x] #1 em_andamento_range = 7 days
+- [x] #2 dormindo_range = 14 days
+- [x] #3 Access methods for configuration values
+- [x] #4 Configuration loads from environment variables or defaults
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -160,11 +160,25 @@ This task adds application configuration for status range values to the Go codeb
 ```
 <!-- SECTION:PLAN:END -->
 
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+2026-04-03: Added EmAndamentoRange (7 days default) and DormindoRange (14 days default) fields to Config struct
+
+2026-04-03: Implemented getEnvAsInt validation to reject negative values - status ranges must be positive
+
+2026-04-03: Added 5 new test functions for status range configuration
+
+2026-04-03: All 130 tests pass across 11 packages
+
+2026-04-03: Build succeeds with no errors or warnings
+<!-- SECTION:NOTES:END -->
+
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 All unit tests pass use testing-expert subagent for test execution and verification
-- [ ] #2 All integration tests pass use testing-expert subagent for test execution and verification
-- [ ] #3 go fmt and go vet pass with no errors
+- [x] #1 All unit tests pass use testing-expert subagent for test execution and verification
+- [x] #2 All integration tests pass use testing-expert subagent for test execution and verification
+- [x] #3 go fmt and go vet pass with no errors
 - [ ] #4 Clean Architecture layers properly followed
 - [ ] #5 Error responses consistent with existing patterns
 - [ ] #6 HTTP status codes correct for response type
