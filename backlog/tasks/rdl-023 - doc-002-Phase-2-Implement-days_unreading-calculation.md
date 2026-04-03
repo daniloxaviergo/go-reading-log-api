@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-03 14:03'
-updated_date: '2026-04-03 20:18'
+updated_date: '2026-04-03 20:21'
 labels:
   - phase-2
   - derived-calculation
@@ -42,10 +42,18 @@ Implement days_unreading calculation in Go matchingRails: days_unreading = (Date
 
 Implement the `days_unreading` calculation method in Go that matches Rails behavior. The calculation is: `days_unreading = (Date.today - last_log_or_started_at).days`.
 
+**Key Findings from Codebase Review:**
+1. The Rails database schema (`rails-app/db/schema.rb`) shows the `projects` table does NOT have computed fields like `days_unread`, `status`, `progress`, etc.
+2. These fields are calculated in Rails via ActiveModelSerializer virtual methods
+3. The current Go PostgreSQL repository incorrectly reads these fields from the database in its SELECT queries
+4. The `CalculateDaysUnreading` method exists in `internal/domain/models/project.go` but has incorrect edge case handling
+
 **Key Changes Required:**
-- Modify the `CalculateDaysUnreading` method in `internal/domain/models/project.go` to return `0` instead of `nil` when no logs and no `started_at` exist
-- Add validation to ensure the result is non-negative (handle future dates gracefully)
-- Ensure the method is called from the appropriate repository/handler layer to populate the `days_unreading` field
+1. Fix `CalculateDaysUnreading` in `internal/domain/models/project.go` to:
+   - Return `0` instead of `nil` when no logs and no `started_at` exist
+   - Clamp negative results to 0 for future dates
+2. Update PostgreSQL repository queries to NOT read computed fields from database
+3. Ensure `CalculateDaysUnreading` is called when building response DTOs in the repository
 
 **Technical Implementation:**
 - The calculation uses date-only comparison to match Rails `Date.today` behavior
@@ -53,20 +61,22 @@ Implement the `days_unreading` calculation method in Go that matches Rails behav
 - If no logs but `started_at` exists, use `started_at`
 - If neither exists, return 0 (not nil)
 - Calculate difference in days using date arithmetic
+- Clamp to 0 if result would be negative (future dates)
 
 **Why this approach:**
 - Matches Rails implementation exactly: `days_unreading = (Date.today - base_data).to_i`
 - Edge case handling ensures no nil values in response
 - Returns non-negative integer as required
 - Follows existing patterns in the codebase (similar to progress/status calculations)
+- Ensures calculated fields are computed on-read, not read from database
 
 ### 2. Files to Modify
 
 | File | Action | Reason |
-|------|--------|--------|
+|------|--|--|
 | `internal/domain/models/project.go` | Modify | Fix `CalculateDaysUnreading()` to return 0 instead of nil when no logs and no started_at; add non-negative validation |
 | `internal/domain/models/project_test.go` | Modify | Update existing test `TestProject_CalculateDaysUnreading_NoLogsNoStartedAt` to expect 0 instead of nil; add test for future dates |
-| `internal/adapter/postgres/project_repository.go` | Verify | Confirm CalculateDaysUnreading is called where needed; if database field is used directly, ensure calculation is done |
+| `internal/adapter/postgres/project_repository.go` | Modify | Remove computed fields (progress, status, logs_count, days_unread, median_day, finished_at) from SELECT queries; add calls to CalculateDaysUnreading() when building responses; ensure fields are calculated on-read |
 | `internal/api/v1/handlers/projects_handler.go` | Verify | Ensure days_unreading is included in responses from repository |
 | `internal/api/v1/handlers/logs_handler.go` | Verify | Ensure days_unreading is included in project eager-loaded in log responses |
 
@@ -82,7 +92,7 @@ Implement the `days_unreading` calculation method in Go that matches Rails behav
 - `internal/domain/models` package with Project model
 - `internal/domain/dto` package with LogResponse structure
 - `internal/config` package with status range configuration (already implemented)
-- PostgreSQL repository with eager-loaded logs support (already implemented)
+- PostgreSQL repository with eager-loaded logs support (already implemented, needs query updates)
 
 **No additional setup required** - all prerequisites are in place.
 
@@ -99,7 +109,7 @@ type Project struct {
     TotalPage  int        `json:"total_page"`
     StartedAt  *time.Time `json:"started_at"`
     Page       int        `json:"page"`
-    // ... other fields including DaysUnread *int
+    // ... other fields
 }
 
 // CalculateDaysUnreading calculates the number of days since the last reading activity
@@ -123,15 +133,34 @@ diff := nowDate.Sub(lastReadDate)
 days := int(diff.Hours() / 24)
 ```
 
-**Key changes to make:**
+**Key changes to make in CalculateDaysUnreading:**
 ```go
-// Current: Returns nil when no logs and no started_at
-// Required: Return 0 instead of nil
-
+// Fix edge case: return 0 instead of nil
 if len(logs) == 0 && p.StartedAt == nil {
-    return &[]int{0}[0] // or create a zero value pointer directly
+    zero := 0
+    return &zero
+}
+
+// Clamp to 0 if negative (future dates)
+if days < 0 {
+    return &zero
 }
 ```
+
+**Repository changes to make:**
+- Remove computed fields from SELECT queries:
+  ```go
+  // Current (incorrect):
+  SELECT id, name, total_page, started_at, page, reinicia, progress, status, logs_count, days_unread, median_day, finished_at
+  // Correct:
+  SELECT id, name, total_page, started_at, page, reinicia
+  ```
+- Add calculation calls when building responses:
+  ```go
+  // Calculate days_unreading
+  daysUnread := domainProject.CalculateDaysUnreading(logs)
+  project.DaysUnread = daysUnread
+  ```
 
 ### 5. Testing Strategy
 
@@ -154,7 +183,12 @@ if len(logs) == 0 && p.StartedAt == nil {
 - Use `testing.T` for assertions
 - Compare returned days value with expected values
 - Test all edge cases: no data, future dates, boundary conditions
-- Verify returned pointer is never nil
+- Verify returned pointer is not nil for valid cases
+
+**Integration tests to verify:**
+- Repository correctly calculates days_unreading instead of reading from database
+- Handler returns correct JSON response with calculated days_unreading
+- Full response includes all derived fields consistently
 
 ### 6. Risks and Considerations
 
@@ -168,13 +202,17 @@ if len(logs) == 0 && p.StartedAt == nil {
 3. **Timezone handling**: Rails Date.today vs time.Now() timezone differences
    - Solution: Use date-only comparison with UTC timezone matching existing pattern
 
-4. **Database field vs calculation**: The repository might be using the database field directly instead of calculating
-   - Solution: Verify the repository calls CalculateDaysUnreading; if not, add the call
+4. **Database field assumption**: Repository currently reads computed fields from database (incorrect)
+   - Solution: Remove computed fields from SELECT queries, calculate on-read
+
+5. **Consistency with status calculation**: `CalculateStatus()` uses `CalculateDaysUnreading()`, ensure both are working together
+   - Solution: Test status determination with the updated days_unreading calculation
 
 **Design decisions:**
-- **Return type**: `*int` (pointer to int) to allow 0 as a valid value while still being able to return nil if needed for other cases
+- **Return type**: `*int` (pointer to int) to allow 0 as a valid value while still being able to handle edge cases
 - **Non-negative guarantee**: Always return >= 0, even for future dates
 - **Consistency**: Follow the same pattern as CalculateStatus which uses the same method
+- **On-read calculation**: Calculate fields when building responses, not read from database (matches Rails pattern)
 
 **Edge cases to handle:**
 1. No logs, no started_at → return 0
@@ -182,19 +220,24 @@ if len(logs) == 0 && p.StartedAt == nil {
 3. All logs have no data field → use started_at if available, else return 0
 4. Future dates → return 0 (not negative)
 5. Very old dates → return large positive integer (no special handling needed)
+6. All logs with valid data → use most recent log
 
-**Database field consideration:**
-- The database has a `days_unread` column in the projects table
-- The repository currently reads this field from the database
-- QUESTION: Should we be calculating this on-the-fly or using database field?
-- Based on RDL-022 pattern and PRD Decision 1, calculations should be done in Go, not stored in DB
-- If database field exists, it may need to be set by the application when saving, OR the application should calculate it on-read
-- Based on status calculation pattern, it seems calculations are done on-read, so we should follow the same pattern
+**Database field clarification:**
+- The database schema shows no computed columns exist
+- These fields are calculated in Rails via ActiveModelSerializer
+- The Go implementation should follow the same pattern:
+  - Calculate fields on-read in the repository/handler layer
+  - Do NOT read from database columns
+  - Return calculated values in DTOs
 
 **Recommendation:**
-- Verify if the database `days_unread` field should be populated or if calculation on-read is preferred
-- If calculation on-read, modify repository to call CalculateDaysUnreading when building responses
-- If database field, ensure it's set correctly when writing to database
+1. First fix `CalculateDaysUnreading` to handle edge cases correctly
+2. Update PostgreSQL repository to remove computed fields from SELECT queries
+3. Add calculation calls when building responses
+4. Update tests to verify on-read calculation
+5. Verify all acceptance criteria pass
+
+**Note:** This task should also consider the related issue in the PostgreSQL repository where computed fields are incorrectly being read from the database. The SELECT queries in `project_repository.go` should be updated to remove `progress, status, logs_count, days_unread, median_day, finished_at` since these don't exist in the database schema and should be calculated in Go.
 <!-- SECTION:PLAN:END -->
 
 ## Definition of Done
