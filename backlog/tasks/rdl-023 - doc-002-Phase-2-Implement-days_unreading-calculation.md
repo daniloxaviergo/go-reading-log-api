@@ -29,10 +29,10 @@ Implement days_unreading calculation in Go matchingRails: days_unreading = (Date
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 days_unreading = today minus last log date or started_at
-- [ ] #2 If no logs, use started_at date
-- [ ] #3 If neither logs nor started_at exist, return 0
-- [ ] #4 Result is non-negative integer
+- [x] #1 days_unreading = today minus last log date or started_at
+- [x] #2 If no logs, use started_at date
+- [x] #3 If neither logs nor started_at exist, return 0
+- [x] #4 Result is non-negative integer
 <!-- AC:END -->
 
 ## Implementation Plan
