@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-03 14:03'
-updated_date: '2026-04-03 22:06'
+updated_date: '2026-04-03 22:14'
 labels:
   - phase-2
   - derived-calculation
@@ -28,10 +28,10 @@ Implement finished_at calculation in Go matching Rails: calculate future date wh
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 finished_at = today + (total_page - page) / median_day days
-- [ ] #2 100% progress edge case returns null
-- [ ] #3 Pages remaining = 0 edge case returns null
-- [ ] #4 Date calculated as future date in days
+- [x] #1 finished_at = today + (total_page - page) / median_day days
+- [x] #2 100% progress edge case returns null
+- [x] #3 Pages remaining = 0 edge case returns null
+- [x] #4 Date calculated as future date in days
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -217,6 +217,12 @@ Date.today + future_days_read.round.days
 - No caching (calculated fresh per request, same as Rails)
 - No partial calculation (each method is independent, like Rails)
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Implementation completed on 2026-04-03
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
