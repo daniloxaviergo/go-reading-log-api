@@ -35,6 +35,15 @@ Create a command make reload when drop database of docker-compose and up the doc
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [ ] #1 [x] Makefile syntax is valid and `make help` shows the new target
+- [ ] #2 [x] Confirmation prompt displays data loss warning
+- [ ] #3 [x] Docker availability is checked before execution
+- [ ] #4 [x] docs/database.sql existence is verified
+- [ ] #5 [x] Services are stopped using docker-compose down
+- [ ] #6 [x] Volumes are removed using docker-compose down -v
+- [ ] #7 [x] Services are started using docker-compose up -d
+- [ ] #8 [x] PostgreSQL readiness is checked with retry loop
+- [ ] #9 [x] Database is restored using psql from docs/database.sql
+- [ ] #10 [x] Database restoration is verified with a test query
 <!-- AC:END -->
 
 ## Implementation Plan
