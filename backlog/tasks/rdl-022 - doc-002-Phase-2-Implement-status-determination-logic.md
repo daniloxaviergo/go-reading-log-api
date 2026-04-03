@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-03 14:02'
-updated_date: '2026-04-03 17:22'
+updated_date: '2026-04-03 17:58'
 labels:
   - phase-2
   - status-logic
@@ -246,6 +246,24 @@ func (p *Project) CalculateStatus(logs []*dto.LogResponse, config *config.Config
 4. Negative values → return 'unstarted' (invalid data)
 5. Far future started_at → days_unreading will be negative → 'unstarted' or 'running'
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+[Implementation Complete] Status determination logic has been implemented with all 5 status types (unstarted, finished, running, sleeping, stopped).
+
+1. Added status constants to project.go
+
+2. Implemented CalculateDaysUnreading() method
+
+3. Implemented CalculateStatus() method
+
+4. Updated repository to call CalculateStatus() when building responses
+
+5. Added 14 unit tests covering all status types and edge cases
+
+All 148 tests pass, go fmt and go vet pass, build succeeds
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
