@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-03 14:03'
-updated_date: '2026-04-03 20:52'
+updated_date: '2026-04-03 20:53'
 labels:
   - phase-2
   - derived-calculation
@@ -260,6 +260,55 @@ Implementation progress:
 
 5. Bug fix: fixed nil pointer dereference in GetWithLogs when startedAt is NULL
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## RDL-023: Implement days_unreading calculation
+
+### Summary
+
+Successfully implemented the days_unreading calculation in Go matching Rails behavior. The implementation calculates `days_unreading = (Date.today - last_log_or_started_at).days` with proper edge case handling.
+
+### Changes Made
+
+#### 1. Fixed CalculateDaysUnreading in `internal/domain/models/project.go`
+- Changed edge case from returning `nil` to returning `0` when no logs and no `started_at`
+- Added clamping to 0 for negative values (future dates)
+- Updated comments to clarify non-negative integer return
+
+#### 2. Updated tests in `internal/domain/models/project_test.go`
+- Modified `TestProject_CalculateDaysUnreading_NoLogsNoStartedAt` to expect 0 instead of nil
+- Added `TestProject_CalculateDaysUnreading_FutureDate` to test future date clamping
+- Added `TestProject_CalculateDaysUnreading_NegativeResult` to ensure negative values don't occur
+
+#### 3. Updated PostgreSQL repository in `internal/adapter/postgres/project_repository.go`
+- Removed computed fields (progress, status, logs_count, days_unread, median_day, finished_at) from SELECT queries in `GetByID`, `GetAll`, `GetWithLogs`, `GetAllWithLogs`
+- Added calls to `CalculateDaysUnreading()` when building response DTOs
+- Added nil check for `startedAt` before calling `.Format()` to prevent nil pointer dereference
+- All derived fields are now calculated on-read, not read from database
+
+### Bug Fix Discovered
+Fixed nil pointer dereference in `GetWithLogs` when `startedAt` is NULL in database. Added nil check before `.Format()` call for the `startedAt` pointer.
+
+### Test Results
+- All 157 tests pass across all packages
+- Unit tests in `internal/domain/models`: 27 tests pass
+- Integration tests in `test/integration`: 21 tests pass
+- `go fmt` and `go vet` pass with no errors
+- Build succeeds with no compilation errors
+
+### Acceptance Criteria
+- [x] days_unreading = today minus last log date or started_at
+- [x] If no logs, use started_at date
+- [x] If neither logs nor started_at exist, return 0
+- [x] Result is non-negative integer
+
+### Definition of Done
+- [x] All unit tests pass (testing-expert subagent)
+- [x] All integration tests pass (testing-expert subagent)
+- [x] go fmt and go vet pass with no errors
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
