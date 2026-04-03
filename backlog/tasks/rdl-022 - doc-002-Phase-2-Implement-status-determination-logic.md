@@ -1,7 +1,7 @@
 ---
 id: RDL-022
 title: '[doc-002 Phase 2] Implement status determination logic'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-03 14:02'
