@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-03 09:36'
-updated_date: '2026-04-03 09:42'
+updated_date: '2026-04-03 09:48'
 labels: []
 dependencies: []
 ---
@@ -113,6 +113,21 @@ Follow existing Makefile patterns:
   6. Wait for PostgreSQL ready
   7. Restore database from docs/database.sql using psql in container
   8. Verify restoration
+
+[2026-04-03] Implementation completed:
+- Added `docker-reload` target to Makefile
+- Added `reload` alias target for convenience
+- Confirmation prompt with data loss warning
+- Docker availability check
+- docs/database.sql existence check
+- docker-compose down to stop services
+- docker-compose down -v to remove volumes
+- docker-compose up -d to start services
+- PostgreSQL readiness check loop (30 attempts, 2s interval)
+- Database restoration using psql
+- Database verification query
+- Success messages and next steps guidance
+- All tests passed: syntax validation, dry-run, help output
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
