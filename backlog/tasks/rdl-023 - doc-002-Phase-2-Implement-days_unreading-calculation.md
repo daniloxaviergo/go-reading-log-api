@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-03 14:03'
-updated_date: '2026-04-03 20:22'
+updated_date: '2026-04-03 20:23'
 labels:
   - phase-2
   - derived-calculation
@@ -239,6 +239,12 @@ if days < 0 {
 
 **Note:** This task should also consider the related issue in the PostgreSQL repository where computed fields are incorrectly being read from the database. The SELECT queries in `project_repository.go` should be updated to remove `progress, status, logs_count, days_unread, median_day, finished_at` since these don't exist in the database schema and should be calculated in Go.
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Updated task status to In Progress after reviewing implementation. Current CalculateDaysUnreading implementation has two issues: 1) Returns nil when no logs and no started_at, but task requires 0. 2) Does not clamp negative results to 0 for future dates. Need to fix both issues in project.go and update corresponding tests.
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
