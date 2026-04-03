@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-03 09:36'
-updated_date: '2026-04-03 09:40'
+updated_date: '2026-04-03 09:42'
 labels: []
 dependencies: []
 ---
@@ -95,6 +95,25 @@ Follow existing Makefile patterns:
 - Pass environment variables from `.env` to the container via `docker exec -e`
 - Validate `docs/database.sql` exists before attempting restoration
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+[2026-04-03] Task overview:
+- Need to add `make reload` command that drops and recreates database
+- Using docker-compose for service management
+- Database dump is in `docs/database.sql` (plain PostgreSQL format, not custom dump format)
+- Using psql (not pg_restore) since the dump is plain SQL
+- Command needs to:
+  1. Warn user about data loss
+  2. Require confirmation
+  3. Stop services
+  4. Remove volumes (docker-compose down -v)
+  5. Start services again
+  6. Wait for PostgreSQL ready
+  7. Restore database from docs/database.sql using psql in container
+  8. Verify restoration
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
