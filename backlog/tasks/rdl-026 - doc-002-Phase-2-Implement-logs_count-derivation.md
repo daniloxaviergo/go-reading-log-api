@@ -237,13 +237,4 @@ Implemented `logs_count` derivation for the Project model to match Rails behavio
 - [x] #10 HTTP handlers test both success and error responses
 - [x] #11 Integration tests verify actual database interactions
 - [x] #12 Tests use testing-expert subagent for test execution and verification
-- [ ] #13 #4 Clean Architecture layers properly followed - Model in domain/models, repository in adapter/postgres, integration tests in test/integration
-- [ ] #14 #5 Error responses consistent with existing patterns - No new error paths added for logs_count
-- [ ] #15 #6 HTTP status codes correct for response type - No changes to HTTP handlers, only model calculation
-- [ ] #16 #7 Database queries optimized with proper indexes - No query changes needed
-- [ ] #17 #8 Documentation updated in QWEN.md - Added logs_count to calculated fields and code patterns sections
-- [ ] #18 #9 New code paths include error path tests - Error handling is not applicable for simple len() calculation
-- [ ] #19 #10 HTTP handlers test both success and error responses - Integration tests verify the full response includes logs_count
-- [ ] #20 #11 Integration tests verify actual database interactions - Existing integration tests pass with logs_count included
-- [ ] #21 #12 Tests use testing-expert subagent for test execution and verification - All tests executed with testing-expert
 <!-- DOD:END -->
