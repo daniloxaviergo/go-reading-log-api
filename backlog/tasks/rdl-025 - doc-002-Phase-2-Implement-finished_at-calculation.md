@@ -1,11 +1,11 @@
 ---
 id: RDL-025
 title: '[doc-002 Phase 2] Implement finished_at calculation'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-03 14:03'
-updated_date: '2026-04-03 22:15'
+updated_date: '2026-04-03 22:16'
 labels:
   - phase-2
   - derived-calculation
@@ -251,3 +251,39 @@ Implementation completed on 2026-04-03
 - [ ] #23 #11 Integration tests verify actual database interactions - no DB changes needed
 - [ ] #24 #12 Tests use testing-expert subagent for test execution and verification
 <!-- DOD:END -->
+
+## Final Summary (PR-style)
+
+### What Changed
+- **Added `CalculateFinishedAt()` method** to `internal/domain/models/project.go`
+  - Calculates estimated completion date based on reading rate (median_day)
+  - Formula: `days_to_finish = (total_page - page) / median_day`, `finished_at = today + days_to_finish`
+  - For finished books (page >= total_page), returns the most recent log's date or nil
+  - Handles all edge cases: no started_at, zero/negative page, zero median_day
+
+- **Added comprehensive unit tests** to `internal/domain/models/project_test.go`
+  - 9 new tests covering normal calculation and edge cases
+  - Tests: normal case, finished book with/without logs, no started_at, zero/negative page, large values, rounding, fractional days, most recent log selection
+
+### Why
+- Task RDL-025: Implement finished_at calculation matching Rails behavior
+- Enables API to return estimated book completion date for reading projects
+
+### Tests Run
+```
+go test ./internal/domain/models/... -v
+```
+- **44 tests passed, 0 failed**
+- **Coverage: 95.2%**
+
+### Verification
+- ✅ `go fmt ./...` - passed
+- ✅ `go vet ./...` - passed
+- ✅ Build succeeds: `go build -o bin/server ./cmd/server.go`
+- ✅ Clean Architecture layers followed (domain model only)
+
+### Risks/Follow-ups
+- No database changes required (schema already has `finished_at` field)
+- HTTP handlers need integration with `CalculateFinishedAt()` (handled by DTO mapping)
+- Future: Add integration tests for GET endpoints to verify JSON output matches Rails
+- Future: Add Rails comparison tests to verify exact behavior match
