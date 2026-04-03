@@ -3,9 +3,9 @@ id: RDL-025
 title: '[doc-002 Phase 2] Implement finished_at calculation'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-03 14:03'
-updated_date: '2026-04-03 22:16'
+updated_date: '2026-04-03 22:17'
 labels:
   - phase-2
   - derived-calculation
