@@ -3,7 +3,7 @@ id: RDL-027
 title: '[doc-002 Phase 3] Implement single JOIN query for projects + logs'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-03 14:03'
 updated_date: '2026-04-03 22:35'
 labels:
