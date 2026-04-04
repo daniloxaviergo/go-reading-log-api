@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-03 14:04'
-updated_date: '2026-04-04 04:05'
+updated_date: '2026-04-04 04:35'
 labels:
   - phase-5
   - json-comparison
@@ -33,6 +33,7 @@ Create and execute test script comparing Go and Rails API JSON responses for all
 - [ ] #2 JSON structures identical between Go and Rails
 - [ ] #3 All field values match within tolerance
 - [ ] #4 Edge cases tested (empty logs, null values)
+- [ ] #5 #1 Script automated response comparison for all 3 endpoints
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -231,6 +232,30 @@ GO_API_URL=http://localhost:3000/api/v1
 - Documentation: 1 hour
 <!-- SECTION:PLAN:END -->
 
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Created test/compare_responses.sh script that compares JSON responses between Go and Rails APIs. The script:
+
+1. Tests all 3 endpoints:
+   - GET /api/v1/projects.json (index endpoint)
+   - GET /api/v1/projects/:id.json (show endpoint)
+   - GET /api/v1/projects/:id/logs.json (logs endpoint)
+
+2. Uses curl and jq for JSON fetching and comparison
+3. Compares both JSON structures (using jq -S for normalized key ordering)
+4. Compares values with 0.01 tolerance for floating point numbers
+5. Tests edge cases (empty logs, null date handling)
+6. Generates human-readable report with pass/fail status
+
+Code quality checks:
+- go fmt: PASS (no changes needed)
+- go vet: PASS (no issues found)
+- All unit tests: PASS (14 tests)
+
+The script is executable and ready to run once both APIs are accessible on ports 3000 (Go) and 3001 (Rails).
+<!-- SECTION:NOTES:END -->
+
 ## Definition of Done
 <!-- DOD:BEGIN -->
 - [ ] #1 All unit tests pass use testing-expert subagent for test execution and verification
@@ -245,4 +270,6 @@ GO_API_URL=http://localhost:3000/api/v1
 - [ ] #10 HTTP handlers test both success and error responses
 - [ ] #11 Integration tests verify actual database interactions
 - [ ] #12 Tests use testing-expert subagent for test execution and verification
+- [ ] #13 #1 All unit tests pass use testing-expert subagent for test execution and verification
+- [ ] #14 #2 All integration tests pass use testing-expert subagent for test execution and verification
 <!-- DOD:END -->
