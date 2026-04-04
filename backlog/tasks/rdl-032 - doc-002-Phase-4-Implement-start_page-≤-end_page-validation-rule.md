@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-03 14:04'
-updated_date: '2026-04-04 03:58'
+updated_date: '2026-04-04 03:59'
 labels:
   - phase-4
   - validation-rule
@@ -30,10 +30,10 @@ Implement validation for log start_page ≤ end_page constraint. Create validati
 - [ ] #2 Error returned when constraint violated
 - [ ] #3 Error includes error code and descriptive message
 - [ ] #4 Validation logic matches Rails behavior
-- [ ] #5 Validation function checks start_page ≤ end_page
-- [ ] #6 Error returned when constraint violated
-- [ ] #7 Error includes error code and descriptive message
-- [ ] #8 Validation logic matches Rails behavior
+- [x] #5 Validation function checks start_page ≤ end_page
+- [x] #6 Error returned when constraint violated
+- [x] #7 Error includes error code and descriptive message
+- [x] #8 Validation logic matches Rails behavior
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -304,4 +304,16 @@ Starting implementation with creating the LogRequest DTO and Create handler.
 - [ ] #10 HTTP handlers test both success and error responses
 - [ ] #11 Integration tests verify actual database interactions
 - [ ] #12 Tests use testing-expert subagent for test execution and verification
+- [ ] #13 All unit tests pass
+- [ ] #14 All integration tests pass
+- [ ] #15 go fmt and go vet pass with no errors
+- [ ] #16 Clean Architecture layers properly followed
+- [ ] #17 Error responses consistent with existing patterns
+- [ ] #18 HTTP status codes correct for response type
+- [ ] #19 Database queries optimized with proper indexes
+- [ ] #20 Documentation updated in QWEN.md
+- [ ] #21 New code paths include error path tests
+- [ ] #22 HTTP handlers test both success and error responses
+- [ ] #23 Integration tests verify actual database interactions
+- [ ] #24 Tests use testing-expert subagent for test execution and verification
 <!-- DOD:END -->
