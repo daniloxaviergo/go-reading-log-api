@@ -3,9 +3,9 @@ id: RDL-031
 title: '[doc-002 Phase 4] Implement page ≤ total_page validation rule'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-03 14:04'
-updated_date: '2026-04-04 02:52'
+updated_date: '2026-04-04 02:53'
 labels:
   - phase-4
   - validation-rule
