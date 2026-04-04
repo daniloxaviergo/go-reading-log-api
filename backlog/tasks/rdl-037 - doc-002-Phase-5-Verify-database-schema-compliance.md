@@ -390,11 +390,11 @@ Phase 4: Final Verification
 - [x] #5 Error responses consistent with existing patterns
 - [x] #6 HTTP status codes correct for response type
 - [x] #7 Database queries optimized with proper indexes
-- [ ] #8 Documentation updated in QWEN.md
+- [x] #8 Documentation updated in QWEN.md
 - [ ] #9 New code paths include error path tests
 - [ ] #10 HTTP handlers test both success and error responses
-- [ ] #11 Integration tests verify actual database interactions
+- [x] #11 Integration tests verify actual database interactions
 - [x] #12 Tests use testing-expert subagent for test execution and verification
-- [ ] #13 No database-level constraints needed - validation is application-level per PRD requirements
-- [ ] #14 Validation tests already exist and comprehensive (26 tests, 100% coverage)
+- [x] #13 No database-level constraints needed - validation is application-level per PRD requirements
+- [x] #14 Validation tests already exist and comprehensive (26 tests, 100% coverage)
 <!-- DOD:END -->
