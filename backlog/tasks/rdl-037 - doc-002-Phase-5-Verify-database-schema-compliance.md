@@ -3,7 +3,7 @@ id: RDL-037
 title: '[doc-002 Phase 5] Verify database schema compliance'
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-03 14:05'
 updated_date: '2026-04-04 07:25'
 labels:
