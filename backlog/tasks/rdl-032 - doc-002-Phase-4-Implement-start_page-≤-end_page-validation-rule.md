@@ -2,8 +2,10 @@
 id: RDL-032
 title: '[doc-002 Phase 4] Implement start_page ≤ end_page validation rule'
 status: To Do
-assignee: []
+assignee:
+  - catarina
 created_date: '2026-04-03 14:04'
+updated_date: '2026-04-04 02:53'
 labels:
   - phase-4
   - validation-rule
