@@ -32,13 +32,15 @@ func (r *LogRepositoryImpl) GetByID(ctx context.Context, id int64) (*models.Log,
 	`
 
 	var log models.Log
-	var data, note, text *string
+	var note, text *string
 	var createdAt, updatedAt time.Time
 
+	// Scan data as string to handle both VARCHAR and TIMESTAMP columns
+	var dataStr string
 	err := r.pool.QueryRow(ctx, query, id).Scan(
 		&log.ID,
 		&log.ProjectID,
-		&data,
+		&dataStr,
 		&log.StartPage,
 		&log.EndPage,
 		&log.Wday,
@@ -54,7 +56,11 @@ func (r *LogRepositoryImpl) GetByID(ctx context.Context, id int64) (*models.Log,
 		return nil, fmt.Errorf("failed to get log by ID %d: %w", id, err)
 	}
 
-	log.Data = data
+	// Convert string data to pointer
+	if dataStr != "" {
+		log.Data = &dataStr
+	}
+
 	log.Note = note
 	log.Text = text
 	log.CreatedAt = &createdAt
@@ -84,13 +90,14 @@ func (r *LogRepositoryImpl) GetByProjectID(ctx context.Context, projectID int64)
 	var logs []*models.Log
 	for rows.Next() {
 		var log models.Log
-		var data, note, text *string
+		var note, text *string
 		var createdAt, updatedAt time.Time
 
+		var dataStr string
 		err := rows.Scan(
 			&log.ID,
 			&log.ProjectID,
-			&data,
+			&dataStr,
 			&log.StartPage,
 			&log.EndPage,
 			&log.Wday,
@@ -103,7 +110,10 @@ func (r *LogRepositoryImpl) GetByProjectID(ctx context.Context, projectID int64)
 			return nil, fmt.Errorf("failed to scan log row: %w", err)
 		}
 
-		log.Data = data
+		if dataStr != "" {
+			log.Data = &dataStr
+		}
+
 		log.Note = note
 		log.Text = text
 		log.CreatedAt = &createdAt
@@ -140,13 +150,14 @@ func (r *LogRepositoryImpl) GetByProjectIDOrdered(ctx context.Context, projectID
 	var logs []*models.Log
 	for rows.Next() {
 		var log models.Log
-		var data, note, text *string
+		var note, text *string
 		var createdAt, updatedAt time.Time
 
+		var dataStr string
 		err := rows.Scan(
 			&log.ID,
 			&log.ProjectID,
-			&data,
+			&dataStr,
 			&log.StartPage,
 			&log.EndPage,
 			&log.Wday,
@@ -159,7 +170,10 @@ func (r *LogRepositoryImpl) GetByProjectIDOrdered(ctx context.Context, projectID
 			return nil, fmt.Errorf("failed to scan log row: %w", err)
 		}
 
-		log.Data = data
+		if dataStr != "" {
+			log.Data = &dataStr
+		}
+
 		log.Note = note
 		log.Text = text
 		log.CreatedAt = &createdAt
@@ -195,13 +209,14 @@ func (r *LogRepositoryImpl) GetAll(ctx context.Context) ([]*models.Log, error) {
 	var logs []*models.Log
 	for rows.Next() {
 		var log models.Log
-		var data, note, text *string
+		var note, text *string
 		var createdAt, updatedAt time.Time
 
+		var dataStr string
 		err := rows.Scan(
 			&log.ID,
 			&log.ProjectID,
-			&data,
+			&dataStr,
 			&log.StartPage,
 			&log.EndPage,
 			&log.Wday,
@@ -214,7 +229,10 @@ func (r *LogRepositoryImpl) GetAll(ctx context.Context) ([]*models.Log, error) {
 			return nil, fmt.Errorf("failed to scan log row: %w", err)
 		}
 
-		log.Data = data
+		if dataStr != "" {
+			log.Data = &dataStr
+		}
+
 		log.Note = note
 		log.Text = text
 		log.CreatedAt = &createdAt
@@ -228,4 +246,41 @@ func (r *LogRepositoryImpl) GetAll(ctx context.Context) ([]*models.Log, error) {
 	}
 
 	return logs, nil
+}
+
+// Create inserts a new log into the database
+func (r *LogRepositoryImpl) Create(ctx context.Context, log *models.Log) (*models.Log, error) {
+	ctx, cancel := context.WithTimeout(ctx, defaultContextTimeout)
+	defer cancel()
+
+	query := `
+		INSERT INTO logs (project_id, data, start_page, end_page, wday, note, text)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		RETURNING id, created_at, updated_at
+	`
+
+	var createdAt, updatedAt time.Time
+	var note, text *string
+
+	err := r.pool.QueryRow(ctx, query,
+		log.ProjectID,
+		log.Data,
+		log.StartPage,
+		log.EndPage,
+		log.Wday,
+		note,
+		text,
+	).Scan(
+		&log.ID,
+		&createdAt,
+		&updatedAt,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create log: %w", err)
+	}
+
+	log.CreatedAt = &createdAt
+	log.UpdatedAt = &updatedAt
+
+	return log, nil
 }

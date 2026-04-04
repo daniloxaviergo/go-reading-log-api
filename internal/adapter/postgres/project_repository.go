@@ -3,16 +3,18 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"go-reading-log-api-next/internal/config"
 	"go-reading-log-api-next/internal/domain/dto"
 	"go-reading-log-api-next/internal/domain/models"
 	"go-reading-log-api-next/internal/repository"
 )
 
-const defaultContextTimeout = 5 * time.Second
+const defaultContextTimeout = 15 * time.Second
 
 // ProjectRepositoryImpl implements ProjectRepository interface using PostgreSQL
 type ProjectRepositoryImpl struct {
@@ -24,21 +26,54 @@ func NewProjectRepositoryImpl(pool *pgxpool.Pool) *ProjectRepositoryImpl {
 	return &ProjectRepositoryImpl{pool: pool}
 }
 
+// Create inserts a new project into the database and returns the created project with ID
+func (r *ProjectRepositoryImpl) Create(ctx context.Context, project *models.Project) (*models.Project, error) {
+	ctx, cancel := context.WithTimeout(ctx, defaultContextTimeout)
+	defer cancel()
+
+	query := `
+		INSERT INTO projects (name, total_page, started_at, page, reinicia)
+		VALUES ($1, $2, $3, $4, $5)
+		RETURNING id, started_at, created_at, updated_at
+	`
+
+	var createdAt, updatedAt time.Time
+	var startedAt *time.Time
+	var id int64
+
+	err := r.pool.QueryRow(ctx, query,
+		project.Name,
+		project.TotalPage,
+		project.StartedAt,
+		project.Page,
+		project.Reinicia,
+	).Scan(&id, &startedAt, &createdAt, &updatedAt)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create project: %w", err)
+	}
+
+	// Set the ID and timestamps on the project
+	project.ID = id
+	project.StartedAt = startedAt
+	project.CreatedAt = &createdAt
+	project.UpdatedAt = &updatedAt
+
+	return project, nil
+}
+
 // GetByID retrieves a project by its ID
 func (r *ProjectRepositoryImpl) GetByID(ctx context.Context, id int64) (*models.Project, error) {
 	ctx, cancel := context.WithTimeout(ctx, defaultContextTimeout)
 	defer cancel()
 
 	query := `
-		SELECT id, name, total_page, started_at, page, reinicia, progress, status, logs_count, days_unread, median_day, finished_at
+		SELECT id, name, total_page, started_at, page, reinicia
 		FROM projects
 		WHERE id = $1
 	`
 
 	var project models.Project
-	var startedAt, finishedAt, medianDay *time.Time
-	var progress, status *string
-	var logsCount, daysUnread *int
+	var startedAt *time.Time
 
 	err := r.pool.QueryRow(ctx, query, id).Scan(
 		&project.ID,
@@ -47,12 +82,6 @@ func (r *ProjectRepositoryImpl) GetByID(ctx context.Context, id int64) (*models.
 		&startedAt,
 		&project.Page,
 		&project.Reinicia,
-		&progress,
-		&status,
-		&logsCount,
-		&daysUnread,
-		&medianDay,
-		&finishedAt,
 	)
 	if err != nil {
 		if err == pgx.ErrNoRows {
@@ -63,11 +92,6 @@ func (r *ProjectRepositoryImpl) GetByID(ctx context.Context, id int64) (*models.
 
 	// Set optional fields
 	project.StartedAt = startedAt
-	project.FinishedAt = finishedAt
-	project.MedianDay = medianDay
-	project.LogsCount = logsCount
-	project.DaysUnread = daysUnread
-	project.Status = status
 
 	return &project, nil
 }
@@ -78,7 +102,7 @@ func (r *ProjectRepositoryImpl) GetAll(ctx context.Context) ([]*models.Project, 
 	defer cancel()
 
 	query := `
-		SELECT id, name, total_page, started_at, page, reinicia, progress, status, logs_count, days_unread, median_day, finished_at
+		SELECT id, name, total_page, started_at, page, reinicia
 		FROM projects
 		ORDER BY id ASC
 	`
@@ -92,9 +116,7 @@ func (r *ProjectRepositoryImpl) GetAll(ctx context.Context) ([]*models.Project, 
 	var projects []*models.Project
 	for rows.Next() {
 		var project models.Project
-		var startedAt, finishedAt, medianDay *time.Time
-		var progress, status *string
-		var logsCount, daysUnread *int
+		var startedAt *time.Time
 
 		err := rows.Scan(
 			&project.ID,
@@ -103,23 +125,12 @@ func (r *ProjectRepositoryImpl) GetAll(ctx context.Context) ([]*models.Project, 
 			&startedAt,
 			&project.Page,
 			&project.Reinicia,
-			&progress,
-			&status,
-			&logsCount,
-			&daysUnread,
-			&medianDay,
-			&finishedAt,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan project row: %w", err)
 		}
 
 		project.StartedAt = startedAt
-		project.FinishedAt = finishedAt
-		project.MedianDay = medianDay
-		project.LogsCount = logsCount
-		project.DaysUnread = daysUnread
-		project.Status = status
 
 		projects = append(projects, &project)
 	}
@@ -136,32 +147,23 @@ func (r *ProjectRepositoryImpl) GetWithLogs(ctx context.Context, id int64) (*rep
 	ctx, cancel := context.WithTimeout(ctx, defaultContextTimeout)
 	defer cancel()
 
-	// First, get the project
+	// First, get the project (only base fields, no computed fields)
 	projectQuery := `
-		SELECT id, name, total_page, started_at, page, reinicia, progress, status, logs_count, days_unread, median_day, finished_at
+		SELECT id, name, total_page, started_at, page, reinicia
 		FROM projects
 		WHERE id = $1
 	`
 
-	var project dto.ProjectResponse
-	var startedAt, finishedAt, medianDay *time.Time
-	var progress *float64
-	var status *string
-	var logsCount, daysUnread *int
+	var domainProject models.Project
+	var startedAt *time.Time
 
 	err := r.pool.QueryRow(ctx, projectQuery, id).Scan(
-		&project.ID,
-		&project.Name,
-		&project.TotalPage,
+		&domainProject.ID,
+		&domainProject.Name,
+		&domainProject.TotalPage,
 		&startedAt,
-		&project.Page,
-		nil, // reinicia
-		&progress,
-		&status,
-		&logsCount,
-		&daysUnread,
-		&medianDay,
-		&finishedAt,
+		&domainProject.Page,
+		&domainProject.Reinicia,
 	)
 	if err != nil {
 		if err == pgx.ErrNoRows {
@@ -170,23 +172,7 @@ func (r *ProjectRepositoryImpl) GetWithLogs(ctx context.Context, id int64) (*rep
 		return nil, fmt.Errorf("failed to get project by ID %d: %w", id, err)
 	}
 
-	// Convert timestamps to strings for DTO
-	if startedAt != nil {
-		startedAtStr := startedAt.Format(time.RFC3339)
-		project.StartedAt = &startedAtStr
-	}
-	if finishedAt != nil {
-		finishedAtStr := finishedAt.Format(time.RFC3339)
-		project.FinishedAt = &finishedAtStr
-	}
-	if medianDay != nil {
-		medianDayStr := medianDay.Format(time.RFC3339)
-		project.MedianDay = &medianDayStr
-	}
-	project.LogsCount = logsCount
-	project.DaysUnread = daysUnread
-	project.Status = status
-	project.Progress = progress
+	domainProject.StartedAt = startedAt
 
 	// Get logs for this project ordered by data DESC
 	logs, err := r.getLogsByProjectID(ctx, id)
@@ -205,6 +191,28 @@ func (r *ProjectRepositoryImpl) GetWithLogs(ctx context.Context, id int64) (*rep
 			Note:      log.Note,
 		}
 	}
+
+	// Calculate derived fields
+	daysUnread := domainProject.CalculateDaysUnreading(logResponses)
+
+	// Convert to DTO
+	var project dto.ProjectResponse
+	var startedAtStr *string
+	if startedAt != nil {
+		s := startedAt.Format(time.RFC3339)
+		startedAtStr = &s
+	}
+	project = *dto.NewProjectResponse(
+		domainProject.ID,
+		domainProject.Name,
+		startedAtStr,
+		domainProject.TotalPage,
+		domainProject.Page,
+	)
+	logsCount := domainProject.CalculateLogsCount(logResponses)
+	project.LogsCount = logsCount
+	project.Status = domainProject.CalculateStatus(logResponses, config.LoadConfig())
+	project.DaysUnread = daysUnread
 
 	return &repository.ProjectWithLogs{
 		Project: &project,
@@ -230,18 +238,20 @@ func (r *ProjectRepositoryImpl) getLogsByProjectID(ctx context.Context, projectI
 	var logs []*models.Log
 	for rows.Next() {
 		var log models.Log
-		var data, note, text *string
+		var data *string
 		var createdAt, updatedAt time.Time
 
+		// Scan data as string (matches VARCHAR column type)
+		var dataStr *string
 		err := rows.Scan(
 			&log.ID,
 			&log.ProjectID,
-			&data,
+			&dataStr,
 			&log.StartPage,
 			&log.EndPage,
 			&log.Wday,
-			&note,
-			&text,
+			&log.Note,
+			&log.Text,
 			&createdAt,
 			&updatedAt,
 		)
@@ -249,9 +259,11 @@ func (r *ProjectRepositoryImpl) getLogsByProjectID(ctx context.Context, projectI
 			return nil, fmt.Errorf("failed to scan log row: %w", err)
 		}
 
+		// Convert timestamp to formatted string for JSON compatibility
+		if dataStr != nil && *dataStr != "" {
+			data = dataStr
+		}
 		log.Data = data
-		log.Note = note
-		log.Text = text
 		log.CreatedAt = &createdAt
 		log.UpdatedAt = &updatedAt
 
@@ -265,65 +277,141 @@ func (r *ProjectRepositoryImpl) getLogsByProjectID(ctx context.Context, projectI
 	return logs, nil
 }
 
-// GetAllWithLogs retrieves all projects with their associated logs ordered by logs data DESC
+// GetAllWithLogs retrieves all projects with their associated logs using a single LEFT OUTER JOIN query
+// The query returns projects with their logs joined, ordered by projects.id ASC and logs.data DESC
+// Projects without logs are included with NULL log fields (LEFT OUTER JOIN behavior)
 func (r *ProjectRepositoryImpl) GetAllWithLogs(ctx context.Context) ([]*repository.ProjectWithLogs, error) {
 	ctx, cancel := context.WithTimeout(ctx, defaultContextTimeout)
 	defer cancel()
 
-	// First, get all projects
-	projectQuery := `
-		SELECT id, name, total_page, started_at, page, reinicia, progress, status, logs_count, days_unread, median_day, finished_at
-		FROM projects
-		ORDER BY id ASC
+	// Single LEFT OUTER JOIN query to fetch projects with their logs
+	// Orders by projects.id ASC, then logs.data DESC to match Rails eager loading behavior
+	query := `
+		SELECT 
+			p.id, p.name, p.total_page, p.started_at, p.page, p.reinicia,
+			l.id as log_id, l.data, l.start_page, l.end_page, l.note, l.wday, l.text,
+			l.created_at as log_created_at, l.updated_at as log_updated_at
+		FROM projects p
+		LEFT OUTER JOIN logs l ON p.id = l.project_id
+		ORDER BY p.id ASC, l.data DESC
 	`
 
-	projectRows, err := r.pool.Query(ctx, projectQuery)
+	rows, err := r.pool.Query(ctx, query)
 	if err != nil {
-		return nil, fmt.Errorf("failed to query projects: %w", err)
+		return nil, fmt.Errorf("failed to query projects with logs: %w", err)
 	}
-	defer projectRows.Close()
+	defer rows.Close()
 
-	projects, err := r.scanProjects(projectRows)
-	if err != nil {
-		return nil, err
+	// Scan projects and group logs from joined result
+	// Since JOIN creates one row per log, project data is duplicated
+	// We need to group logs by project ID
+	var domainProjects []*models.Project
+	var logsByProject = make(map[int64][]*dto.LogResponse)
+	var seenProjectIDs = make(map[int64]bool)
+
+	for rows.Next() {
+		var project models.Project
+		var startedAt *time.Time
+		var logID *int64
+		var logCreatedAt, logUpdatedAt *time.Time
+		var wday, startPage, endPage *int
+
+		// Scan data as string (matches VARCHAR column type)
+		var dataStr *string
+		var note, text *string
+
+		err := rows.Scan(
+			&project.ID,
+			&project.Name,
+			&project.TotalPage,
+			&startedAt,
+			&project.Page,
+			&project.Reinicia,
+			&logID,
+			&dataStr,
+			&startPage,
+			&endPage,
+			&note,
+			&wday,
+			&text,
+			&logCreatedAt,
+			&logUpdatedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan joined row: %w", err)
+		}
+
+		project.StartedAt = startedAt
+
+		// Track if we've seen this project before (project data is duplicated in JOIN result)
+		if !seenProjectIDs[project.ID] {
+			domainProjects = append(domainProjects, &project)
+			seenProjectIDs[project.ID] = true
+		}
+
+		// If log_id is not NULL, we have a log entry to process
+		if logID != nil && *logID != 0 {
+			// Convert timestamp to formatted string for JSON compatibility
+			var data *string
+			if dataStr != nil && *dataStr != "" {
+				data = dataStr
+			}
+			logResponse := &dto.LogResponse{
+				ID:   *logID,
+				Data: data,
+				StartPage: func() int {
+					if startPage == nil {
+						return 0
+					}
+					return *startPage
+				}(),
+				EndPage: func() int {
+					if endPage == nil {
+						return 0
+					}
+					return *endPage
+				}(),
+				Note: note,
+			}
+			logsByProject[project.ID] = append(logsByProject[project.ID], logResponse)
+		}
 	}
 
-	// Get all project IDs
-	var projectIDs []int64
-	for _, p := range projects {
-		projectIDs = append(projectIDs, p.ID)
-	}
-
-	// Get all logs for these projects, ordered by data DESC
-	logs, err := r.getLogsByProjectIDs(ctx, projectIDs)
-	if err != nil {
-		return nil, err
-	}
-
-	// Group logs by project ID
-	logsByProject := make(map[int64][]*models.Log)
-	for _, log := range logs {
-		logsByProject[log.ProjectID] = append(logsByProject[log.ProjectID], log)
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating joined rows: %w", err)
 	}
 
 	// Build result
 	var result []*repository.ProjectWithLogs
-	for _, project := range projects {
-		pw := &repository.ProjectWithLogs{
-			Project: project,
-			Logs:    make([]*dto.LogResponse, 0),
+	for _, project := range domainProjects {
+		// Get logs for this project
+		logsForProject := logsByProject[project.ID]
+
+		// Calculate derived fields
+		daysUnread := project.CalculateDaysUnreading(logsForProject)
+		logsCount := project.CalculateLogsCount(logsForProject)
+
+		// Create DTO with calculated fields
+		var startedAtStr *string
+		if project.StartedAt != nil {
+			s := project.StartedAt.Format(time.RFC3339)
+			startedAtStr = &s
 		}
 
-		// Convert logs to DTOs
-		for _, log := range logsByProject[project.ID] {
-			logResponse := &dto.LogResponse{
-				ID:        log.ID,
-				Data:      log.Data,
-				StartPage: log.StartPage,
-				EndPage:   log.EndPage,
-				Note:      log.Note,
-			}
-			pw.Logs = append(pw.Logs, logResponse)
+		projectResp := dto.NewProjectResponse(
+			project.ID,
+			project.Name,
+			startedAtStr,
+			project.TotalPage,
+			project.Page,
+		)
+		projectResp.LogsCount = logsCount
+		projectResp.Status = project.CalculateStatus(logsForProject, config.LoadConfig())
+		projectResp.DaysUnread = daysUnread
+
+		pw := &repository.ProjectWithLogs{
+			Project: projectResp,
+			Logs:    logsForProject,
 		}
 
 		result = append(result, pw)
@@ -338,10 +426,11 @@ func (r *ProjectRepositoryImpl) scanProjects(rows pgx.Rows) ([]*dto.ProjectRespo
 
 	for rows.Next() {
 		var project dto.ProjectResponse
-		var startedAt, finishedAt, medianDay *time.Time
+		var startedAt, finishedAt *time.Time
 		var progress *float64
 		var status *string
 		var logsCount, daysUnread *int
+		var medianDayStr *string
 
 		err := rows.Scan(
 			&project.ID,
@@ -354,7 +443,7 @@ func (r *ProjectRepositoryImpl) scanProjects(rows pgx.Rows) ([]*dto.ProjectRespo
 			&status,
 			&logsCount,
 			&daysUnread,
-			&medianDay,
+			&medianDayStr,
 			&finishedAt,
 		)
 		if err != nil {
@@ -370,9 +459,11 @@ func (r *ProjectRepositoryImpl) scanProjects(rows pgx.Rows) ([]*dto.ProjectRespo
 			finishedAtStr := finishedAt.Format(time.RFC3339)
 			project.FinishedAt = &finishedAtStr
 		}
-		if medianDay != nil {
-			medianDayStr := medianDay.Format(time.RFC3339)
-			project.MedianDay = &medianDayStr
+		// Convert median_day string to float64 if available
+		if medianDayStr != nil && *medianDayStr != "" {
+			if medianDay, err := strconv.ParseFloat(*medianDayStr, 64); err == nil {
+				project.MedianDay = &medianDay
+			}
 		}
 		project.LogsCount = logsCount
 		project.DaysUnread = daysUnread

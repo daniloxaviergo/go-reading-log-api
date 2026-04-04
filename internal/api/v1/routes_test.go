@@ -129,6 +129,24 @@ func (m *MockProjectRepository) GetAllWithLogs(ctx context.Context) ([]*reposito
 	return nil, nil
 }
 
+func (m *MockProjectRepository) Create(ctx context.Context, project *models.Project) (*models.Project, error) {
+	if m.Projects == nil {
+		m.Projects = make(map[int64]interface{})
+	}
+
+	// Generate a new ID
+	var maxID int64
+	for id := range m.Projects {
+		if id > maxID {
+			maxID = id
+		}
+	}
+	project.ID = maxID + 1
+	m.Projects[project.ID] = project
+
+	return project, nil
+}
+
 // MockLogRepository is a mock implementation of repository.LogRepository
 type MockLogRepository struct {
 	Logs map[int64]interface{}
@@ -148,4 +166,18 @@ func (m *MockLogRepository) GetAll(ctx context.Context) ([]*models.Log, error) {
 
 func (m *MockLogRepository) GetByProjectIDOrdered(ctx context.Context, projectID int64) ([]*models.Log, error) {
 	return nil, nil
+}
+
+func (m *MockLogRepository) Create(ctx context.Context, log *models.Log) (*models.Log, error) {
+	// Generate a new ID
+	var maxID int64
+	for id := range m.Logs {
+		if id > maxID {
+			maxID = id
+		}
+	}
+	log.ID = maxID + 1
+	m.Logs[log.ID] = log
+
+	return log, nil
 }

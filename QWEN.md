@@ -167,9 +167,17 @@ The API is versioned under `/api/v1/`:
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/healthz` | GET | Health check endpoint |
-| `/api/v1/projects` | GET | List all projects |
-| `/api/v1/projects/:id` | GET | Get project by ID |
+| `/api/v1/projects` | GET | List all projects with calculated fields |
+| `/api/v1/projects/:id` | GET | Get project by ID with calculated fields |
 | `/api/v1/projects/:project_id/logs` | GET | Get logs for a project |
+
+**Calculated Fields:** The API includes several derived calculations that are computed in real-time:
+- `progress`: Percentage of book completed (page / total_page * 100)
+- `status`: Project status (unstarted, finished, running, sleeping, stopped)
+- `days_unread`: Number of days since last reading activity
+- `logs_count`: Number of log entries (len(logs))
+- `median_day`: Pages per day calculation (page / days_reading.round(2))
+- `finished_at`: Estimated completion date (computed from median_day)
 
 **Note:** Phase 1 only implements read-only endpoints (GET). POST/PUT/DELETE operations for logs will be added in Phase 2.
 
@@ -226,12 +234,14 @@ CREATE TABLE projects (
     status VARCHAR(255),
     logs_count INT DEFAULT 0,
     days_unread INT DEFAULT 0,
-    median_day VARCHAR(255),
+    median_day VARCHAR(255),  -- Stores calculated float as string (e.g., "5.5")
     finished_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 ```
+
+**Note:** The `median_day` field is stored as a VARCHAR but contains the calculated float value as a string. The API returns this as a `float64` in the response.
 
 ### Logs Table
 
@@ -239,7 +249,7 @@ CREATE TABLE projects (
 CREATE TABLE logs (
     id BIGSERIAL PRIMARY KEY,
     project_id BIGINT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
-    data VARCHAR(255),
+    data TIMESTAMP WITHOUT TIME ZONE,
     start_page INT NOT NULL DEFAULT 0,
     end_page INT NOT NULL DEFAULT 0,
     wday INT NOT NULL DEFAULT 0,
@@ -249,7 +259,9 @@ CREATE TABLE logs (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_logs_project_id ON logs(project_id);
+-- Indexes for optimized JOIN and ORDER BY queries
+CREATE INDEX index_logs_on_project_id ON logs(project_id);
+CREATE INDEX index_logs_on_project_id_and_data_desc ON logs(project_id, data DESC);
 ```
 
 ### Users Table
@@ -355,6 +367,23 @@ defer helper.Close()
 ```
 
 ## Code Patterns
+
+### Derived Calculation Methods
+
+The `Project` model includes several derived calculation methods that compute values dynamically:
+
+```go
+// CalculateLogsCount calculates logs_count as len(logs)
+// Matches Rails behavior: def logs_count; logs.size; end
+func (p *Project) CalculateLogsCount(logs []*dto.LogResponse) *int
+
+// CalculateMedianDay calculates median_day as (page / days_reading).round(2)
+// where days_reading is the number of days since started_at
+// Returns 0.00 for edge cases (zero/negative days_reading, no started_at)
+func (p *Project) CalculateMedianDay() *float64
+```
+
+**Formula:** `median_day = (page / days_reading).round(2)` where `days_reading = (today - started_at).days`
 
 ### Handler Pattern
 
@@ -498,4 +527,4 @@ See `.qwen/settings.json` for editor/IDE configuration settings.
 
 ---
 
-*Last updated: 2026-04-01*
+*Last updated: 2026-04-03*

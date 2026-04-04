@@ -81,18 +81,21 @@ build:
 # Run all tests
 test:
 	@echo "$(BLUE)Running all tests...$(NC)"
-	$(GO_TEST) $(TEST_PKG)
+	@echo "$(BLUE)Loading test configuration from .env.test...$(NC)"
+	@export $$(xargs < .env.test | grep -v '^#' | xargs) && $(GO_TEST) $(TEST_PKG)
 	@echo "$(GREEN)All tests passed!$(NC)"
 
 # Run tests with verbose output
 test-verbose:
 	@echo "$(BLUE)Running tests with verbose output...$(NC)"
-	$(GO_TEST) -v $(TEST_PKG)
+	@echo "$(BLUE)Loading test configuration from .env.test...$(NC)"
+	@export $$(xargs < .env.test | grep -v '^#' | xargs) && $(GO_TEST) -v $(TEST_PKG)
 
 # Run tests with coverage report
 test-coverage:
 	@echo "$(BLUE)Running tests with coverage...$(NC)"
-	$(GO_TEST) -coverprofile=$(COVERAGE_FILE) $(TEST_PKG)
+	@echo "$(BLUE)Loading test configuration from .env.test...$(NC)"
+	@export $$(xargs < .env.test | grep -v '^#' | xargs) && $(GO_TEST) -coverprofile=$(COVERAGE_FILE) $(TEST_PKG)
 	@echo "$(GREEN)Coverage report generated: $(COVERAGE_FILE)$(NC)"
 	$(GO) tool cover -func=$(COVERAGE_FILE)
 

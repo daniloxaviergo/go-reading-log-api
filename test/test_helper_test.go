@@ -2,11 +2,15 @@ package test
 
 import (
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
 	"go-reading-log-api-next/internal/config"
 )
+
+// dbTestLock serializes database access for tests that use the same test database
+var dbTestLock sync.Mutex
 
 // TestGetTestContext tests that GetTestContext returns a context with timeout
 func TestGetTestContext(t *testing.T) {
@@ -78,6 +82,10 @@ func TestTestHelperLifecycle(t *testing.T) {
 		t.Skip("Test database not configured - skipping database lifecycle test")
 	}
 
+	// Serialize database access for parallel tests
+	dbTestLock.Lock()
+	defer dbTestLock.Unlock()
+
 	// Setup
 	helper, err := SetupTestDB()
 	if err != nil {
@@ -109,6 +117,9 @@ func TestTestHelperSetupSchema(t *testing.T) {
 		t.Skip("Test database not configured - skipping schema setup test")
 	}
 
+	dbTestLock.Lock()
+	defer dbTestLock.Unlock()
+
 	helper, err := SetupTestDB()
 	if err != nil {
 		t.Fatalf("Failed to setup test DB: %v", err)
@@ -136,6 +147,9 @@ func TestTestHelperClearTestData(t *testing.T) {
 		t.Skip("Test database not configured - skipping clear test data test")
 	}
 
+	dbTestLock.Lock()
+	defer dbTestLock.Unlock()
+
 	helper, err := SetupTestDB()
 	if err != nil {
 		t.Fatalf("Failed to setup test DB: %v", err)
@@ -160,6 +174,9 @@ func TestTestHelperCleanupSchema(t *testing.T) {
 		t.Skip("Test database not configured - skipping cleanup schema test")
 	}
 
+	dbTestLock.Lock()
+	defer dbTestLock.Unlock()
+
 	helper, err := SetupTestDB()
 	if err != nil {
 		t.Fatalf("Failed to setup test DB: %v", err)
@@ -179,6 +196,8 @@ func TestTestHelperCleanupSchema(t *testing.T) {
 
 // TestTestHelperClose tests closing the helper
 func TestTestHelperClose(t *testing.T) {
+	dbTestLock.Lock()
+	defer dbTestLock.Unlock()
 	helper, err := SetupTestDB()
 	if err != nil {
 		t.Fatalf("Failed to setup test DB: %v", err)
@@ -195,6 +214,8 @@ func TestTestHelperClose(t *testing.T) {
 func TestSetupTestDBWithConfig(t *testing.T) {
 	cfg := config.LoadConfig()
 
+	dbTestLock.Lock()
+	defer dbTestLock.Unlock()
 	helper, err := SetupTestDBWithConfig(cfg)
 	if err != nil {
 		// If this fails due to DB connection issues, it's expected in some environments

@@ -573,7 +573,7 @@ CREATE TABLE projects (
 CREATE TABLE logs (
     id BIGSERIAL PRIMARY KEY,
     project_id BIGINT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
-    data VARCHAR(255),
+    data TIMESTAMP WITHOUT TIME ZONE,
     start_page INT NOT NULL DEFAULT 0,
     end_page INT NOT NULL DEFAULT 0,
     wday INT NOT NULL DEFAULT 0,
@@ -583,7 +583,9 @@ CREATE TABLE logs (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_logs_project_id ON logs(project_id);
+-- Indexes for optimized JOIN and ORDER BY queries
+CREATE INDEX index_logs_on_project_id ON logs(project_id);
+CREATE INDEX index_logs_on_project_id_and_data_desc ON logs(project_id, data DESC);
 ```
 
 ### Users Table

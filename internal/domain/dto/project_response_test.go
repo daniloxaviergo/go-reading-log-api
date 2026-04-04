@@ -83,6 +83,7 @@ func TestProjectResponse_AllFields(t *testing.T) {
 	status := "completed"
 	logsCount := 10
 	daysUnread := 5
+	medianDay := 5.5
 
 	response := &ProjectResponse{
 		ID:         1,
@@ -94,7 +95,7 @@ func TestProjectResponse_AllFields(t *testing.T) {
 		Status:     &status,
 		LogsCount:  &logsCount,
 		DaysUnread: &daysUnread,
-		MedianDay:  &startedAt,
+		MedianDay:  &medianDay,
 		FinishedAt: &startedAt,
 		Logs:       []*LogResponse{},
 	}
@@ -152,4 +153,13 @@ func containsString(s, substr string) bool {
 		}
 	}
 	return false
+}
+
+// formatTimePtr converts a time.Time pointer to a string pointer for JSON serialization
+func formatTimePtr(t *time.Time) *string {
+	if t == nil {
+		return nil
+	}
+	s := t.Format(time.RFC3339)
+	return &s
 }

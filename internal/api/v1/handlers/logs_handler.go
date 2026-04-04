@@ -72,7 +72,7 @@ func (h *LogsHandler) Index(w http.ResponseWriter, r *http.Request) {
 		Status:     project.Status,
 		LogsCount:  project.LogsCount,
 		DaysUnread: project.DaysUnread,
-		MedianDay:  formatTimePtr(project.MedianDay),
+		MedianDay:  project.MedianDay,
 		FinishedAt: formatTimePtr(project.FinishedAt),
 	}
 

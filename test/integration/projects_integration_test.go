@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 
 	"go-reading-log-api-next/internal/adapter/postgres"
@@ -97,7 +98,8 @@ func TestProjectsShowIntegration(t *testing.T) {
 	projectID := ctx.CreateTestProject(t)
 	ctx.CreateTestLog(t, projectID)
 
-	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/api/v1/projects/"+string(rune(projectID+'0')), nil))
+	idStr := strconv.Itoa(int(projectID))
+	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/api/v1/projects/"+idStr, nil))
 
 	if recorder.Code != http.StatusOK {
 		t.Errorf("Expected status 200, got %d", recorder.Code)
@@ -155,7 +157,8 @@ func TestProjectsShowWithLogs(t *testing.T) {
 	projectID := ctx.CreateTestProject(t)
 	ctx.CreateTestLogWithNote(t, projectID)
 
-	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/api/v1/projects/"+string(rune(projectID+'0')), nil))
+	idStr := strconv.Itoa(int(projectID))
+	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/api/v1/projects/"+idStr, nil))
 
 	if recorder.Code != http.StatusOK {
 		t.Errorf("Expected status 200, got %d", recorder.Code)

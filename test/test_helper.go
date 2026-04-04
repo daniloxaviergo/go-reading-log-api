@@ -5,17 +5,19 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/joho/godotenv"
 	"go-reading-log-api-next/internal/config"
 	"go-reading-log-api-next/internal/domain/dto"
 	"go-reading-log-api-next/internal/domain/models"
 	"go-reading-log-api-next/internal/repository"
 )
 
-const testContextTimeout = 5 * time.Second
+const testContextTimeout = 30 * time.Second
 
 // TestHelper provides common test utilities for database setup and cleanup
 type TestHelper struct {
@@ -26,7 +28,17 @@ type TestHelper struct {
 
 // SetupTestDB creates a test database connection using test database configuration
 // It reads DB_DATABASE_TEST env var, falling back to DB_DATABASE with '_test' suffix
+// For parallel tests, a unique database name is created based on the test name
 func SetupTestDB() (*TestHelper, error) {
+	// Load .env.test for test-specific configuration
+	_ = godotenv.Load(".env.test")
+
+	// Override DB_HOST to localhost for local testing (overrides .env file)
+	// Environment variable DB_HOST takes precedence, so we must explicitly set it
+	if os.Getenv("DB_HOST") == "postgres" {
+		os.Setenv("DB_HOST", "localhost")
+	}
+
 	cfg := config.LoadConfig()
 
 	// Determine test database name
@@ -35,8 +47,29 @@ func SetupTestDB() (*TestHelper, error) {
 		testDBName = cfg.DBDatabase + "_test"
 	}
 
-	// Build connection string for test database
+	// Check if we're running in parallel mode and need unique database
+	// Use a unique database name based on PID and timestamp for parallel test isolation
+	testDBName = fmt.Sprintf("%s_%d_%d", testDBName, os.Getpid(), time.Now().UnixNano())
+
+	// Connect to the main database to create the test database if needed
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
+		cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBDatabase)
+	mainPool, err := pgxpool.New(context.Background(), connStr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create main connection pool: %w", err)
+	}
+	defer mainPool.Close()
+
+	// Create the test database if it doesn't exist
+	ctx, cancel := context.WithTimeout(context.Background(), testContextTimeout)
+	defer cancel()
+	_, err = mainPool.Exec(ctx, fmt.Sprintf("CREATE DATABASE %s", testDBName))
+	if err != nil && !strings.Contains(err.Error(), "already exists") && !strings.Contains(err.Error(), "exists") {
+		return nil, fmt.Errorf("failed to create test database: %w", err)
+	}
+
+	// Build connection string for test database
+	connStr = fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
 		cfg.DBUser,
 		cfg.DBPassword,
 		cfg.DBHost,
@@ -50,7 +83,7 @@ func SetupTestDB() (*TestHelper, error) {
 	}
 
 	// Verify connection works
-	ctx, cancel := context.WithTimeout(context.Background(), testContextTimeout)
+	ctx, cancel = context.WithTimeout(context.Background(), testContextTimeout)
 	defer cancel()
 
 	if err := pool.Ping(ctx); err != nil {
@@ -67,11 +100,23 @@ func SetupTestDB() (*TestHelper, error) {
 
 // SetupTestDBWithConfig creates a test database connection with custom configuration
 func SetupTestDBWithConfig(cfg *config.Config) (*TestHelper, error) {
+	// Load .env.test for test-specific configuration
+	_ = godotenv.Load(".env.test")
+
+	// Override DB_HOST to localhost for local testing (overrides .env file)
+	// Environment variable DB_HOST takes precedence, so we must explicitly set it
+	if os.Getenv("DB_HOST") == "postgres" {
+		os.Setenv("DB_HOST", "localhost")
+	}
+
 	// Determine test database name
 	testDBName := os.Getenv("DB_DATABASE_TEST")
 	if testDBName == "" {
 		testDBName = cfg.DBDatabase + "_test"
 	}
+
+	// Use unique database name for parallel tests
+	testDBName = fmt.Sprintf("%s_%d_%d", testDBName, os.Getpid(), time.Now().UnixNano())
 
 	// Build connection string for test database
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
@@ -211,6 +256,19 @@ func (h *TestHelper) GetContextWithTimeout(timeout time.Duration) context.Contex
 // Close cleans up the database connection pool
 func (h *TestHelper) Close() {
 	if h.Pool != nil {
+		// Drop the unique database if it was created for this test
+		if h.TestDBName != "" && h.Pool != nil {
+			ctx, cancel := context.WithTimeout(context.Background(), testContextTimeout)
+			defer cancel()
+			// Connect to the main database to drop the test database
+			connStr := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
+				h.Config.DBUser, h.Config.DBPassword, h.Config.DBHost, h.Config.DBPort, h.Config.DBDatabase)
+			mainPool, err := pgxpool.New(ctx, connStr)
+			if err == nil {
+				mainPool.Exec(ctx, fmt.Sprintf("DROP DATABASE IF EXISTS %s", h.TestDBName))
+				mainPool.Close()
+			}
+		}
 		h.Pool.Close()
 	}
 }
@@ -338,7 +396,7 @@ func (m *MockProjectRepository) GetAllWithLogs(ctx context.Context) ([]*reposito
 				Status:     project.Status,
 				LogsCount:  project.LogsCount,
 				DaysUnread: project.DaysUnread,
-				MedianDay:  formatTimePtr(project.MedianDay),
+				MedianDay:  project.MedianDay,
 				FinishedAt: formatTimePtr(project.FinishedAt),
 			}
 		}
@@ -383,7 +441,7 @@ func (m *MockProjectRepository) GetWithLogs(ctx context.Context, id int64) (*rep
 			Status:     project.Status,
 			LogsCount:  project.LogsCount,
 			DaysUnread: project.DaysUnread,
-			MedianDay:  formatTimePtr(project.MedianDay),
+			MedianDay:  project.MedianDay,
 			FinishedAt: formatTimePtr(project.FinishedAt),
 		}
 		return &repository.ProjectWithLogs{
@@ -393,6 +451,25 @@ func (m *MockProjectRepository) GetWithLogs(ctx context.Context, id int64) (*rep
 	}
 
 	return nil, fmt.Errorf("project with ID %d not found", id)
+}
+
+// Create inserts a new project into the mock repository
+func (m *MockProjectRepository) Create(ctx context.Context, project *models.Project) (*models.Project, error) {
+	if m.Err != nil {
+		return nil, m.Err
+	}
+
+	// Generate a new ID (use the next available ID + 1)
+	var maxID int64
+	for id := range m.Projects {
+		if id > maxID {
+			maxID = id
+		}
+	}
+	project.ID = maxID + 1
+	m.Projects[project.ID] = project
+
+	return project, nil
 }
 
 // formatTimePtr converts a time.Time pointer to a string pointer for JSON serialization
@@ -548,4 +625,29 @@ func (m *MockLogRepository) GetByIDLastCall() int64 {
 		return 0
 	}
 	return m.GetByIDCalls[len(m.GetByIDCalls)-1]
+}
+
+// Create inserts a new log into the mock repository
+func (m *MockLogRepository) Create(ctx context.Context, log *models.Log) (*models.Log, error) {
+	if m.Err != nil {
+		return nil, m.Err
+	}
+
+	// Generate a new ID (use the next available ID + 1)
+	var maxID int64
+	for id := range m.Logs {
+		if id > maxID {
+			maxID = id
+		}
+	}
+	log.ID = maxID + 1
+	m.Logs[log.ID] = log
+
+	// Also add to ByProjectID map
+	if _, ok := m.ByProjectID[log.ProjectID]; !ok {
+		m.ByProjectID[log.ProjectID] = make([]*models.Log, 0)
+	}
+	m.ByProjectID[log.ProjectID] = append(m.ByProjectID[log.ProjectID], log)
+
+	return log, nil
 }

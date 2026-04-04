@@ -50,7 +50,7 @@ func TestLog(t *testing.T) {
 // TestLog_WithOptionalFields tests the log with optional fields
 func TestLog_WithOptionalFields(t *testing.T) {
 	ctx := context.Background()
-	data := "2024-01-01"
+	data := "2024-01-01T00:00:00Z"
 	note := "This is a note"
 
 	log := &Log{
@@ -64,8 +64,8 @@ func TestLog_WithOptionalFields(t *testing.T) {
 		Note:      &note,
 	}
 
-	if *log.Data != "2024-01-01" {
-		t.Errorf("Expected data '2024-01-01', got '%s'", *log.Data)
+	if *log.Data != "2024-01-01T00:00:00Z" {
+		t.Errorf("Expected data '2024-01-01T00:00:00Z', got '%s'", *log.Data)
 	}
 
 	if *log.Note != "This is a note" {

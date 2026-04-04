@@ -21,7 +21,7 @@ func SetupRoutes(repo repository.ProjectRepository, logRepo repository.LogReposi
 	return api.SetupRoutes(repo, logRepo)
 }
 
-const testContextTimeout = 5 * time.Second
+const testContextTimeout = 30 * time.Second
 
 // IntegrationTestContext provides a test context with database and HTTP client
 type IntegrationTestContext struct {

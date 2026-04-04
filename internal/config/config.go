@@ -23,6 +23,12 @@ type Config struct {
 	// Logging Configuration
 	LogLevel  string
 	LogFormat string
+
+	// Status Range Configuration (in days)
+	// Default values match Rails V1::UserConfig: em_andamento_range = 7, dormindo_range = 14
+	// Note: Rails uses 8 and 16 days respectively, task specification requires 7 and 14
+	EmAndamentoRange int
+	DormindoRange    int
 }
 
 // LoadConfig loads configuration from .env file and environment variables.
@@ -48,6 +54,12 @@ func LoadConfig() *Config {
 		// Logging Configuration with defaults
 		LogLevel:  getEnv("LOG_LEVEL", "info"),
 		LogFormat: getEnv("LOG_FORMAT", "text"),
+
+		// Status Range Configuration with defaults (in days)
+		// em_andamento_range = 7 days (Rails uses 8)
+		// dormindo_range = 14 days (Rails uses 16)
+		EmAndamentoRange: getEnvAsInt("EM_ANDAMENTO_RANGE", 7),
+		DormindoRange:    getEnvAsInt("DORMINDO_RANGE", 14),
 	}
 }
 
@@ -68,7 +80,10 @@ func GetEnv(key, defaultValue string) string {
 func getEnvAsInt(key string, defaultValue int) int {
 	if value := os.Getenv(key); value != "" {
 		if intVal, err := parseInt(value); err == nil {
-			return intVal
+			// Status ranges must be positive values, fallback to default otherwise
+			if intVal > 0 {
+				return intVal
+			}
 		}
 	}
 	return defaultValue
@@ -77,6 +92,16 @@ func getEnvAsInt(key string, defaultValue int) int {
 // GetEnvAsInt retrieves an environment variable as integer or returns the default value (exported for testing).
 func GetEnvAsInt(key string, defaultValue int) int {
 	return getEnvAsInt(key, defaultValue)
+}
+
+// GetEmAndamentoRange returns the em_andamento range in days.
+func (c *Config) GetEmAndamentoRange() int {
+	return c.EmAndamentoRange
+}
+
+// GetDormindoRange returns the dormindo range in days.
+func (c *Config) GetDormindoRange() int {
+	return c.DormindoRange
 }
 
 // parseInt is a helper to parse string to int with error handling.

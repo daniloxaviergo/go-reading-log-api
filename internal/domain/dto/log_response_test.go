@@ -8,7 +8,7 @@ import (
 
 // TestLogResponse tests the LogResponse DTO
 func TestLogResponse(t *testing.T) {
-	data := "2024-01-01"
+	data := "2024-01-01T00:00:00Z"
 	response := NewLogResponse(1, &data, 10, 20)
 
 	if response == nil {
@@ -19,8 +19,8 @@ func TestLogResponse(t *testing.T) {
 		t.Errorf("Expected ID 1, got %d", response.ID)
 	}
 
-	if *response.Data != "2024-01-01" {
-		t.Errorf("Expected data '2024-01-01', got '%s'", *response.Data)
+	if *response.Data != "2024-01-01T00:00:00Z" {
+		t.Errorf("Expected data '2024-01-01T00:00:00Z', got '%s'", *response.Data)
 	}
 
 	if response.StartPage != 10 {
@@ -48,7 +48,7 @@ func TestLogResponse(t *testing.T) {
 
 // TestLogResponse_JSON tests JSON serialization
 func TestLogResponse_JSON(t *testing.T) {
-	data := "2024-01-01"
+	data := "2024-01-01T00:00:00Z"
 	response := NewLogResponse(1, &data, 10, 20)
 	response.SetContext(context.Background())
 
@@ -69,14 +69,14 @@ func TestLogResponse_JSON(t *testing.T) {
 		t.Errorf("Expected ID 1, got %d", decoded.ID)
 	}
 
-	if *decoded.Data != "2024-01-01" {
-		t.Errorf("Expected data '2024-01-01', got '%s'", *decoded.Data)
+	if *decoded.Data != "2024-01-01T00:00:00Z" {
+		t.Errorf("Expected data '2024-01-01T00:00:00Z', got '%s'", *decoded.Data)
 	}
 }
 
 // TestLogResponse_WithNote tests the response with optional note
 func TestLogResponse_WithNote(t *testing.T) {
-	data := "2024-01-01"
+	data := "2024-01-01T00:00:00Z"
 	note := "This is a note"
 	response := &LogResponse{
 		ID:        1,
@@ -99,7 +99,7 @@ func TestLogResponse_WithNote(t *testing.T) {
 
 // TestLogResponse_WithProject tests the response with project
 func TestLogResponse_WithProject(t *testing.T) {
-	data := "2024-01-01"
+	data := "2024-01-01T00:00:00Z"
 	project := NewProjectResponse(1, "Test Project", nil, 100, 50)
 
 	response := &LogResponse{

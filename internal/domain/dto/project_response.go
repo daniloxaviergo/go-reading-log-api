@@ -15,7 +15,7 @@ type ProjectResponse struct {
 	Status     *string        `json:"status"`
 	LogsCount  *int           `json:"logs_count"`
 	DaysUnread *int           `json:"days_unreading"`
-	MedianDay  *string        `json:"median_day"`
+	MedianDay  *float64       `json:"median_day,omitempty"`
 	FinishedAt *string        `json:"finished_at"`
 	Logs       []*LogResponse `json:"logs,omitempty"`
 }

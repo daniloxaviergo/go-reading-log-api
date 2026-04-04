@@ -12,4 +12,5 @@ type LogRepository interface {
 	GetByProjectID(ctx context.Context, projectID int64) ([]*models.Log, error)
 	GetAll(ctx context.Context) ([]*models.Log, error)
 	GetByProjectIDOrdered(ctx context.Context, projectID int64) ([]*models.Log, error)
+	Create(ctx context.Context, log *models.Log) (*models.Log, error)
 }

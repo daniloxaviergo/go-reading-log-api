@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 
 	"go-reading-log-api-next/internal/domain/dto"
@@ -23,7 +24,7 @@ func TestLogsIndexIntegration(t *testing.T) {
 	ctx.CreateTestLog(t, projectID)
 
 	// Make HTTP request to the test server
-	url := "/api/v1/projects/" + string(rune(projectID+'0')) + "/logs"
+	url := "/api/v1/projects/" + strconv.Itoa(int(projectID)) + "/logs"
 	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, url, nil))
 
 	if recorder.Code != http.StatusOK {
@@ -54,7 +55,7 @@ func TestLogsIndexEmpty(t *testing.T) {
 	projectID := ctx.CreateTestProject(t)
 
 	// Make HTTP request to the test server
-	url := "/api/v1/projects/" + string(rune(projectID+'0')) + "/logs"
+	url := "/api/v1/projects/" + strconv.Itoa(int(projectID)) + "/logs"
 	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, url, nil))
 
 	if recorder.Code != http.StatusOK {
@@ -119,7 +120,7 @@ func TestLogsIndexLimit(t *testing.T) {
 	}
 
 	// Make HTTP request to the test server
-	url := "/api/v1/projects/" + string(rune(projectID+'0')) + "/logs"
+	url := "/api/v1/projects/" + strconv.Itoa(int(projectID)) + "/logs"
 	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, url, nil))
 
 	if recorder.Code != http.StatusOK {
@@ -150,7 +151,7 @@ func TestLogsIndexWithLogs(t *testing.T) {
 	ctx.CreateTestLogWithNote(t, projectID)
 
 	// Make HTTP request to the test server
-	url := "/api/v1/projects/" + string(rune(projectID+'0')) + "/logs"
+	url := "/api/v1/projects/" + strconv.Itoa(int(projectID)) + "/logs"
 	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, url, nil))
 
 	if recorder.Code != http.StatusOK {
@@ -186,7 +187,7 @@ func TestLogsIndexConcurrent(t *testing.T) {
 	done := make(chan bool, 5)
 	for i := 0; i < 5; i++ {
 		go func() {
-			url := "/api/v1/projects/" + string(rune(projectID+'0')) + "/logs"
+			url := "/api/v1/projects/" + strconv.Itoa(int(projectID)) + "/logs"
 			recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, url, nil))
 
 			if recorder.Code == http.StatusOK {
@@ -222,7 +223,7 @@ func TestLogsIndexResponseFormat(t *testing.T) {
 	ctx.CreateTestLog(t, projectID)
 
 	// Make HTTP request to the test server
-	url := "/api/v1/projects/" + string(rune(projectID+'0')) + "/logs"
+	url := "/api/v1/projects/" + strconv.Itoa(int(projectID)) + "/logs"
 	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, url, nil))
 
 	body := recorder.Body.String()

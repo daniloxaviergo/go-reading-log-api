@@ -1,6 +1,8 @@
 package dto
 
-import "context"
+import (
+	"context"
+)
 
 // LogResponse represents the JSON response for Log entities
 // Matches Rails LogSerializer output

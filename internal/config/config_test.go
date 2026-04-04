@@ -142,3 +142,87 @@ func TestLoadConfigEmptyEnvVars(t *testing.T) {
 		t.Errorf("expected SERVER_PORT='3000' for empty env var, got '%s'", config.ServerPort)
 	}
 }
+
+// TestLoadConfigStatusRangesDefaultValues tests that status range config uses defaults.
+func TestLoadConfigStatusRangesDefaultValues(t *testing.T) {
+	// Ensure no env vars are set
+	os.Unsetenv("EM_ANDAMENTO_RANGE")
+	os.Unsetenv("DORMINDO_RANGE")
+
+	config := LoadConfig()
+
+	// Verify default status range values
+	// em_andamento_range = 7 days
+	if config.EmAndamentoRange != 7 {
+		t.Errorf("expected EmAndamentoRange=7 (default), got %d", config.EmAndamentoRange)
+	}
+	// dormindo_range = 14 days
+	if config.DormindoRange != 14 {
+		t.Errorf("expected DormindoRange=14 (default), got %d", config.DormindoRange)
+	}
+}
+
+// TestLoadConfigStatusRangesEnvironmentVariables tests that env vars override status range defaults.
+func TestLoadConfigStatusRangesEnvironmentVariables(t *testing.T) {
+	// Set environment variables for status ranges
+	os.Setenv("EM_ANDAMENTO_RANGE", "10")
+	os.Setenv("DORMINDO_RANGE", "21")
+
+	config := LoadConfig()
+
+	// Verify environment variable values are loaded
+	if config.EmAndamentoRange != 10 {
+		t.Errorf("expected EmAndamentoRange=10, got %d", config.EmAndamentoRange)
+	}
+	if config.DormindoRange != 21 {
+		t.Errorf("expected DormindoRange=21, got %d", config.DormindoRange)
+	}
+}
+
+// TestLoadConfigStatusRangesGetterMethods tests the getter methods for status ranges.
+func TestLoadConfigStatusRangesGetterMethods(t *testing.T) {
+	os.Unsetenv("EM_ANDAMENTO_RANGE")
+	os.Unsetenv("DORMINDO_RANGE")
+
+	config := LoadConfig()
+
+	// Test getter methods return correct values
+	if config.GetEmAndamentoRange() != 7 {
+		t.Errorf("expected GetEmAndamentoRange()=7, got %d", config.GetEmAndamentoRange())
+	}
+	if config.GetDormindoRange() != 14 {
+		t.Errorf("expected GetDormindoRange()=14, got %d", config.GetDormindoRange())
+	}
+}
+
+// TestLoadConfigStatusRangesInvalidValues tests that invalid values fall back to defaults.
+func TestLoadConfigStatusRangesInvalidValues(t *testing.T) {
+	os.Setenv("EM_ANDAMENTO_RANGE", "invalid")
+	os.Setenv("DORMINDO_RANGE", "-5")
+
+	config := LoadConfig()
+
+	// Invalid values should fall back to defaults
+	if config.EmAndamentoRange != 7 {
+		t.Errorf("expected EmAndamentoRange=7 (default for invalid value), got %d", config.EmAndamentoRange)
+	}
+	if config.DormindoRange != 14 {
+		t.Errorf("expected DormindoRange=14 (default for invalid value), got %d", config.DormindoRange)
+	}
+}
+
+// TestLoadConfigStatusRangesEmptyValues tests that empty env vars use defaults.
+func TestLoadConfigStatusRangesEmptyValues(t *testing.T) {
+	os.Setenv("EM_ANDAMENTO_RANGE", "")
+	os.Setenv("DORMINDO_RANGE", "")
+
+	config := LoadConfig()
+
+	// Empty values should use defaults
+	if config.EmAndamentoRange != 7 {
+		t.Errorf("expected EmAndamentoRange=7 (default for empty value), got %d", config.EmAndamentoRange)
+	}
+	if config.DormindoRange != 14 {
+		t.Errorf("expected DormindoRange=14 (default for empty value), got %d", config.DormindoRange)
+	}
+}

@@ -19,4 +19,5 @@ type ProjectRepository interface {
 	GetAll(ctx context.Context) ([]*models.Project, error)
 	GetWithLogs(ctx context.Context, id int64) (*ProjectWithLogs, error)
 	GetAllWithLogs(ctx context.Context) ([]*ProjectWithLogs, error)
+	Create(ctx context.Context, project *models.Project) (*models.Project, error)
 }
