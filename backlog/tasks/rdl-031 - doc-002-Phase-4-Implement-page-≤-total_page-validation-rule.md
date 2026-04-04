@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - thomas
 created_date: '2026-04-03 14:04'
-updated_date: '2026-04-04 01:36'
+updated_date: '2026-04-04 02:49'
 labels:
   - phase-4
   - validation-rule
@@ -31,6 +31,7 @@ Implement validation for project page ≤ total_page constraint. Create validati
 - [ ] #2 Error returned when constraint violated
 - [ ] #3 Error includes error code and descriptive message
 - [ ] #4 Validation logic matches Rails behavior
+- [ ] #5 #1 Validation function checks page ≤ total_page
 <!-- AC:END -->
 
 ## Implementation Plan
