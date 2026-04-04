@@ -397,6 +397,4 @@ Phase 4: Final Verification
 - [x] #12 Tests use testing-expert subagent for test execution and verification
 - [x] #13 No database-level constraints needed - validation is application-level per PRD requirements
 - [x] #14 Validation tests already exist and comprehensive (26 tests, 100% coverage)
-- [ ] #15 #9 N/A - No new code paths created (verification task only)
-- [ ] #16 #10 N/A - No new HTTP handlers created (verification task only)
 <!-- DOD:END -->
