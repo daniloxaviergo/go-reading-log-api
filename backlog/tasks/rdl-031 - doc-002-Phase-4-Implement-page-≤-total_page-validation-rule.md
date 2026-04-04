@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-03 14:04'
-updated_date: '2026-04-04 01:32'
+updated_date: '2026-04-04 01:34'
 labels:
   - phase-4
   - validation-rule
@@ -53,10 +53,16 @@ The implementation will create a POST endpoint for projects that includes page �
 - Return HTTP 400 Bad Request for validation errors (matching Rails behavior)
 
 **Rationale**:
-- The validation package already has `ValidatePage(page, totalPage)` implemented and tested
+- The validation package already has `ValidatePage(page, totalPage)` implemented and tested in RDL-030
 - No existing POST endpoints exist, so this follows new endpoint pattern
 - Validation must happen before database insert to prevent constraint violations
 - Error response format must match existing error patterns for consistency
+
+**Validation Logic**:
+- Page validation: `page >= 0 AND page <= totalPage` (from RDL-030 validation package)
+- Error code `page_exceeds_total` when page > total_page
+- Error code `page_invalid` when page < 0
+- Note: Rails app does NOT explicitly validate page <= total_page in model (no CHECK constraint found)
 
 ### 2. Files to Modify
 
@@ -72,13 +78,15 @@ The implementation will create a POST endpoint for projects that includes page �
 | `internal/api/v1/handlers/projects_handler.go` | Modify | Add `Create` handler method with validation integration |
 | `internal/domain/dto/project_request.go` | Create | New struct for incoming project creation payload |
 | `internal/repository/project_repository.go` | Modify | Add `Create` method interface |
+| `internal/adapter/postgres/project_repository.go` | Modify | Implement `Create` method |
+| `internal/api/v1/routes.go` | Modify | Register POST /api/v1/projects route |
 
 #### Existing Files to Reference (No Changes):
 | File | Purpose |
 |------|---------|
-| `internal/validation/validate_project.go` | Validation function `ValidatePage(page, totalPage)` already exists |
+| `internal/validation/validate_project.go` | Validation function `ValidatePage(page, totalPage)` already exists (RDL-030) |
 | `internal/validation/errors.go` | `ValidationError` struct and helper functions |
-| `internal/adapter/postgres/project_repository.go` | PostgreSQL implementation reference |
+| `internal/domain/models/project.go` |参考 domain model structure |
 
 ### 3. Dependencies
 
@@ -86,6 +94,7 @@ The implementation will create a POST endpoint for projects that includes page �
 - ✅ RDL-030 complete - validation package exists with `ValidatePage` function
 - ✅ RDL-002 complete - domain models and DTOs exist
 - ✅ RDL-006 complete - existing handlers follow established patterns
+- ✅ RDL-030 complete - error types and validation helpers created
 
 **Blocking Issues**:
 - None - all prerequisites are met
@@ -102,18 +111,18 @@ The implementation will create a POST endpoint for projects that includes page �
 **Pattern 1: Request DTO Structure** (based on `project_response.go`)
 ```go
 type ProjectRequest struct {
-    Name       string `json:"name"`
-    TotalPage  int    `json:"total_page"`
-    Page       int    `json:"page"`
+    Name       string  `json:"name"`
+    TotalPage  int     `json:"total_page"`
+    Page       int     `json:"page"`
     StartedAt  *string `json:"started_at,omitempty"`
-    Reinicia   bool   `json:"reinicia,omitempty"`
+    Reinicia   bool    `json:"reinicia,omitempty"`
 }
 ```
 
 **Pattern 2: Validation Integration in Handler**
 ```go
 // Validate before processing
-if err := validation.ValidateProject(req.Page, req.TotalPage, ""); err != nil {
+if err := validation.ValidateProject(req.Page, req.TotalPage, req.Status); err != nil {
     if err.HasErrors() {
         w.Header().Set("Content-Type", "application/json")
         w.WriteHeader(http.StatusBadRequest)
@@ -136,10 +145,17 @@ if err := validation.ValidateProject(req.Page, req.TotalPage, ""); err != nil {
 }
 ```
 
+**Pattern 4: Repository Create Method** (based on `project_repository.go`)
+```go
+func (r *ProjectRepositoryImpl) Create(ctx context.Context, project *models.Project) (*models.Project, error) {
+    // INSERT logic
+}
+```
+
 **Naming Conventions**:
 - Struct fields: snake_case JSON keys matching Rails API
 - Handler methods: Title case (e.g., `Create`)
-- Error codes: snake_case (e.g., `page_exceeds_total`)
+- Error codes: snake_case (e.g., `page_exceeds_total`, `total_page_invalid`)
 
 **Integration Points**:
 - Call validation in handler BEFORE repository insert
@@ -150,34 +166,43 @@ if err := validation.ValidateProject(req.Page, req.TotalPage, ""); err != nil {
 
 **Unit Tests (handlers package)**:
 - **Validation Tests**: Test `ValidatePage` integration in handler
-  - Valid: page ≤ total_page (should proceed)
+  - Valid: page ≤ total_page (should proceed to create)
   - Invalid: page > total_page (should return 400)
   - Edge: page = total_page (should proceed)
   - Edge: page = 0 (should proceed if total_page > 0)
+  - Edge: negative page values (should return 400)
 
 - **Handler Response Tests**:
-  - Success: returns 201 Created with project JSON
+  - Success: returns 201 Created with project JSON (including ID)
   - Validation error: returns 400 Bad Request with error details
   - Database error: returns 500 Internal Server Error
 
+- **Request Parsing Tests**:
+  - Valid JSON payload parsed correctly
+  - Missing required fields handled appropriately
+  - Optional fields handled correctly (nil pointers)
+
 **Integration Tests (test/integration package)**:
 - **End-to-End Tests**:
-  - Create project with valid data (page ≤ total_page)
+  - Create project with valid data (page ≤ total_page, valid status)
   - Create project with invalid data (page > total_page) - expects 400
   - Verify validation error response format matches expectations
-  - Test database persistence: retrieve created project via GET
+  - Verify created project can be retrieved via GET /api/v1/projects/{id}
+  - Test database persistence: verify row exists in projects table
 
 **Test Coverage Targets**:
 - All validation rule combinations (page values relative to total_page)
 - Error response format verification
 - HTTP status code correctness (201 for success, 400 for validation)
 - Edge cases: zero values, negative values, equal values
+- Integration test must use actual database (not mocks)
 
 **Testing Approach**:
 - Unit tests in `handlers` package using `testing` package
 - Integration tests in `test/integration` using test database
 - Use existing test helpers from `test/test_helper.go`
 - Mock repository for unit tests, real PostgreSQL for integration
+- Use `testing-expert` subagent for test execution and verification
 
 ### 6. Risks and Considerations
 
@@ -185,13 +210,14 @@ if err := validation.ValidateProject(req.Page, req.TotalPage, ""); err != nil {
 - None identified
 
 **Potential Pitfalls**:
-1. **Database Constraint vs Application Validation**: The database may have a CHECK constraint for page ≤ total_page, but we should validate in application layer for user-friendly error messages
-2. **Rails API Differences**: Rails may use different validation logic; must verify behavior matches Rails (see Rails tests in spec/models/project_spec.rb)
-3. **Timing**: Validation should happen BEFORE database insert to prevent constraint violations
+1. **Database Schema Match**: Ensure ProjectRequest struct fields match database columns (name, total_page, page, started_at, reinicia)
+2. **Rails API Differences**: Rails may have different validation logic - verify behavior matches Rails by checking existing specs
+3. **Validation Timing**: Must validate BEFORE database insert to prevent constraint violations
+4. **Status Field**: Need to decide if validation should check status - Rails doesn't validate project status, so may skip or add later
 
 **Trade-offs**:
 1. **Validation Location**: Application-level validation provides better error messages than database constraint errors
-2. **Error Response Format**: Using `{"error": "...", "details": {...}}` format matches existing error patterns
+2. **Error Response Format**: Using `{"error": "...", "details": {...}}` format matches existing error patterns in handlers
 3. **HTTP Status Codes**: 400 for validation errors, 201 for successful creation (standard REST conventions)
 
 **Deployment Considerations**:
@@ -201,10 +227,10 @@ if err := validation.ValidateProject(req.Page, req.TotalPage, ""); err != nil {
 - No configuration changes needed
 
 **Validation Logic Details**:
-- The existing `ValidatePage(page, totalPage)` function from RDL-030 already validates: page >= 0 AND page <= totalPage
-- Error code: `page_exceeds_total` when page > totalPage
-- Error code: `page_invalid` when page < 0
-- Rails behavior: Must match Rails validation (check existing specs)
+- The existing `ValidatePage(page, totalPage)` function from RDL-030 validates: page >= 0 AND page <= totalPage
+- Error code `page_exceeds_total` when page > total_page
+- Error code `page_invalid` when page < 0
+- Rails behavior: No explicit validation for page <= total_page found in Rails app
 <!-- SECTION:PLAN:END -->
 
 ## Definition of Done
