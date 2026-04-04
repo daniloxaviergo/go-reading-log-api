@@ -3,9 +3,9 @@ id: RDL-032
 title: '[doc-002 Phase 4] Implement start_page ≤ end_page validation rule'
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-03 14:04'
-updated_date: '2026-04-04 02:59'
+updated_date: '2026-04-04 03:00'
 labels:
   - phase-4
   - validation-rule
