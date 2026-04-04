@@ -3,7 +3,7 @@ id: RDL-034
 title: '[doc-002 Phase 5] Execute JSON response comparison test'
 status: Done
 assignee:
-  - next-task
+  - workflow
 created_date: '2026-04-03 14:04'
 updated_date: '2026-04-04 05:06'
 labels:

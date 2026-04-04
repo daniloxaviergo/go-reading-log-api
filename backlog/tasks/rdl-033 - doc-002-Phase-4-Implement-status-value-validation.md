@@ -2,8 +2,10 @@
 id: RDL-033
 title: '[doc-002 Phase 4] Implement status value validation'
 status: To Do
-assignee: []
+assignee:
+  - workflow
 created_date: '2026-04-03 14:04'
+updated_date: '2026-04-04 05:06'
 labels:
   - phase-4
   - validation-rule
