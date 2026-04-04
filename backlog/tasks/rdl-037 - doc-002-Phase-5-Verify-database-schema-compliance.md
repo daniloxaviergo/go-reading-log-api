@@ -5,7 +5,7 @@ status: Done
 assignee:
   - thomas
 created_date: '2026-04-03 14:05'
-updated_date: '2026-04-04 07:48'
+updated_date: '2026-04-04 07:49'
 labels:
   - phase-5
   - database-verification
@@ -391,10 +391,12 @@ Phase 4: Final Verification
 - [x] #6 HTTP status codes correct for response type
 - [x] #7 Database queries optimized with proper indexes
 - [x] #8 Documentation updated in QWEN.md
-- [ ] #9 New code paths include error path tests
-- [ ] #10 HTTP handlers test both success and error responses
+- [x] #9 New code paths include error path tests
+- [x] #10 HTTP handlers test both success and error responses
 - [x] #11 Integration tests verify actual database interactions
 - [x] #12 Tests use testing-expert subagent for test execution and verification
 - [x] #13 No database-level constraints needed - validation is application-level per PRD requirements
 - [x] #14 Validation tests already exist and comprehensive (26 tests, 100% coverage)
+- [ ] #15 #9 N/A - No new code paths created (verification task only)
+- [ ] #16 #10 N/A - No new HTTP handlers created (verification task only)
 <!-- DOD:END -->
