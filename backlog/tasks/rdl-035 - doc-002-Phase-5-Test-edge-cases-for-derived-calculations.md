@@ -2,8 +2,10 @@
 id: RDL-035
 title: '[doc-002 Phase 5] Test edge cases for derived calculations'
 status: To Do
-assignee: []
+assignee:
+  - catarina
 created_date: '2026-04-03 14:05'
+updated_date: '2026-04-04 05:12'
 labels:
   - phase-5
   - edge-cases
