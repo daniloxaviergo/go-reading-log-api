@@ -266,4 +266,5 @@ func (r *ProjectRepositoryImpl) Create(ctx context.Context, project *models.Proj
 - [ ] #11 Integration tests verify actual database interactions
 - [ ] #12 Tests use testing-expert subagent for test execution and verification
 - [ ] #13 All unit tests pass - verified with testing-expert subagent
+- [ ] #14 All integration tests pass - verified with testing-expert subagent
 <!-- DOD:END -->
