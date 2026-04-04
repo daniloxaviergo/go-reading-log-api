@@ -3,7 +3,7 @@ id: RDL-035
 title: '[doc-002 Phase 5] Test edge cases for derived calculations'
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-03 14:05'
 updated_date: '2026-04-04 06:49'
 labels:
