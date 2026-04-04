@@ -34,6 +34,7 @@ Implement validation for project page ≤ total_page constraint. Create validati
 - [ ] #5 #1 Validation function checks page ≤ total_page
 - [ ] #6 #2 Error returned when constraint violated
 - [ ] #7 #3 Error includes error code and descriptive message
+- [ ] #8 #4 Validation logic matches Rails behavior
 <!-- AC:END -->
 
 ## Implementation Plan
