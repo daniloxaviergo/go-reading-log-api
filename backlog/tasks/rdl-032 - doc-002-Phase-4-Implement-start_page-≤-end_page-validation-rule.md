@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-03 14:04'
-updated_date: '2026-04-04 03:02'
+updated_date: '2026-04-04 03:58'
 labels:
   - phase-4
   - validation-rule
@@ -30,6 +30,10 @@ Implement validation for log start_page ≤ end_page constraint. Create validati
 - [ ] #2 Error returned when constraint violated
 - [ ] #3 Error includes error code and descriptive message
 - [ ] #4 Validation logic matches Rails behavior
+- [ ] #5 Validation function checks start_page ≤ end_page
+- [ ] #6 Error returned when constraint violated
+- [ ] #7 Error includes error code and descriptive message
+- [ ] #8 Validation logic matches Rails behavior
 <!-- AC:END -->
 
 ## Implementation Plan
