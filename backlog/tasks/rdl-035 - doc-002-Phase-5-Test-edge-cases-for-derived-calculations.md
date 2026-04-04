@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-03 14:05'
-updated_date: '2026-04-04 05:16'
+updated_date: '2026-04-04 06:44'
 labels:
   - phase-5
   - edge-cases
@@ -33,6 +33,11 @@ Create comprehensive tests for derived calculation edge cases: zero total_page (
 - [ ] #3 100% progress returns null finished_at
 - [ ] #4 Invalid status values handled with error
 - [ ] #5 All edge cases documented
+- [ ] #6 #1 Zero total_page returns 0.00 progress
+- [ ] #7 #2 No logs uses started_at for days_unreading or returns 0
+- [ ] #8 #3 100% progress returns null finished_at
+- [ ] #9 #4 Invalid status values handled with error
+- [ ] #10 #5 All edge cases documented
 <!-- AC:END -->
 
 ## Implementation Plan
