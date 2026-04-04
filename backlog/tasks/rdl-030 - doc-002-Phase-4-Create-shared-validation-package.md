@@ -3,7 +3,7 @@ id: RDL-030
 title: '[doc-002 Phase 4] Create shared validation package'
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-03 14:04'
 updated_date: '2026-04-04 00:43'
 labels:
