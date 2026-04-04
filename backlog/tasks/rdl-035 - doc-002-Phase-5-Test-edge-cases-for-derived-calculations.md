@@ -1,11 +1,11 @@
 ---
 id: RDL-035
 title: '[doc-002 Phase 5] Test edge cases for derived calculations'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-03 14:05'
-updated_date: '2026-04-04 06:44'
+updated_date: '2026-04-04 06:48'
 labels:
   - phase-5
   - edge-cases
@@ -28,16 +28,11 @@ Create comprehensive tests for derived calculation edge cases: zero total_page (
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Zero total_page returns 0.00 progress
-- [ ] #2 No logs uses started_at for days_unreading or returns 0
-- [ ] #3 100% progress returns null finished_at
-- [ ] #4 Invalid status values handled with error
-- [ ] #5 All edge cases documented
-- [ ] #6 #1 Zero total_page returns 0.00 progress
-- [ ] #7 #2 No logs uses started_at for days_unreading or returns 0
-- [ ] #8 #3 100% progress returns null finished_at
-- [ ] #9 #4 Invalid status values handled with error
-- [ ] #10 #5 All edge cases documented
+- [x] #1 Zero total_page returns 0.00 progress
+- [x] #2 No logs uses started_at for days_unreading or returns 0
+- [x] #3 100% progress returns null finished_at
+- [x] #4 Invalid status values handled with error
+- [x] #5 All edge cases documented
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -256,16 +251,16 @@ func TestValidateStatus_Invalid(t *testing.T) {
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 All unit tests pass use testing-expert subagent for test execution and verification
-- [ ] #2 All integration tests pass use testing-expert subagent for test execution and verification
-- [ ] #3 go fmt and go vet pass with no errors
-- [ ] #4 Clean Architecture layers properly followed
-- [ ] #5 Error responses consistent with existing patterns
-- [ ] #6 HTTP status codes correct for response type
-- [ ] #7 Database queries optimized with proper indexes
+- [x] #1 All unit tests pass use testing-expert subagent for test execution and verification
+- [x] #2 All integration tests pass use testing-expert subagent for test execution and verification
+- [x] #3 go fmt and go vet pass with no errors
+- [x] #4 Clean Architecture layers properly followed
+- [x] #5 Error responses consistent with existing patterns
+- [x] #6 HTTP status codes correct for response type
+- [x] #7 Database queries optimized with proper indexes
 - [ ] #8 Documentation updated in QWEN.md
-- [ ] #9 New code paths include error path tests
-- [ ] #10 HTTP handlers test both success and error responses
-- [ ] #11 Integration tests verify actual database interactions
-- [ ] #12 Tests use testing-expert subagent for test execution and verification
+- [x] #9 New code paths include error path tests
+- [x] #10 HTTP handlers test both success and error responses
+- [x] #11 Integration tests verify actual database interactions
+- [x] #12 Tests use testing-expert subagent for test execution and verification
 <!-- DOD:END -->
