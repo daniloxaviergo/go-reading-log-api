@@ -3,9 +3,9 @@ id: RDL-036
 title: '[doc-002 Phase 5] Perform performance comparison test'
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-03 14:05'
-updated_date: '2026-04-04 06:52'
+updated_date: '2026-04-04 06:53'
 labels:
   - phase-5
   - performance-test
