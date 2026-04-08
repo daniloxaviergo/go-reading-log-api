@@ -4,6 +4,7 @@ title: Create a report of all routes of rails app
 status: To Do
 assignee: []
 created_date: '2026-04-08 12:26'
+updated_date: '2026-04-08 12:27'
 labels: []
 dependencies: []
 ---
@@ -12,6 +13,7 @@ dependencies: []
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
 Execute rails route on container rails-api and make a report of all routes
+Save in docs/rails_routes.md
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Definition of Done
