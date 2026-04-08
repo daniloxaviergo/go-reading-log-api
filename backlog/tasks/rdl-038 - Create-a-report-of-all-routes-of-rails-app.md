@@ -1,10 +1,10 @@
 ---
 id: RDL-038
 title: Create a report of all routes of rails app
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-04-08 12:26'
-updated_date: '2026-04-08 12:33'
+updated_date: '2026-04-08 12:35'
 labels: []
 dependencies: []
 ---
