@@ -3,7 +3,7 @@ id: RDL-039
 title: Create a report in docs to endpoint v1/projects.json
 status: To Do
 assignee:
-  - workflow
+  - catarina
 created_date: '2026-04-12 20:40'
 updated_date: '2026-04-12 20:43'
 labels: []
