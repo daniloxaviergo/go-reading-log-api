@@ -5,7 +5,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-03 14:04'
-updated_date: '2026-04-04 05:06'
+updated_date: '2026-04-12 22:50'
 labels:
   - phase-5
   - json-comparison
@@ -289,35 +289,62 @@ The script is executable and ready to run once both APIs are accessible on ports
 ## Final Summary
 
 <!-- SECTION:FINAL_SUMMARY:BEGIN -->
-## Summary
+## JSON Response Comparison - Final Summary
 
-Created `test/compare_responses.sh` script for JSON response comparison between Go and Rails APIs. The script provides:
+### Task Completion
 
-**Features:**
-- Automated comparison for all 3 endpoints (index, show, logs)
-- Uses curl + jq for JSON fetching and comparison
-- Compares JSON structures using jq -S (key-sorted normalization)
-- Compares values with 0.01 tolerance for floating point numbers
-- Tests edge cases (empty logs, null dates)
-- Generates human-readable pass/fail report
-- Configurable API URLs via environment variables
+Executed JSON response comparison script at `/home/danilo/scripts/github/go-reading-log-api-next/test/compare_responses.sh` and captured all output.
 
-**Bug Fix:**
-Fixed PostgreSQL timestamp scanning in `project_repository.go` where `logs.data` (TIMESTAMP type) was incorrectly scanned as `*string`. Changed to scan as `*time.Time` first, then format to string.
+### Key Findings
 
-**Code Quality:**
-- go fmt: PASS (all files properly formatted)
-- go vet: PASS (no static analysis issues)
-- All unit tests: PASS (134 tests, 7 packages)
+**API Accessibility:**
+- ✅ Go API: Running on http://localhost:3000/api/v1
+- ✅ Rails API: Running on http://localhost:3001/v1
 
-**Known Limitation:**
-The comparison script requires identical JSON structure between APIs. Currently, Rails API returns JSON:API format (id, type, attributes) while Go API returns flat structure. This structure mismatch is tracked in doc-002 Phase 4.
+**Comparison Results:** 3 endpoints tested, 3 failures
 
-**Files Created:**
-- `test/compare_responses.sh` - Main comparison script
+### Differences Found
 
-**Files Modified:**
-- `internal/adapter/postgres/project_repository.go` - Fixed timestamp scanning for `logs.data` column
+#### 1. Index Endpoint (`GET /api/v1/projects`)
+- **Issue**: Different project data (ID 1 vs ID 450)
+- **Cause**: Different databases or seed data between Go and Rails
+
+#### 2. Show Endpoint (`GET /api/v1/projects/450`)
+| Field | Go | Rails | Issue |
+|-------|-----|-------|-------|
+| `progress` | null | 100.0 | Missing 100% calculation |
+| `finished_at` | null | "2026-04-02" | Missing estimation |
+| `days_unreading` | 52 | 10 | Different calculation |
+| `started_at` | "2026-02-19T00:00:00Z" | "2026-02-19" | Format difference |
+
+#### 3. Logs Endpoint (`GET /api/v1/projects/450/logs`)
+| Aspect | Go | Rails | Issue |
+|--------|-----|-------|-------|
+| Structure | Flat array | JSON:API | Structural difference |
+| `data` format | "2026-04-02 21:21:53" | "2026-04-02T18:21:53.000-03:00" | Format difference |
+| `project` | Nested object | Reference in relationships | Structure difference |
+
+### Bug Fixes Applied
+
+**PostgreSQL Timestamp Scanning Issue:**
+- Fixed `project_repository.go`: Added `::text` cast for `data` column
+- Fixed `log_repository.go`: Added `::text` casts in 4 queries (`GetByID`, `GetByProjectID`, `GetByProjectIDOrdered`, `GetAll`)
+- Changed scan from `*string` to proper text handling for timestamp columns
+
+### Recommendations
+
+1. **Sync databases** between Go and Rails APIs
+2. **Align JSON structure** (JSON:API vs flat)
+3. **Standardize field names** (snake_case vs kebab-case)
+4. **Complete derived calculations** in Go (`progress`, `finished_at`)
+5. **Use consistent date formats** (RFC3339)
+
+### Files Created
+- `/tmp/compare_modified.sh` - Modified comparison script with proper JSON handling
+- `/tmp/compare_full_report.txt` - Complete comparison output
+
+### Output Location
+Full report captured at: `/tmp/compare_full_report.txt`
 <!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
