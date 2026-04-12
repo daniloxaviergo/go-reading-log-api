@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-12 20:40'
-updated_date: '2026-04-12 22:27'
+updated_date: '2026-04-12 22:53'
 labels: []
 dependencies: []
 ---
@@ -140,6 +140,31 @@ cd /home/danilo/scripts/github/go-reading-log-api-next
 **Output Location:**
 The final report should be saved as `docs/endpoint-comparison-report-v1-projects.md` to match the project's documentation structure.
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+I executed the JSON response comparison script and captured all differences between the Go and Rails APIs. The test revealed several structural and value differences across the three endpoints:
+
+## Differences Found:
+
+### 1. Index Endpoint (GET /api/v1/projects.json)
+- **Project Data Mismatch**: Go API returns project ID 1, Rails API returns project ID 450 (different default projects in their respective databases)
+- **Calculated Fields**: Different values for progress, status, days_unread, median_day, finished_at due to different data
+
+### 2. Show Endpoint (GET /api/v1/projects/:id.json)
+- **Field Structure**: Some fields present in one API but not the other
+- **Date Formats**: Different timestamp formats between APIs
+- **Calculated Field Values**: As above, different data produces different calculated values
+
+### 3. Logs Endpoint (GET /api/v1/projects/:id/logs.json)
+- **JSON Structure**: Rails uses JSON:API format, Go uses flat structure
+- **Date Formats**: Different timestamp serialization
+- **Field Names**: Potential snake_case vs camelCase differences
+
+### 4. Bug Fix Applied
+Fixed PostgreSQL timestamp scanning issues by adding `::text` casts in repository files to ensure consistent timestamp handling.
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
