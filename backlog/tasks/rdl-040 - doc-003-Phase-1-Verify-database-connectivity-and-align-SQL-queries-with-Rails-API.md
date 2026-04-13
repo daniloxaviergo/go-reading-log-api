@@ -5,9 +5,9 @@ title: >-
   Rails API
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-12 23:50'
-updated_date: '2026-04-13 00:16'
+updated_date: '2026-04-13 00:40'
 labels:
   - database
   - query
