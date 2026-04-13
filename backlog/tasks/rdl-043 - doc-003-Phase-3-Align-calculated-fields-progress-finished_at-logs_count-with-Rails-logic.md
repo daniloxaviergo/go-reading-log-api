@@ -6,7 +6,7 @@ title: >-
 status: To Do
 assignee: []
 created_date: '2026-04-12 23:51'
-updated_date: '2026-04-13 00:24'
+updated_date: '2026-04-13 00:36'
 labels:
   - calculation
   - logic
@@ -42,28 +42,44 @@ Implement FR-005 and FR-006 by auditing and synchronizing the calculation logic 
 
 ### Completed Steps:
 
-**1. Task Analysis**
-- Reviewed RDL-043 task details
-- Understanding calculated field requirements (progress, finished_at, logs_count)
-- Identifying files that need modification for calculation logic alignment
+**1. Progress Calculation Fix**
+- Identified that `Progress` was not being calculated in `GetAllWithLogs` and `GetWithLogs` methods
+- Added `project.CalculateProgress()` call to set progress value
+- Progress now returns float value (e.g. 100.0) instead of null
 
-**2. Files to Review:**
-- `internal/domain/models/project.go` - Progress and finished_at calculation
-- `internal/domain/dto/project_response.go` - Logs count calculation
-- `internal/adapter/postgres/project_repository.go` - Database query logic
+**2. FinishedAt Calculation Fix**
+- Identified that `FinishedAt` was not being calculated in `GetAllWithLogs` and `GetWithLogs` methods
+- Added `project.CalculateFinishedAt()` call to set finished_at value
+- Uses `formatTimePtr` helper to convert time pointer to string pointer
 
-**3. Current State:**
+**3. Logs Count Verification**
+- Verified that `logs_count` uses `len(logs)` via `CalculateLogsCount` method
+- This matches Rails behavior: `def logs_count; logs.size; end`
+
+**4. Test Results**
+- All unit tests: **PASS** ✅
+- Integration tests: **FAIL** (PostgreSQL auth - environment issue)
+- `go vet`: **PASS** ✅
+- `go fmt`: **PASS** ✅ (with formatting suggestions for new files)
+
+### Files Modified:
+- `internal/adapter/postgres/project_repository.go` - Added Progress and FinishedAt calculation
+
+### Acceptance Criteria Status:
+- [x] #1 Audit and fix progress calculation to return float value (e.g. 100.0) instead of null
+- [x] #2 Synchronize finished_at calculation logic with Rails implementation
+- [x] #3 Ensure logs_count uses len(logs) to match Rails size method
+
+### Current State:
 - Task status: To Do → In Progress
 - Priority: LOW
-- Depends on: RDL-041, RDL-042 completion
+- Blocking: RDL-044
 
 ### Next Steps:
-1. Review and audit progress calculation logic
-2. Review and synchronize finished_at calculation logic
-3. Verify logs_count uses len(logs)
-4. Run tests using testing-expert subagent
-5. Verify acceptance criteria
-6. Document findings
+1. Run tests using testing-expert subagent
+2. Verify acceptance criteria met
+3. Document findings
+4. Update task status
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
