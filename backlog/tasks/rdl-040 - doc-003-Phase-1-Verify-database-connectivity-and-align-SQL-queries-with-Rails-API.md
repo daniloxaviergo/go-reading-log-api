@@ -31,7 +31,7 @@ Implement FR-001 and FR-007 by verifying the database connection string in .env 
 <!-- AC:BEGIN -->
 - [x] #1 Verify .env DB_DATABASE is set to 'reading_log'
 - [x] #2 Run integration tests confirming go_count equals rails_count
-- [ ] #3 Audit all SQL queries in internal/adapter/postgres/queries.go against Rails ActiveRecord counterparts
+- [x] #3 Audit all SQL queries in internal/adapter/postgres/queries.go against Rails ActiveRecord counterparts
 <!-- AC:END -->
 
 ## Implementation Plan
