@@ -5,7 +5,7 @@ title: >-
   with Rails logic
 status: Done
 assignee:
-  - workflow
+  - thomas
 created_date: '2026-04-12 23:51'
 updated_date: '2026-04-13 02:33'
 labels:
