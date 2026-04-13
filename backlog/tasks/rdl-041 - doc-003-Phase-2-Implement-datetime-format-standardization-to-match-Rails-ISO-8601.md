@@ -6,6 +6,7 @@ title: >-
 status: To Do
 assignee: []
 created_date: '2026-04-12 23:50'
+updated_date: '2026-04-13 00:17'
 labels:
   - datetime
   - format
@@ -31,6 +32,38 @@ Implement FR-002 by updating all datetime field marshaling in the Go API to use 
 - [ ] #2 Implement custom MarshalJSON methods for datetime fields
 - [ ] #3 Update unmarshaling to accept both Z and +00:00 formats
 <!-- AC:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress: RDL-041
+
+### Status: In Progress
+
+### Completed Steps:
+
+**1. Task Analysis**
+- Reviewed RDL-041 task details
+- Understanding datetime format requirements for Rails ISO 8601 compatibility
+- Identifying files that need modification for datetime format standardization
+
+**2. Files to Modify:**
+- `internal/domain/dto/*.go` - Update time.Time field marshaling
+- Implement custom MarshalJSON methods for datetime fields
+- Update unmarshaling to accept both Z and +00:00 formats
+
+**3. Current State:**
+- Task status: To Do → In Progress
+- Priority: HIGH
+- Blocking: RDL-042, RDL-043, RDL-044 (Phase 2 tasks depend on this)
+
+### Next Steps:
+1. Update DTOs with custom datetime marshaling
+2. Implement ISO 8601 format with timezone offset (+00:00)
+3. Run tests using testing-expert subagent
+4. Verify acceptance criteria
+5. Document findings
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
