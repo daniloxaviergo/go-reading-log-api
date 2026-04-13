@@ -3,10 +3,10 @@ id: RDL-043
 title: >-
   [doc-003 Phase 3] Align calculated fields (progress, finished_at, logs_count)
   with Rails logic
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-04-12 23:51'
-updated_date: '2026-04-13 00:36'
+updated_date: '2026-04-13 00:37'
 labels:
   - calculation
   - logic
