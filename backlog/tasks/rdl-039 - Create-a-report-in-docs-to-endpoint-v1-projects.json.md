@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-12 20:40'
-updated_date: '2026-04-13 10:33'
+updated_date: '2026-04-13 10:34'
 labels: []
 dependencies: []
 ---
@@ -21,13 +21,14 @@ execute test/compare_responses.sh to endpoint v1/projects.json and make a report
 <!-- SECTION:PLAN:BEGIN -->
 ### 1. Technical Approach
 
-This task requires running the existing comparison script (`test/compare_responses.sh`) against the `/api/v1/projects.json` endpoint (and related endpoints) and creating a comprehensive report documenting any differences found between the Go API and Rails API responses.
+This task requires updating the comparison script to use the correct `.json` endpoint suffixes and running a comprehensive comparison between the Go API and Rails API for the projects endpoint.
 
 **Key Technical Decisions:**
-- Use the existing `compare_responses.sh` script which already has robust JSON comparison logic using `curl` and `jq`
+- Update `test/compare_responses.sh` to use `.json` suffix for all endpoints
 - The script tests three endpoints: index, show, and logs
 - Compare both JSON structure and values (with 0.01 tolerance for floating-point numbers)
 - Document all discrepancies in a structured markdown report
+- The existing report `docs/endpoint-comparison-report-v1-projects.md` shows there are known differences that need to be re-verified
 
 **Why This Approach:**
 - The comparison script already exists and handles edge cases (null values, empty arrays)
@@ -39,13 +40,19 @@ This task requires running the existing comparison script (`test/compare_respons
 
 ### 2. Files to Modify
 
+#### Files to Modify:
+1. **`test/compare_responses.sh`** - Update endpoint URLs to use `.json` suffix
+   - Line 21-22: Update default URLs
+   - Lines 200-220: Update `test_index_endpoint()` to use `/api/v1/projects.json`
+   - Lines 223-240: Update `test_show_endpoint()` to use `/api/v1/projects/:id.json`
+   - Lines 243-260: Update `test_logs_endpoint()` to use `/api/v1/projects/:id/logs.json`
+
 #### New Files to Create:
 1. **`docs/rdl-039-comparison-report.md`** - The main comparison report documenting all findings
 
 #### Files to Read (No modification):
-1. **`test/compare_responses.sh`** - The comparison script to execute
-2. **`docs/endpoint-comparison-report-v1-projects.md`** - Template/reference for report format
-3. **`docs/comprare.md`** - Additional context on comparison plan
+1. **`docs/endpoint-comparison-report-v1-projects.md`** - Template/reference for report format
+2. **`docs/comprare.md`** - Additional context on comparison plan
 
 #### Existing Documentation to Review:
 1. **`AGENTS.md`** - Project context and API documentation
