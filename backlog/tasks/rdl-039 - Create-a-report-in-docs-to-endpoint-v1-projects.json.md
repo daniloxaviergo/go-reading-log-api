@@ -1,11 +1,11 @@
 ---
 id: RDL-039
 title: Create a report in docs to endpoint v1/projects.json
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-12 20:40'
-updated_date: '2026-04-13 10:52'
+updated_date: '2026-04-13 10:54'
 labels: []
 dependencies: []
 ---
