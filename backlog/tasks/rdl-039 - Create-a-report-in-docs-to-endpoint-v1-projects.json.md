@@ -2,10 +2,9 @@
 id: RDL-039
 title: Create a report in docs to endpoint v1/projects.json
 status: To Do
-assignee:
-  - next-task
+assignee: []
 created_date: '2026-04-12 20:40'
-updated_date: '2026-04-13 10:34'
+updated_date: '2026-04-13 10:35'
 labels: []
 dependencies: []
 ---
