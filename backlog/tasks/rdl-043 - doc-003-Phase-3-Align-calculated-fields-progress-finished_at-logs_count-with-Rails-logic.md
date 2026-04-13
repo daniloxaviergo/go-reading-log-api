@@ -4,8 +4,7 @@ title: >-
   [doc-003 Phase 3] Align calculated fields (progress, finished_at, logs_count)
   with Rails logic
 status: Done
-assignee:
-  - next-task
+assignee: []
 created_date: '2026-04-12 23:51'
 updated_date: '2026-04-13 09:17'
 labels:
