@@ -4,9 +4,10 @@ title: >-
   [doc-003 Phase 2] Harmonize JSON response structure to match Rails JSON:API
   format
 status: Done
-assignee: []
+assignee:
+  - catarina
 created_date: '2026-04-12 23:50'
-updated_date: '2026-04-13 00:23'
+updated_date: '2026-04-13 01:34'
 labels:
   - json
   - api
