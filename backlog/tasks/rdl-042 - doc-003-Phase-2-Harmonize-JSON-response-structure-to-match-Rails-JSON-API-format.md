@@ -3,7 +3,7 @@ id: RDL-042
 title: >-
   [doc-003 Phase 2] Harmonize JSON response structure to match Rails JSON:API
   format
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-04-12 23:50'
 updated_date: '2026-04-13 00:23'
