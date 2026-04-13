@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-12 23:50'
-updated_date: '2026-04-13 00:05'
+updated_date: '2026-04-13 00:07'
 labels:
   - database
   - query
@@ -92,12 +92,15 @@ query := `
 | File | Action | Reason |
 |------|--------|--------|
 | `internal/adapter/postgres/project_repository.go` | Review/Verify | Ensure SQL queries match Rails ActiveRecord logic exactly |
+| `internal/adapter/postgres/log_repository.go` | Review/Verify | Ensure log queries match Rails ActiveRecord logic |
 | `internal/config/config.go` | Review/Verify | Confirm DB_DATABASE defaults to `reading_log` |
 | `.env` / `.env.example` | Update if needed | Ensure DB_DATABASE=reading_log is explicitly set |
 | `test/compare_responses.sh` | Reference | Use for verification after implementation |
 | `docs/database-alignment-report.md` | Create | Document findings and verification results |
 
 **No new files required** - this is a verification and alignment task, not a feature implementation.
+
+**Note:** The task description mentions `internal/adapter/postgres/queries.go` but this file doesn't exist. SQL queries are embedded in `project_repository.go` and `log_repository.go`.
 
 ### 3. Dependencies
 
@@ -232,7 +235,7 @@ If verification fails:
    # Should show: DB_DATABASE=reading_log
    ```
 
-2. Review and verify SQL queries in `project_repository.go`
+2. Review and verify SQL queries in `project_repository.go` and `log_repository.go`
    - Confirm `GetAllWithLogs` uses LEFT OUTER JOIN
    - Confirm ORDER BY matches Rails behavior
    - Confirm column selection matches serializer
@@ -248,7 +251,7 @@ If verification fails:
 **Phase 2: Fixes (If Needed)**
 
 If issues found during verification:
-1. Fix SQL queries in `project_repository.go`
+1. Fix SQL queries in `project_repository.go` or `log_repository.go`
 2. Update DTOs in `internal/domain/dto/` if needed
 3. Re-run comparison tests
 
@@ -269,7 +272,7 @@ This implementation plan addresses **Task RDL-040: Verify database connectivity 
 
 **Key Activities:**
 1. Verify .env configuration points to correct database
-2. Audit SQL queries in `internal/adapter/postgres/project_repository.go` against Rails `eager_load` behavior
+2. Audit SQL queries in `internal/adapter/postgres/project_repository.go` and `log_repository.go` against Rails `eager_load` behavior
 3. Run comprehensive comparison tests using `test/compare_responses.sh`
 4. Document any discrepancies and fixes
 5. Obtain stakeholder sign-off
