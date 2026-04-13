@@ -5,7 +5,7 @@ title: >-
   8601
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-12 23:50'
 updated_date: '2026-04-13 01:34'
 labels:
