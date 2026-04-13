@@ -3,9 +3,9 @@ id: RDL-044
 title: '[doc-003 Phase 4] Run full validation suite and obtain stakeholder sign-off'
 status: Done
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-12 23:51'
-updated_date: '2026-04-13 09:17'
+updated_date: '2026-04-13 09:35'
 labels:
   - testing
   - validation
