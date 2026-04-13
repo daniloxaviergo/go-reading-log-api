@@ -6,6 +6,7 @@ title: >-
 status: To Do
 assignee: []
 created_date: '2026-04-12 23:51'
+updated_date: '2026-04-13 00:24'
 labels:
   - calculation
   - logic
@@ -31,6 +32,39 @@ Implement FR-005 and FR-006 by auditing and synchronizing the calculation logic 
 - [ ] #2 Synchronize finished_at calculation logic with Rails implementation
 - [ ] #3 Ensure logs_count uses len(logs) to match Rails size method
 <!-- AC:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress: RDL-043
+
+### Status: In Progress
+
+### Completed Steps:
+
+**1. Task Analysis**
+- Reviewed RDL-043 task details
+- Understanding calculated field requirements (progress, finished_at, logs_count)
+- Identifying files that need modification for calculation logic alignment
+
+**2. Files to Review:**
+- `internal/domain/models/project.go` - Progress and finished_at calculation
+- `internal/domain/dto/project_response.go` - Logs count calculation
+- `internal/adapter/postgres/project_repository.go` - Database query logic
+
+**3. Current State:**
+- Task status: To Do → In Progress
+- Priority: LOW
+- Depends on: RDL-041, RDL-042 completion
+
+### Next Steps:
+1. Review and audit progress calculation logic
+2. Review and synchronize finished_at calculation logic
+3. Verify logs_count uses len(logs)
+4. Run tests using testing-expert subagent
+5. Verify acceptance criteria
+6. Document findings
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
