@@ -5,9 +5,9 @@ title: >-
   format
 status: Done
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-12 23:50'
-updated_date: '2026-04-13 01:37'
+updated_date: '2026-04-13 01:39'
 labels:
   - json
   - api
