@@ -3,7 +3,7 @@ id: RDL-041
 title: >-
   [doc-003 Phase 2] Implement datetime format standardization to match Rails ISO
   8601
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-04-12 23:50'
 updated_date: '2026-04-13 00:17'
