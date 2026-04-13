@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-12 23:50'
-updated_date: '2026-04-13 00:13'
+updated_date: '2026-04-13 00:14'
 labels:
   - database
   - query
@@ -29,7 +29,7 @@ Implement FR-001 and FR-007 by verifying the database connection string in .env 
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Verify .env DB_DATABASE is set to 'reading_log'
+- [x] #1 Verify .env DB_DATABASE is set to 'reading_log'
 - [ ] #2 Run integration tests confirming go_count equals rails_count
 - [ ] #3 Audit all SQL queries in internal/adapter/postgres/queries.go against Rails ActiveRecord counterparts
 <!-- AC:END -->
