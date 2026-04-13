@@ -4,8 +4,10 @@ title: >-
   [doc-003 Phase 1] Verify database connectivity and align SQL queries with
   Rails API
 status: To Do
-assignee: []
+assignee:
+  - workflow
 created_date: '2026-04-12 23:50'
+updated_date: '2026-04-13 00:00'
 labels:
   - database
   - query
