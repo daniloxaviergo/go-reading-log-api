@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-12 20:40'
-updated_date: '2026-04-13 10:35'
+updated_date: '2026-04-13 10:42'
 labels: []
 dependencies: []
 ---
@@ -194,6 +194,60 @@ The comparison script includes comprehensive test coverage:
    - Ensure all acceptance criteria are met
    - Update task status in backlog
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Task Execution Progress: RDL-039 - Create a report in docs to endpoint v1/projects.json
+
+### Date: 2026-04-13
+
+### What I've Done
+
+1. **Analyzed the task requirements:**
+   - Execute the comparison script `test/compare_responses.sh` against the v1/projects.json endpoint
+   - Create a comprehensive report documenting differences between Go API and Rails API
+   - Use the testing-expert subagent for test execution
+
+2. **Examined the existing infrastructure:**
+   - Found the comparison script at `test/compare_responses.sh`
+   - Found an existing comparison report at `docs/endpoint-comparison-report-v1-projects.md`
+   - The script tests three endpoints: index, show, and logs
+   - Uses jq for JSON comparison with 0.01 tolerance for floating-point numbers
+
+3. **Identified the issue:**
+   - The comparison script was designed to use `.json` suffixes
+   - However, neither the Go API nor the Rails API actually have `.json` suffix routes
+   - The Go API routes are `/api/v1/projects` and `/api/v1/projects/:id` (no .json suffix)
+   - The Rails API routes appear to follow JSON:API conventions differently
+
+4. **Fixed the comparison script:**
+   - Added directory creation in `fetch_json` function to ensure temp directory structure exists
+   - Updated endpoint URLs to remove `.json` suffix (both APIs use plain routes)
+   - Added proper error handling for API accessibility checks
+
+5. **Ran the comparison script:**
+   - Both APIs are running (Go on 3000, Rails on 3001)
+   - The script successfully executed and captured differences
+   - Key findings documented in the output
+
+### Pending Actions
+
+- [ ] Create comprehensive report documenting all differences found
+- [ ] Verify all acceptance criteria are met
+- [ ] Submit PR-style final summary
+
+### Next Steps
+
+1. Document all differences found in the comparison between Go API and Rails API
+2. Create the report at `docs/rdl-039-comparison-report.md`
+3. Address any critical differences that need fixing
+4. Finalize the task in the backlog
+
+### Notes
+
+The comparison script now works correctly with both APIs running. The next step is to generate the comprehensive report documenting all discrepancies found between the two implementations.
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
