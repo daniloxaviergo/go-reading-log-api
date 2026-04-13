@@ -3,7 +3,7 @@ id: RDL-040
 title: >-
   [doc-003 Phase 1] Verify database connectivity and align SQL queries with
   Rails API
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-12 23:50'
