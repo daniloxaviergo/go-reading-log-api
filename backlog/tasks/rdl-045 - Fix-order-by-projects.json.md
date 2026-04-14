@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-14 09:53'
-updated_date: '2026-04-14 10:00'
+updated_date: '2026-04-14 10:01'
 labels: []
 dependencies: []
 ---
@@ -165,6 +165,33 @@ go test -v ./internal/api/v1/...
 - The current implementation in `GetAllWithLogs` groups logs by project after querying, which works correctly with the new ordering
 - No schema changes required
 - No migration needed
+
+---
+
+## Final Acceptance Criteria Checklist
+
+After implementation, verify:
+
+- [ ] **#1** All unit tests pass (use testing-expert subagent for test execution and verification)
+- [ ] **#2** All integration tests pass (use testing-expert subagent for test execution and verification)
+- [ ] **#3** `go fmt` and `go vet` pass with no errors
+- [ ] **#4** Clean Architecture layers properly followed
+- [ ] **#5** Error responses consistent with existing patterns
+- [ ] **#6** HTTP status codes correct for response type
+- [ ] **#7** Database queries optimized with proper indexes
+- [ ] **#8** Documentation updated in QWEN.md
+- [ ] **#9** New code paths include error path tests
+- [ ] **#10** HTTP handlers test both success and error responses
+- [ ] **#11** Integration tests verify actual database interactions
+- [ ] **#12** Tests use testing-expert subagent for test execution and verification
+
+**Manual Verification Step:**
+```bash
+# Run comparison script to verify fix
+./test/compare_responses.sh
+
+# Expected: All tests should pass, first project should match between Go and Rails APIs
+```
 <!-- SECTION:PLAN:END -->
 
 ## Definition of Done
