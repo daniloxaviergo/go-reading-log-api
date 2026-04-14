@@ -2,8 +2,7 @@
 id: RDL-045
 title: Fix order by projects.json
 status: In Progress
-assignee:
-  - thomas
+assignee: []
 created_date: '2026-04-14 09:53'
 updated_date: '2026-04-14 11:03'
 labels: []
