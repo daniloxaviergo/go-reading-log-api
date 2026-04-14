@@ -3,9 +3,9 @@ id: RDL-039
 title: Create a report in docs to endpoint v1/projects.json
 status: Done
 assignee:
-  - Thomas
+  - workflow
 created_date: '2026-04-12 20:40'
-updated_date: '2026-04-14 09:10'
+updated_date: '2026-04-14 09:11'
 labels: []
 dependencies: []
 ---
