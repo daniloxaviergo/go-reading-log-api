@@ -4,6 +4,7 @@ title: Update handlers to routes
 status: To Do
 assignee: []
 created_date: '2026-04-14 11:08'
+updated_date: '2026-04-14 11:10'
 labels: []
 dependencies: []
 ---
@@ -20,6 +21,8 @@ update the prd to correct url, should be `.json` at the end
 - /v1/projects/{project_id}.json
 - /v1/projects/{project_id}/logs.json
 - /v1/projects.json
+
+update for new routes: test/compare_responses.sh
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Definition of Done
