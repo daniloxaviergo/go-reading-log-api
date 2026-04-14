@@ -1,7 +1,7 @@
 ---
 id: RDL-039
 title: Create a report in docs to endpoint v1/projects.json
-status: To Do
+status: Done
 assignee:
   - Thomas
 created_date: '2026-04-12 20:40'
