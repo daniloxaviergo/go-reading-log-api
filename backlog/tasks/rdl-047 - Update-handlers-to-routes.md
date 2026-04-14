@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - Catarina
 created_date: '2026-04-14 11:08'
-updated_date: '2026-04-14 11:10'
+updated_date: '2026-04-14 11:18'
 labels: []
 dependencies: []
 ---
@@ -25,6 +25,125 @@ update the prd to correct url, should be `.json` at the end
 
 update for new routes: test/compare_responses.sh
 <!-- SECTION:DESCRIPTION:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+### 1. Technical Approach
+
+The task requires updating the Go API to match the Rails API's routing structure and response format. The Rails API uses JSON:API specification with nested routes, while the Go API currently uses flat routes.
+
+**Key Changes:**
+1. Update route definitions to match Rails API: `/api/v1/projects`, `/api/v1/projects/:id`, `/api/v1/projects/:id/logs`
+2. Implement JSON:API response wrapper for all endpoints
+3. Ensure datetime format consistency (RFC3339)
+4. Align calculated fields (progress, status, logs_count, finished_at, median_day)
+5. Update test script to verify JSON:API structure
+
+**Architecture Decision:** Use a JSON:API envelope middleware to wrap responses consistently, following the existing middleware pattern in `internal/api/v1/middleware/`.
+
+---
+
+### 2. Files to Modify
+
+| File | Action | Description |
+|------|--------|-------------|
+| `internal/api/v1/routes.go` | Modify | Update route definitions to match Rails API structure |
+| `internal/api/v1/handlers/projects_handler.go` | Modify | Update handlers to return JSON:API structure |
+| `internal/api/v1/handlers/logs_handler.go` | Modify | Update logs handler to match Rails API response |
+| `internal/domain/dto/project.go` | Modify | Add JSON:API struct tags and envelope support |
+| `internal/domain/dto/log.go` | Modify | Align log response structure |
+| `internal/api/v1/middleware/jsonapi.go` | Create | New middleware for JSON:API envelope |
+| `test/compare_responses.sh` | Modify | Update comparison logic for JSON:API structure |
+| `docs/endpoint-comparison-report-v1-projects.md` | Create | Document route and response differences |
+
+---
+
+### 3. Dependencies
+
+- **Task RDL-039** - Must be partially complete (database connectivity, datetime format)
+- **Existing middleware** - `internal/api/v1/middleware/` folder structure
+- **DTOs** - `internal/domain/dto/` must exist with current structure
+- **Comparison script** - `test/compare_responses.sh` must be functional
+
+**Prerequisites:**
+1. Database connection verified (Issue #1 from PRD)
+2. Datetime format standardized (Issue #3 from PRD)
+3. Basic JSON structure aligned (Issue #2 from PRD)
+
+---
+
+### 4. Code Patterns
+
+**JSON:API Response Format (matching Rails):**
+```go
+{
+  "data": [
+    {
+      "type": "projects",
+      "id": "1",
+      "attributes": {
+        "name": "Project Name",
+        "total_page": 200,
+        "page": 100,
+        "progress": 50.0,
+        "status": "running",
+        "logs_count": 5,
+        "days_unread": 2,
+        "median_day": 20.0,
+        "finished_at": "2026-05-01T00:00:00Z"
+      }
+    }
+  ]
+}
+```
+
+**Pattern to Follow:**
+1. Create JSON:API envelope middleware
+2. Modify handlers to return plain objects (envelope added by middleware)
+3. Update DTOs with `jsonapi` tags
+4. Align calculated field logic with Rails
+
+---
+
+### 5. Testing Strategy
+
+**Unit Tests:**
+- Test JSON:API serialization/deserialization
+- Test calculated field logic (progress, status, logs_count, median_day, finished_at)
+- Test error handling with JSON:API error format
+
+**Integration Tests:**
+- Compare full response structure between Go and Rails APIs
+- Verify route matching (all 3 endpoints)
+- Test edge cases (empty logs, null dates)
+
+**Test Execution:**
+- Use `testing-expert` subagent for test execution
+- Run `go test -v ./internal/api/v1/...`
+- Run `go test -v ./test/...`
+- Execute `test/compare_responses.sh` for full comparison
+
+---
+
+### 6. Risks and Considerations
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| Breaking existing clients | HIGH | Maintain backward compatibility where possible |
+| Performance degradation | MEDIUM | Profile queries before/after changes |
+| Test flakiness | LOW | Use stable test data, fix comparison script |
+| Route mismatch | HIGH | Align with Rails routes exactly |
+
+**Blocking Issues:**
+1. Rails API route configuration (may need to add `/api/v1/projects` route to Rails)
+2. JSON:API structure adoption (may require frontend changes)
+
+**Trade-offs:**
+- JSON:API adds wrapper overhead but ensures compatibility
+- May need to add pagination if not present in Rails API
+- Calculated fields may need DB storage for performance
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
