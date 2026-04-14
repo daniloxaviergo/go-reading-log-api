@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - Catarina
 created_date: '2026-04-14 11:08'
-updated_date: '2026-04-14 11:19'
+updated_date: '2026-04-14 11:21'
 labels: []
 dependencies: []
 ---
@@ -33,18 +33,18 @@ update for new routes: test/compare_responses.sh
 
 The task requires updating the Go API to match the Rails API's routing structure and response format. 
 
-**CRITICAL CLARIFICATION - URL FORMAT:**
-The PRD description mentions URLs with `.json` suffix (e.g., `/v1/projects.json`), but the **actual Rails API routes do NOT have this suffix**. The Rails routes are:
-- `/api/v1/projects` (no `.json`)
-- `/api/v1/projects/:id` (no `.json`)
-- `/api/v1/projects/:id/logs` (no `.json`)
+**URL FORMAT CLARIFICATION:**
+After reviewing the Rails API routes (`rails-app/config/routes.rb`), the actual routes are:
+- `/api/v1/projects` - NO `.json` suffix
+- `/api/v1/projects/:id` - NO `.json` suffix
+- `/api/v1/projects/:id/logs` - NO `.json` suffix
 
-The `.json` in the task description refers to the **response content type** (JSON format), not the URL path.
+The PRD description mentions `.json` suffix, but this refers to the **response content type** (JSON format), not the URL path. The Rails API does not require or use `.json` suffix in routes.
 
 **Key Changes:**
 1. Update route definitions to match Rails API exactly: `/api/v1/projects`, `/api/v1/projects/:id`, `/api/v1/projects/:id/logs`
-2. Implement JSON:API response wrapper for all endpoints
-3. Ensure datetime format consistency (RFC3339 with timezone offset)
+2. Implement JSON:API response wrapper for all endpoints (wraps responses in `data` array with `type` and `attributes`)
+3. Ensure datetime format consistency (RFC3339 with timezone offset `+00:00`)
 4. Align calculated fields (progress, status, logs_count, finished_at, median_day)
 5. Update test script to verify JSON:API structure
 
