@@ -1,11 +1,11 @@
 ---
 id: RDL-045
 title: Fix order by projects.json
-status: To Do
+status: In Progress
 assignee:
   - thomas
 created_date: '2026-04-14 09:53'
-updated_date: '2026-04-14 10:04'
+updated_date: '2026-04-14 11:03'
 labels: []
 dependencies: []
 ---
