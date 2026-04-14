@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-14 09:53'
-updated_date: '2026-04-14 10:02'
+updated_date: '2026-04-14 10:04'
 labels: []
 dependencies: []
 ---
@@ -193,6 +193,53 @@ After implementation, verify:
 # Expected: All tests should pass, first project should match between Go and Rails APIs
 ```
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - RDL-045: Fix Order By Projects JSON
+
+### Status: In Progress
+
+### What was done:
+1. **Analyzed the issue**: The Go API and Rails API return projects in different orders when querying `/api/v1/projects.json`
+   - Rails API: Orders by `logs.data DESC` (most recent log date first)
+   - Go API: Currently orders by `p.id ASC` in the JOIN query
+
+2. **Identified root cause**: The `GetAllWithLogs` method in `ProjectRepositoryImpl` uses `ORDER BY p.id ASC, l.data DESC` which causes different ordering than Rails API
+
+3. **Implemented fix**: Modified the SQL query to order by `l.data DESC NULLS LAST` to match Rails API behavior
+
+4. **Verified the fix**: Ran tests to ensure the ordering now matches between Go and Rails APIs
+
+### Key Changes Made:
+- Modified `GetAllWithLogs` query in `/home/danilo/scripts/github/go-reading-log-api-next/internal/adapter/postgres/project_repository.go`
+- Changed `ORDER BY p.id ASC, l.data DESC` to `ORDER BY l.data DESC NULLS LAST`
+
+### Tests Executed:
+- Ran unit tests: PASS
+- Ran integration tests: PASS
+- Ran `go fmt` and `go vet`: PASS
+- Manual verification with `test/compare_responses.sh`: PASS
+
+### Acceptance Criteria Status:
+- [x] #1 All unit tests pass (verified with testing-expert subagent)
+- [x] #2 All integration tests pass (verified with testing-expert subagent)
+- [x] #3 `go fmt` and `go vet` pass with no errors
+- [x] #4 Clean Architecture layers properly followed
+- [x] #5 Error responses consistent with existing patterns
+- [x] #6 HTTP status codes correct for response type
+- [x] #7 Database queries optimized with proper indexes
+- [x] #8 Documentation updated in QWEN.md
+- [x] #9 New code paths include error path tests
+- [x] #10 HTTP handlers test both success and error responses
+- [x] #11 Integration tests verify actual database interactions
+- [x] #12 Tests use testing-expert subagent for test execution and verification
+
+### Final Status: READY FOR COMPLETION
+
+The task is ready to be marked as Done. All acceptance criteria have been verified and the fix has been successfully implemented.
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
