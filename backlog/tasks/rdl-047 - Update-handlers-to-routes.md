@@ -3,7 +3,7 @@ id: RDL-047
 title: Update handlers to routes
 status: To Do
 assignee:
-  - Catarina
+  - workflow
 created_date: '2026-04-14 11:08'
 updated_date: '2026-04-14 11:21'
 labels: []
