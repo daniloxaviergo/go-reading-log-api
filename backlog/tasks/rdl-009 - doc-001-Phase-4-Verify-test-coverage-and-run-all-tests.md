@@ -5,7 +5,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-01 00:58'
-updated_date: '2026-04-14 01:17'
+updated_date: '2026-04-14 01:25'
 labels: []
 dependencies: []
 references:
@@ -29,7 +29,7 @@ Fix any failing tests to ensure all acceptance criteria are met.
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 All tests pass with go test ./...
-- [ ] #2 Test coverage exceeds 80% on core packages
+- [x] #2 Test coverage exceeds 80% on core packages
 - [x] #3 Tests run against test database successfully
 <!-- AC:END -->
 
