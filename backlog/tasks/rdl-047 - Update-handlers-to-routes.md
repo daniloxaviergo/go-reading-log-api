@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - Catarina
 created_date: '2026-04-14 11:08'
-updated_date: '2026-04-14 11:18'
+updated_date: '2026-04-14 11:19'
 labels: []
 dependencies: []
 ---
@@ -31,12 +31,20 @@ update for new routes: test/compare_responses.sh
 <!-- SECTION:PLAN:BEGIN -->
 ### 1. Technical Approach
 
-The task requires updating the Go API to match the Rails API's routing structure and response format. The Rails API uses JSON:API specification with nested routes, while the Go API currently uses flat routes.
+The task requires updating the Go API to match the Rails API's routing structure and response format. 
+
+**CRITICAL CLARIFICATION - URL FORMAT:**
+The PRD description mentions URLs with `.json` suffix (e.g., `/v1/projects.json`), but the **actual Rails API routes do NOT have this suffix**. The Rails routes are:
+- `/api/v1/projects` (no `.json`)
+- `/api/v1/projects/:id` (no `.json`)
+- `/api/v1/projects/:id/logs` (no `.json`)
+
+The `.json` in the task description refers to the **response content type** (JSON format), not the URL path.
 
 **Key Changes:**
-1. Update route definitions to match Rails API: `/api/v1/projects`, `/api/v1/projects/:id`, `/api/v1/projects/:id/logs`
+1. Update route definitions to match Rails API exactly: `/api/v1/projects`, `/api/v1/projects/:id`, `/api/v1/projects/:id/logs`
 2. Implement JSON:API response wrapper for all endpoints
-3. Ensure datetime format consistency (RFC3339)
+3. Ensure datetime format consistency (RFC3339 with timezone offset)
 4. Align calculated fields (progress, status, logs_count, finished_at, median_day)
 5. Update test script to verify JSON:API structure
 
@@ -48,14 +56,14 @@ The task requires updating the Go API to match the Rails API's routing structure
 
 | File | Action | Description |
 |------|--------|-------------|
-| `internal/api/v1/routes.go` | Modify | Update route definitions to match Rails API structure |
+| `internal/api/v1/routes.go` | Modify | Update route definitions to match Rails API structure exactly |
 | `internal/api/v1/handlers/projects_handler.go` | Modify | Update handlers to return JSON:API structure |
 | `internal/api/v1/handlers/logs_handler.go` | Modify | Update logs handler to match Rails API response |
 | `internal/domain/dto/project.go` | Modify | Add JSON:API struct tags and envelope support |
 | `internal/domain/dto/log.go` | Modify | Align log response structure |
 | `internal/api/v1/middleware/jsonapi.go` | Create | New middleware for JSON:API envelope |
 | `test/compare_responses.sh` | Modify | Update comparison logic for JSON:API structure |
-| `docs/endpoint-comparison-report-v1-projects.md` | Create | Document route and response differences |
+| `docs/rdl-047-route-alignment.md` | Create | Document route and response differences |
 
 ---
 
@@ -91,7 +99,7 @@ The task requires updating the Go API to match the Rails API's routing structure
         "logs_count": 5,
         "days_unread": 2,
         "median_day": 20.0,
-        "finished_at": "2026-05-01T00:00:00Z"
+        "finished_at": "2026-05-01T00:00:00+00:00"
       }
     }
   ]
