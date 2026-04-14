@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-14 09:53'
-updated_date: '2026-04-14 09:53'
+updated_date: '2026-04-14 09:59'
 labels: []
 dependencies: []
 ---
@@ -50,6 +50,31 @@ The Go API and Rails API return completely different projects from the same data
 }
 ```
 <!-- SECTION:DESCRIPTION:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+### 1. Technical Approach
+
+The issue is that the Go API and Rails API return projects in different orders when querying `/api/v1/projects`. 
+
+**Root Cause Analysis:**
+- **Rails API**: Orders projects by `logs.data DESC` (most recent log date first)
+- **Go API**: Currently orders by `projects.id ASC` (oldest project first)
+
+This causes the first project in the list to be different:
+- Rails returns: Project ID 450 ("História da Igreja VIII.1") - has recent logs
+- Go returns: Project ID 1 ("Filocalia") - oldest project, no recent logs
+
+**Solution:**
+Modify the `GetAllWithLogs` method in `ProjectRepositoryImpl` to order results by the most recent log date (`logs.data DESC`) instead of project ID. This matches the Rails API behavior.
+
+**Implementation Strategy:**
+1. Update the SQL query in `GetAllWithLogs` to order by `l.data DESC` (with NULLS LAST for projects without logs)
+2. Update the `GetWithLogs` method to also use consistent ordering
+3. Ensure the ordering is applied to the joined result set
+4. Update tests to verify the ordering behavior
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
