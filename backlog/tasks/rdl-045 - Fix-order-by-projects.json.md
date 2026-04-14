@@ -3,7 +3,7 @@ id: RDL-045
 title: Fix order by projects.json
 status: To Do
 assignee:
-  - workflow
+  - thomas
 created_date: '2026-04-14 09:53'
 updated_date: '2026-04-14 10:02'
 labels: []
