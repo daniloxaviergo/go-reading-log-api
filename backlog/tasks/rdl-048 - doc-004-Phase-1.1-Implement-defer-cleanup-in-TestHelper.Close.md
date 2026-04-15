@@ -3,9 +3,9 @@ id: RDL-048
 title: '[doc-004 Phase 1.1] Implement defer cleanup in TestHelper.Close()'
 status: To Do
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-15 12:14'
-updated_date: '2026-04-15 23:40'
+updated_date: '2026-04-15 23:48'
 labels:
   - cleanup
   - infrastructure
