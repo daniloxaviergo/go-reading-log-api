@@ -5,7 +5,7 @@ import (
 )
 
 // LogResponse represents the JSON response for Log entities
-// Matches Rails LogSerializer output
+// Matches Rails LogSerializer output (without nested project)
 type LogResponse struct {
 	ctx       context.Context
 	ID        int64            `json:"id"`

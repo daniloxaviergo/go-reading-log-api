@@ -25,8 +25,9 @@ func (r *LogRepositoryImpl) GetByID(ctx context.Context, id int64) (*models.Log,
 	ctx, cancel := context.WithTimeout(ctx, defaultContextTimeout)
 	defer cancel()
 
+	// Cast timestamp columns to text to avoid binary format scanning issues
 	query := `
-		SELECT id, project_id, data, start_page, end_page, wday, note, text, created_at, updated_at
+		SELECT id, project_id, data::text as data_text, start_page, end_page, wday, note, text, created_at, updated_at
 		FROM logs
 		WHERE id = $1
 	`
@@ -74,8 +75,9 @@ func (r *LogRepositoryImpl) GetByProjectID(ctx context.Context, projectID int64)
 	ctx, cancel := context.WithTimeout(ctx, defaultContextTimeout)
 	defer cancel()
 
+	// Cast timestamp columns to text to avoid binary format scanning issues
 	query := `
-		SELECT id, project_id, data, start_page, end_page, wday, note, text, created_at, updated_at
+		SELECT id, project_id, data::text as data_text, start_page, end_page, wday, note, text, created_at, updated_at
 		FROM logs
 		WHERE project_id = $1
 		ORDER BY id ASC
@@ -134,8 +136,9 @@ func (r *LogRepositoryImpl) GetByProjectIDOrdered(ctx context.Context, projectID
 	ctx, cancel := context.WithTimeout(ctx, defaultContextTimeout)
 	defer cancel()
 
+	// Cast timestamp columns to text to avoid binary format scanning issues
 	query := `
-		SELECT id, project_id, data, start_page, end_page, wday, note, text, created_at, updated_at
+		SELECT id, project_id, data::text as data_text, start_page, end_page, wday, note, text, created_at, updated_at
 		FROM logs
 		WHERE project_id = $1
 		ORDER BY data DESC
@@ -194,8 +197,9 @@ func (r *LogRepositoryImpl) GetAll(ctx context.Context) ([]*models.Log, error) {
 	ctx, cancel := context.WithTimeout(ctx, defaultContextTimeout)
 	defer cancel()
 
+	// Cast timestamp columns to text to avoid binary format scanning issues
 	query := `
-		SELECT id, project_id, data, start_page, end_page, wday, note, text, created_at, updated_at
+		SELECT id, project_id, data::text as data_text, start_page, end_page, wday, note, text, created_at, updated_at
 		FROM logs
 		ORDER BY id ASC
 	`

@@ -61,21 +61,6 @@ func (h *LogsHandler) Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get project DTO for eager loading
-	projectResponse := &dto.ProjectResponse{
-		ID:         project.ID,
-		Name:       project.Name,
-		StartedAt:  formatTimePtr(project.StartedAt),
-		Progress:   project.Progress,
-		TotalPage:  project.TotalPage,
-		Page:       project.Page,
-		Status:     project.Status,
-		LogsCount:  project.LogsCount,
-		DaysUnread: project.DaysUnread,
-		MedianDay:  project.MedianDay,
-		FinishedAt: formatTimePtr(project.FinishedAt),
-	}
-
 	// Get logs for the project ordered by data DESC
 	logs, err := h.repo.GetByProjectIDOrdered(ctx, id)
 	if err != nil {
@@ -89,16 +74,31 @@ func (h *LogsHandler) Index(w http.ResponseWriter, r *http.Request) {
 		limit = len(logs)
 	}
 
-	// Convert to response DTOs with project eager-loaded
+	// Convert to response DTOs (with nested project object for Rails API compatibility)
 	response := make([]*dto.LogResponse, limit)
 	for i := 0; i < limit; i++ {
+		// Format StartedAt as string
+		var startedAtStr *string
+		if project.StartedAt != nil {
+			formatted := project.StartedAt.Format(time.RFC3339)
+			startedAtStr = &formatted
+		}
+
 		response[i] = &dto.LogResponse{
 			ID:        logs[i].ID,
 			Data:      logs[i].Data,
 			StartPage: logs[i].StartPage,
 			EndPage:   logs[i].EndPage,
 			Note:      logs[i].Note,
-			Project:   projectResponse,
+			Project: &dto.ProjectResponse{
+				ID:        project.ID,
+				Name:      project.Name,
+				TotalPage: project.TotalPage,
+				Page:      project.Page,
+				StartedAt: startedAtStr,
+				Status:    project.Status,
+				Progress:  project.Progress,
+			},
 		}
 	}
 

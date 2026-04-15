@@ -213,6 +213,9 @@ func (r *ProjectRepositoryImpl) GetWithLogs(ctx context.Context, id int64) (*rep
 	project.LogsCount = logsCount
 	project.Status = domainProject.CalculateStatus(logResponses, config.LoadConfig())
 	project.DaysUnread = daysUnread
+	project.Progress = domainProject.CalculateProgress()
+	finishedAtPtr := domainProject.CalculateFinishedAt(logResponses)
+	project.FinishedAt = formatTimePtr(finishedAtPtr)
 
 	return &repository.ProjectWithLogs{
 		Project: &project,
@@ -222,8 +225,9 @@ func (r *ProjectRepositoryImpl) GetWithLogs(ctx context.Context, id int64) (*rep
 
 // getLogsByProjectID retrieves logs for a specific project ID ordered by data DESC
 func (r *ProjectRepositoryImpl) getLogsByProjectID(ctx context.Context, projectID int64) ([]*models.Log, error) {
+	// Cast timestamp columns to text to avoid binary format scanning issues
 	query := `
-		SELECT id, project_id, data, start_page, end_page, wday, note, text, created_at, updated_at
+		SELECT id, project_id, data::text as data_text, start_page, end_page, wday, note, text, created_at, updated_at
 		FROM logs
 		WHERE project_id = $1
 		ORDER BY data DESC
@@ -278,22 +282,24 @@ func (r *ProjectRepositoryImpl) getLogsByProjectID(ctx context.Context, projectI
 }
 
 // GetAllWithLogs retrieves all projects with their associated logs using a single LEFT OUTER JOIN query
-// The query returns projects with their logs joined, ordered by projects.id ASC and logs.data DESC
+// The query returns projects with their logs joined, ordered by logs.data DESC
 // Projects without logs are included with NULL log fields (LEFT OUTER JOIN behavior)
+// Note: This matches Rails API behavior which orders by logs.data DESC
 func (r *ProjectRepositoryImpl) GetAllWithLogs(ctx context.Context) ([]*repository.ProjectWithLogs, error) {
 	ctx, cancel := context.WithTimeout(ctx, defaultContextTimeout)
 	defer cancel()
 
 	// Single LEFT OUTER JOIN query to fetch projects with their logs
-	// Orders by projects.id ASC, then logs.data DESC to match Rails eager loading behavior
+	// Orders by logs.data DESC to match Rails eager loading behavior
+	// Cast timestamp columns to text to avoid binary format scanning issues
 	query := `
 		SELECT 
 			p.id, p.name, p.total_page, p.started_at, p.page, p.reinicia,
-			l.id as log_id, l.data, l.start_page, l.end_page, l.note, l.wday, l.text,
+			l.id as log_id, l.data::text as data_text, l.start_page, l.end_page, l.note, l.wday, l.text,
 			l.created_at as log_created_at, l.updated_at as log_updated_at
 		FROM projects p
 		LEFT OUTER JOIN logs l ON p.id = l.project_id
-		ORDER BY p.id ASC, l.data DESC
+		ORDER BY l.data DESC NULLS LAST
 	`
 
 	rows, err := r.pool.Query(ctx, query)
@@ -408,6 +414,8 @@ func (r *ProjectRepositoryImpl) GetAllWithLogs(ctx context.Context) ([]*reposito
 		projectResp.LogsCount = logsCount
 		projectResp.Status = project.CalculateStatus(logsForProject, config.LoadConfig())
 		projectResp.DaysUnread = daysUnread
+		projectResp.Progress = project.CalculateProgress()
+		projectResp.FinishedAt = formatTimePtr(project.CalculateFinishedAt(logsForProject))
 
 		pw := &repository.ProjectWithLogs{
 			Project: projectResp,

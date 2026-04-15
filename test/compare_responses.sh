@@ -22,6 +22,7 @@ GO_API_URL="${GO_API_URL:-http://localhost:3000/api/v1}"
 RAILS_API_URL="${RAILS_API_URL:-http://localhost:3001/api/v1}"
 TIMEOUT=10
 TEMP_DIR=""
+ENDPOINT_SUFFIX=""  # No .json suffix needed - APIs use plain /api/v1/... routes
 
 # Colors for output
 RED='\033[0;31m'
@@ -150,15 +151,15 @@ check_apis_accessible() {
     log_info "Checking API accessibility..."
 
     # Check Go API
-    if ! curl -s --max-time "$TIMEOUT" "$GO_API_URL/projects" > /dev/null 2>&1; then
-        log_error "Go API not accessible at $GO_API_URL"
+    if ! curl -s --max-time "$TIMEOUT" "${GO_API_URL}/projects${ENDPOINT_SUFFIX}" > /dev/null 2>&1; then
+        log_error "Go API not accessible at ${GO_API_URL}"
         log_info "Make sure the Go API is running with: make run"
         return 1
     fi
 
     # Check Rails API
-    if ! curl -s --max-time "$TIMEOUT" "$RAILS_API_URL/projects" > /dev/null 2>&1; then
-        log_error "Rails API not accessible at $RAILS_API_URL"
+    if ! curl -s --max-time "$TIMEOUT" "${RAILS_API_URL}/projects${ENDPOINT_SUFFIX}" > /dev/null 2>&1; then
+        log_error "Rails API not accessible at ${RAILS_API_URL}"
         log_info "Make sure the Rails API is running on port 3001"
         return 1
     fi
@@ -171,8 +172,14 @@ check_apis_accessible() {
 fetch_json() {
     local url="$1"
     local output_file="$2"
+    local suffix="${3:-}"
 
-    curl -s --max-time "$TIMEOUT" -H "Accept: application/json" "$url" > "$output_file"
+    # Create parent directory if it doesn't exist
+    local parent_dir
+    parent_dir=$(dirname "$output_file")
+    mkdir -p "$parent_dir"
+
+    curl -s --max-time "$TIMEOUT" -H "Accept: application/json" "${url}${suffix}" > "$output_file"
 }
 
 # Normalize JSON for comparison (sort keys, remove whitespace)
@@ -251,7 +258,7 @@ get_rails_project_with_logs() {
     local output_file="$2"
 
     curl -s --max-time "$TIMEOUT" -H "Accept: application/json" \
-        "$RAILS_API_URL/projects/$project_id" > "$output_file"
+        "${RAILS_API_URL}/projects/${project_id}${ENDPOINT_SUFFIX}" > "$output_file"
 }
 
 # Test the index endpoint (/api/v1/projects)
@@ -264,8 +271,8 @@ test_index_endpoint() {
     log_info "Testing: $name"
 
     # Fetch from both APIs
-    fetch_json "$GO_API_URL/projects" "$go_file"
-    fetch_json "$RAILS_API_URL/projects" "$rails_file"
+    fetch_json "$GO_API_URL/projects" "$go_file" "$ENDPOINT_SUFFIX"
+    fetch_json "$RAILS_API_URL/projects" "$rails_file" "$ENDPOINT_SUFFIX"
 
     # Check if we got valid JSON
     if ! jq empty "$go_file" 2>/dev/null; then
@@ -327,8 +334,8 @@ test_show_endpoint() {
     fi
 
     # Fetch from both APIs
-    fetch_json "$GO_API_URL/projects/$project_id" "$go_file"
-    fetch_json "$RAILS_API_URL/projects/$project_id" "$rails_file"
+    fetch_json "$GO_API_URL/projects/$project_id" "$go_file" "$ENDPOINT_SUFFIX"
+    fetch_json "$RAILS_API_URL/projects/$project_id" "$rails_file" "$ENDPOINT_SUFFIX"
 
     # Check if we got valid JSON
     if ! jq empty "$go_file" 2>/dev/null; then
@@ -389,8 +396,8 @@ test_logs_endpoint() {
     fi
 
     # Fetch from both APIs
-    fetch_json "$GO_API_URL/projects/$project_id/logs" "$go_file"
-    fetch_json "$RAILS_API_URL/projects/$project_id/logs" "$rails_file"
+    fetch_json "$GO_API_URL/projects/$project_id/logs" "$go_file" "$ENDPOINT_SUFFIX"
+    fetch_json "$RAILS_API_URL/projects/$project_id/logs" "$rails_file" "$ENDPOINT_SUFFIX"
 
     # Check if we got valid JSON
     if ! jq empty "$go_file" 2>/dev/null; then

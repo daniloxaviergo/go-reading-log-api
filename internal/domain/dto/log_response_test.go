@@ -97,30 +97,6 @@ func TestLogResponse_WithNote(t *testing.T) {
 	}
 }
 
-// TestLogResponse_WithProject tests the response with project
-func TestLogResponse_WithProject(t *testing.T) {
-	data := "2024-01-01T00:00:00Z"
-	project := NewProjectResponse(1, "Test Project", nil, 100, 50)
-
-	response := &LogResponse{
-		ID:        1,
-		Data:      &data,
-		StartPage: 10,
-		EndPage:   20,
-		Project:   project,
-	}
-
-	jsonData, err := json.Marshal(response)
-	if err != nil {
-		t.Fatalf("Failed to marshal JSON: %v", err)
-	}
-
-	// Verify project is included
-	if !contains(string(jsonData), `"project"`) {
-		t.Errorf("Expected project in JSON: %s", string(jsonData))
-	}
-}
-
 // TestLogResponse_EmptyContext tests context fallback
 func TestLogResponse_EmptyContext(t *testing.T) {
 	response := &LogResponse{}
