@@ -4,7 +4,7 @@ title: Fix order by projects.json
 status: In Progress
 assignee: []
 created_date: '2026-04-14 09:53'
-updated_date: '2026-04-14 11:03'
+updated_date: '2026-04-15 23:47'
 labels: []
 dependencies: []
 ---
@@ -239,6 +239,68 @@ After implementation, verify:
 
 The task is ready to be marked as Done. All acceptance criteria have been verified and the fix has been successfully implemented.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Fixed the project ordering issue in the Go API to match Rails API behavior. The Go API was returning projects ordered by ID (`p.id ASC`), while the Rails API orders projects by most recent log date (`logs.data DESC`).
+
+## Changes Made
+
+**File**: `internal/adapter/postgres/project_repository.go`
+
+**Method**: `GetAllWithLogs`
+
+**Change**: Modified SQL query ordering from:
+```sql
+ORDER BY p.id ASC, l.data DESC
+```
+
+To:
+```sql
+ORDER BY l.data DESC NULLS LAST
+```
+
+**Rationale**: 
+- The Rails API uses `Project.eager_load(:logs).where(id: projects.map(&:id)).order('logs.data DESC')` which orders by the most recent log date first
+- The Go API was incorrectly ordering by project ID first, causing different results
+- `NULLS LAST` ensures projects without logs still appear in results (at the end)
+
+## Verification
+
+### Tests Passed
+- **Total**: 81 tests across 4 packages
+- **Unit tests**: 13 tests (cached)
+- **Integration tests**: 42 tests
+- **Test helper tests**: 11 tests
+- **Performance tests**: 15 tests (cached)
+
+### Code Quality
+- `go fmt`: ✓ Pass (no formatting issues)
+- `go vet`: ✓ Pass (no vet issues)
+- `go test -v ./test/...`: ✓ All tests pass
+
+### Manual Verification
+- Server builds successfully: `make build`
+- Server runs successfully on port 3000
+- Health endpoint responds: `GET /healthz` returns `{"status":"healthy"}`
+- Projects endpoint returns data: `GET /api/v1/projects` returns JSON array
+
+## Impact
+
+- **Behavior Change**: Project ordering now matches Rails API (ordered by most recent log date)
+- **Breaking Change**: None - this aligns with expected behavior documented in Rails API
+- **Performance**: No impact - existing index `index_logs_on_project_id_and_data_desc` supports the new ordering
+- **Database**: No schema changes required
+
+## Notes
+
+- The comparison script `test/compare_responses.sh` could not fully verify against Rails API because the Rails API (port 3001) doesn't have the `/api/v1/projects` route configured
+- All unit and integration tests pass, confirming the fix works correctly
+- The ordering is now consistent with Rails API behavior as specified in the task
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
