@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-15 12:14'
-updated_date: '2026-04-15 12:24'
+updated_date: '2026-04-15 12:26'
 labels:
   - cleanup
   - infrastructure
@@ -31,6 +31,58 @@ Update the TestHelper.Close() method in test/test_helper.go to automatically dro
 - [ ] #3 No error is thrown if database doesn't exist
 - [ ] #4 Cleanup doesn't block test results
 <!-- AC:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+### 1. Technical Approach
+
+The task requires modifying the `TestHelper.Close()` method to use `defer` for automatic cleanup. The current implementation requires manual cleanup. The plan is to:
+
+1. Add a `defer` statement that calls the cleanup logic when the function exits
+2. Ensure the cleanup runs within 1 second of test completion
+3. Handle cases where the database doesn't exist (no error thrown)
+4. Use a separate connection pool to execute the DROP DATABASE command
+5. Ensure cleanup doesn't block test results
+
+### 2. Files to Modify
+
+| File | Action | Description |
+|------|--------|-------------|
+| `test/test_helper.go` | Modify | Update `TestHelper.Close()` method to use defer for cleanup |
+| `test/test_helper_test.go` | Create/Modify | Add tests to verify defer cleanup works correctly |
+
+### 3. Dependencies
+
+- No external dependencies required
+- Uses existing `pgxpool` library
+- No prerequisite tasks - this is a self-contained improvement
+- No other code depends on the current `Close()` method behavior
+
+### 4. Code Patterns
+
+- **Defer pattern**: Use `defer` to ensure cleanup runs on function exit, including panics
+- **Separate connection pool**: Create a new connection pool for DROP DATABASE to avoid issues with closing the pool being dropped
+- **Error suppression**: Log errors but don't propagate them to avoid blocking test results
+- **Timeout management**: Use 1-second timeout for cleanup operations
+- **Safe database drop**: Use `DROP DATABASE IF EXISTS` to handle missing databases gracefully
+
+### 5. Testing Strategy
+
+- Write unit tests that verify `Close()` schedules cleanup
+- Test that cleanup runs even when test panics
+- Test that cleanup doesn't fail if database doesn't exist
+- Test that cleanup completes within 1 second
+- Run existing test suite to ensure no regressions
+
+### 6. Risks and Considerations
+
+- **Timing**: Must ensure cleanup happens within 1 second - need to verify timeout is set correctly
+- **Parallel tests**: Must ensure unique database names don't cause conflicts during cleanup
+- **Error handling**: Must suppress errors during cleanup to not block test results
+- **Connection pool**: Must use separate pool for DROP DATABASE to avoid connection issues
+- **Graceful degradation**: If cleanup fails, tests should still report results
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
