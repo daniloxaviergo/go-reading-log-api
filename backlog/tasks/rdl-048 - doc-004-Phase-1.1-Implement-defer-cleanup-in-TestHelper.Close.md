@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-15 12:14'
-updated_date: '2026-04-15 12:27'
+updated_date: '2026-04-15 12:28'
 labels:
   - cleanup
   - infrastructure
@@ -83,6 +83,43 @@ The task requires modifying the `TestHelper.Close()` method to use `defer` for a
 - **Connection pool**: Must use separate pool for DROP DATABASE to avoid connection issues
 - **Graceful degradation**: If cleanup fails, tests should still report results
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - RDL-048
+
+### Current Status
+- Task: Implement defer cleanup in TestHelper.Close()
+- Status: In Progress
+- Date: 2026-04-15
+
+### Analysis
+The current `TestHelper.Close()` method (lines 260-279 in test_helper.go) has manual cleanup logic that:
+1. Drops the test database if created
+2. Closes the connection pool
+
+However, it does NOT use `defer` to ensure cleanup runs on panic or automatic cleanup.
+
+### Required Changes
+According to acceptance criteria:
+- [ ] Test database is dropped within 1 second of test completion
+- [ ] Cleanup occurs even if test panics
+- [ ] No error is thrown if database doesn't exist
+- [ ] Cleanup doesn't block test results
+
+### Implementation Plan
+1. Wrap the cleanup logic in a `defer` statement in `Close()`
+2. Ensure cleanup runs within 1 second (current timeout is 30s, needs reduction)
+3. Add proper error suppression so cleanup doesn't block test results
+4. Use separate connection pool for DROP DATABASE command
+5. Handle cases where database doesn't exist gracefully
+
+### Code Changes Needed
+- Modify `TestHelper.Close()` method to use `defer` for cleanup
+- Ensure timeout is 1 second for cleanup operations
+- Suppress errors during cleanup to not block test results
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
