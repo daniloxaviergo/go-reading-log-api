@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-14 11:08'
-updated_date: '2026-04-16 20:50'
+updated_date: '2026-04-16 20:58'
 labels: []
 dependencies: []
 ---
@@ -200,6 +200,23 @@ Modified `test/compare_responses.sh` to:
 ### Blockers/Issues
 - None currently
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Implemented JSON:API response envelope support for Go API endpoints to match Rails API structure. Key changes:
+1. Created middleware in `internal/api/v1/middleware/jsonapi.go` for consistent response wrapping
+2. Updated handlers in `projects_handler.go` and `logs_handler.go` to return plain objects (envelope added by middleware)
+3. Modified `test/compare_responses.sh` to validate JSON:API structure against Rails API
+4. Removed `.json` suffix from routes (per PRD clarification - response format is JSON, not path suffix)
+5. All tests pass including error scenarios and database interactions
+
+Verification:
+- go fmt/vet clean
+- Integration tests verify route consistency with Rails API
+- Documentation updated in docs/rdl-047-route-alignment.md
+- No regressions detected in existing functionality
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
