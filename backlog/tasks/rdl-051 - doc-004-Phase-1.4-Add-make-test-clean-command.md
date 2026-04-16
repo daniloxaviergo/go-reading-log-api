@@ -29,7 +29,7 @@ Add a make test-clean command to the Makefile that provides a manual cleanup mec
 - [x] #1 Command is available in Makefile
 - [x] #2 It drops all orphaned test databases
 - [x] #3 It provides progress feedback
-- [ ] #4 It handles errors gracefully
+- [x] #4 It handles errors gracefully
 <!-- AC:END -->
 
 ## Implementation Plan
