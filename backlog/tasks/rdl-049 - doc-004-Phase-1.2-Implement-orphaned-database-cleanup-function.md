@@ -26,7 +26,7 @@ Implement the cleanupOrphanedDatabases() function in test/test_helper.go to iden
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Databases older than 24 hours are identified and dropped
+- [x] #1 Databases older than 24 hours are identified and dropped
 - [ ] #2 Current test database is excluded from cleanup
 - [ ] #3 Cleanup runs in under 1 minute for 6,000+ databases
 - [ ] #4 Errors are logged but don't fail test execution
