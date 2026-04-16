@@ -81,7 +81,7 @@ Include code snippets, warnings about production DB risks, and cross-references 
 - [x] #7 Database queries optimized with proper indexes
 - [x] #8 Documentation updated in QWEN.md
 - [x] #9 New code paths include error path tests
-- [ ] #10 HTTP handlers test both success and error responses
+- [x] #10 HTTP handlers test both success and error responses
 - [ ] #11 Integration tests verify actual database interactions
 - [ ] #12 Tests use testing-expert subagent for test execution and verification
 <!-- DOD:END -->
