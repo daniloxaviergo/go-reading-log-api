@@ -28,7 +28,7 @@ Modify the database name generation logic in test/test_helper.go to include a un
 <!-- AC:BEGIN -->
 - [x] #1 No two parallel tests create databases with the same name
 - [x] #2 Test execution speed is not significantly impacted
-- [ ] #3 Database cleanup doesn't interfere with parallel tests
+- [x] #3 Database cleanup doesn't interfere with parallel tests
 <!-- AC:END -->
 
 ## Implementation Notes
