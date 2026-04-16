@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-15 12:14'
-updated_date: '2026-04-16 00:07'
+updated_date: '2026-04-16 00:10'
 labels:
   - cleanup
   - infrastructure
@@ -35,6 +35,30 @@ Implement the cleanupOrphanedDatabases() function in test/test_helper.go to iden
 ## Implementation Plan
 
 <!-- SECTION:PLAN:BEGIN -->
+### 1. Technical Approach
+
+The task requires implementing the `cleanupOrphanedDatabases()` function in `test/test_helper.go` to identify and drop test databases that are older than 24 hours. The function should:
+
+- Query `pg_database` for databases matching the pattern `reading_log_test_%`
+- Exclude the current test database from cleanup
+- Drop each identified orphan database
+- Complete within 1 minute for 6,000+ databases
+- Log errors without failing test execution
+- Use context timeouts to prevent indefinite blocking
+
+**Architecture Decisions:**
+- Use a separate connection pool to query the main database for orphaned databases
+- Implement batch cleanup to process multiple databases efficiently
+- Use context timeouts (60 seconds) to prevent indefinite blocking
+- Log errors at warning level but continue cleanup of other databases
+- Use `DROP DATABASE IF EXISTS` for safe deletion
+
+**Why this approach:**
+- 6,000+ database cleanup requires efficient batch processing
+- Separate connection pool ensures we can query even if test pool is closed
+- 60-second timeout balances thoroughness with speed
+- Error logging without failure ensures cleanup doesn't break tests
+
 ### 2. Files to Modify
 
 | File | Action | Description |
