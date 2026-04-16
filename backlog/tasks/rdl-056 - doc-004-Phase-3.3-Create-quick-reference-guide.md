@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-15 12:15'
-updated_date: '2026-04-16 20:02'
+updated_date: '2026-04-16 20:06'
 labels:
   - documentation
   - reference
@@ -31,6 +31,49 @@ Create a quick reference guide for developers covering all test database cleanup
 - [ ] #3 Troubleshooting section
 - [ ] #4 Quick lookup format
 <!-- AC:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+### 1. Technical Approach
+
+Create a dedicated "Quick Reference Guide" section in `QWEN.md` consolidating database cleanup commands, validation rules, and troubleshooting steps into a concise, scannable format. This section will be structured under the "Common Tasks" header to maintain existing documentation flow. The approach prioritizes:
+- **Table-driven summaries** for validation rules (easier scanning than paragraphs)
+- **Code-block examples** for all CLI/SQL commands with clear labels
+- **Warning callouts** for critical safety considerations (e.g., production DB risks)
+
+This structure aligns with the project's existing documentation style while improving usability for developers needing quick reference during development.
+
+### 2. Files to Modify
+
+- `QWEN.md` (only file)
+
+### 3. Dependencies
+
+- None. This is purely a documentation update requiring no code changes or dependencies.
+
+### 4. Code Patterns
+
+- **Header structure**: Use `###` for section headers matching existing QWEN.md conventions
+- **Validation rules table**: Format with columns: `Table`, `Field`, `Validation Rule`
+- **Command examples**: Always wrap in ```bash or ```sql code blocks with explicit labels
+- **Critical warnings**: Use bolded "⚠️ WARNING" format as seen in existing documentation
+
+### 5. Testing Strategy
+
+- **Manual verification**:
+  - Cross-check all SQL commands against current database schema (projects/logs tables)
+  - Verify `make test-clean` behavior matches actual Makefile implementation
+  - Validate validation rules against implemented code logic (e.g., RDL-032, RDL-033 tasks)
+- **Documentation review**: Ensure all examples are syntactically correct and contextually accurate
+
+### 6. Risks and Considerations
+
+- **Production database safety**: Explicitly warn that cleanup commands only apply to `reading_log_test` databases
+- **Makefile dependency**: Confirm `make test-clean` exists in project's Makefile before documenting it
+- **Validation rule accuracy**: Double-check rules against actual code (e.g., `page <= total_page` must be enforced in application logic)
+- **Format consistency**: Maintain existing markdown style (tables, code blocks) to avoid breaking documentation flow
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
