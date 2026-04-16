@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-15 12:14'
-updated_date: '2026-04-16 09:53'
+updated_date: '2026-04-16 10:07'
 labels:
   - build
   - automation
@@ -201,23 +201,29 @@ psql -U postgres -d reading_log -c "SELECT datname FROM pg_database WHERE datnam
    - Identified that the Makefile's `test-clean` currently tries to run a test instead of actual cleanup
 
 2. **Implementation Decisions:**
-   - Create standalone cleanup script `test/cleanup_orphaned_databases.go`
+   - Create standalone cleanup script in `tools/cleanup_orphaned_databases.go`
    - The script will wrap the existing `cleanupOrphanedDatabases` function
    - Provide progress feedback and graceful error handling
    - Update Makefile to call the standalone script
 
 3. **Implementation Completed:**
-   - Created `test/cleanup_orphaned_databases.go` (4760 bytes)
+   - Created `tools/cleanup_orphaned_databases.go` (standalone script)
+   - Created `test/testutil/cleanup.go` (exported functions for testing)
    - Updated `Makefile` - fixed `test-clean` target and added `test-cleanup` alias
    - Added comprehensive unit tests to `test_helper_test.go`
 
-### Running Tests with testing-expert...
+4. **Test Results:**
+   - All 67 tests pass
+   - 0 tests fail
+   - 1 test skipped (expected - requires custom DB config)
+   - `go fmt` passes
+   - `go vet` passes
+   - Build successful
 
 ### Next Steps:
-1. Run tests using testing-expert subagent
-2. Verify acceptance criteria
-3. Check Definition of Done items
-4. Finalize task
+1. Verify acceptance criteria
+2. Check Definition of Done items
+3. Finalize task
 
 ### Blockers:
 - None identified
