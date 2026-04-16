@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-15 12:14'
-updated_date: '2026-04-16 10:10'
+updated_date: '2026-04-16 10:11'
 labels:
   - build
   - automation
@@ -240,7 +240,7 @@ psql -U postgres -d reading_log -c "SELECT datname FROM pg_database WHERE datnam
 - [x] #7 Database queries optimized with proper indexes
 - [x] #8 Documentation updated in QWEN.md
 - [x] #9 New code paths include error path tests
-- [ ] #10 HTTP handlers test both success and error responses
+- [x] #10 HTTP handlers test both success and error responses
 - [ ] #11 Integration tests verify actual database interactions
 - [ ] #12 Tests use testing-expert subagent for test execution and verification
 <!-- DOD:END -->
