@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-14 11:08'
-updated_date: '2026-04-16 11:16'
+updated_date: '2026-04-16 12:01'
 labels: []
 dependencies: []
 ---
@@ -156,9 +156,9 @@ The PRD description mentions `.json` suffix, but this refers to the **response c
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-# Implementation Progress - RDL-047: Update Handlers to Routes
+## Implementation Progress - RDL-047: Update Handlers to Routes
 
-## Status: In Progress
+### Status: In Progress
 
 ### What I'm Doing
 I'm implementing JSON:API response envelope support for the Go API to match the Rails API response structure.
