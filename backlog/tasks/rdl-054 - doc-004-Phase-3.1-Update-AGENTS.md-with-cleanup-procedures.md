@@ -4,7 +4,7 @@ title: '[doc-004 Phase 3.1] Update AGENTS.md with cleanup procedures'
 status: To Do
 assignee: []
 created_date: '2026-04-15 12:15'
-updated_date: '2026-04-16 11:03'
+updated_date: '2026-04-16 11:04'
 labels:
   - documentation
   - guide
@@ -74,7 +74,7 @@ Update the AGENTS.md documentation file to include the new test database cleanup
 - [x] #6 HTTP status codes correct for response type
 - [x] #7 Database queries optimized with proper indexes
 - [x] #8 Documentation updated in QWEN.md
-- [ ] #9 New code paths include error path tests
+- [x] #9 New code paths include error path tests
 - [ ] #10 HTTP handlers test both success and error responses
 - [ ] #11 Integration tests verify actual database interactions
 - [ ] #12 Tests use testing-expert subagent for test execution and verification
