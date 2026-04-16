@@ -2,7 +2,8 @@
 id: RDL-053
 title: '[doc-004 Phase 2.2] Verify parallel test performance impact'
 status: To Do
-assignee: []
+assignee:
+  - Catarina
 created_date: '2026-04-15 12:15'
 updated_date: '2026-04-16 12:02'
 labels:
