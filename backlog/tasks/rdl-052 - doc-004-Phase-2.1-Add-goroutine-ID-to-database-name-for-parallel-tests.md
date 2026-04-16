@@ -86,7 +86,7 @@ Total: 44 tests passed
 - [x] #5 Error responses consistent with existing patterns
 - [x] #6 HTTP status codes correct for response type
 - [x] #7 Database queries optimized with proper indexes
-- [ ] #8 Documentation updated in QWEN.md
+- [x] #8 Documentation updated in QWEN.md
 - [ ] #9 New code paths include error path tests
 - [ ] #10 HTTP handlers test both success and error responses
 - [ ] #11 Integration tests verify actual database interactions
