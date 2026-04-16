@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-14 11:08'
-updated_date: '2026-04-14 11:21'
+updated_date: '2026-04-16 11:11'
 labels: []
 dependencies: []
 ---
@@ -152,6 +152,54 @@ The PRD description mentions `.json` suffix, but this refers to the **response c
 - May need to add pagination if not present in Rails API
 - Calculated fields may need DB storage for performance
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+# Implementation Progress - RDL-047: Update Handlers to Routes
+
+## Status: In Progress
+
+### What I'm Doing
+I'm implementing JSON:API response envelope support for the Go API to match the Rails API response structure.
+
+### Implementation Steps
+
+#### Step 1: Create JSON:API Envelope Middleware
+Created `internal/api/v1/middleware/jsonapi.go` - a middleware that wraps responses in JSON:API envelope format:
+- Wraps single objects in `{ "data": { "type": "...", "attributes": {...} } }`
+- Wraps arrays in `{ "data": [{ "type": "...", "attributes": {...} }] }`
+- Handles both success and error responses
+
+#### Step 2: Update Handler Return Types
+Modified handlers to return JSON:API wrapped responses:
+- `ProjectsHandler.Index` - Returns array of projects wrapped in envelope
+- `ProjectsHandler.Show` - Returns single project wrapped in envelope
+- `LogsHandler.Index` - Returns array of logs wrapped in envelope
+
+#### Step 3: Update Comparison Script
+Modified `test/compare_responses.sh` to:
+- Expect JSON:API envelope structure
+- Extract attributes for comparison
+- Properly compare wrapped responses
+
+### Files Created/Modified
+
+| File | Action |
+|------|--------|
+| `internal/api/v1/middleware/jsonapi.go` | Created - JSON:API envelope middleware |
+| `internal/api/v1/handlers/projects_handler.go` | Modified - Return JSON:API wrapped responses |
+| `internal/api/v1/handlers/logs_handler.go` | Modified - Return JSON:API wrapped responses |
+| `test/compare_responses.sh` | Modified - Handle JSON:API envelope comparison |
+
+### Next Steps
+1. Run tests using testing-expert subagent
+2. Verify acceptance criteria
+3. Test endpoint comparisons
+
+### Blockers/Issues
+- None currently
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
