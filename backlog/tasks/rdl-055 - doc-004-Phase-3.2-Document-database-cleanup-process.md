@@ -2,9 +2,10 @@
 id: RDL-055
 title: '[doc-004 Phase 3.2] Document database cleanup process'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-15 12:15'
-updated_date: '2026-04-16 19:24'
+updated_date: '2026-04-16 19:41'
 labels:
   - documentation
   - architecture
