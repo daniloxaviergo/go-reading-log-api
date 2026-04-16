@@ -2,10 +2,9 @@
 id: RDL-047
 title: Update handlers to routes
 status: To Do
-assignee:
-  - catarina
+assignee: []
 created_date: '2026-04-14 11:08'
-updated_date: '2026-04-16 12:01'
+updated_date: '2026-04-16 20:29'
 labels: []
 dependencies: []
 ---
