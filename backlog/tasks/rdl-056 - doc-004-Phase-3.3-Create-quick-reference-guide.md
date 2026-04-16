@@ -2,8 +2,10 @@
 id: RDL-056
 title: '[doc-004 Phase 3.3] Create quick reference guide'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-15 12:15'
+updated_date: '2026-04-16 20:02'
 labels:
   - documentation
   - reference
