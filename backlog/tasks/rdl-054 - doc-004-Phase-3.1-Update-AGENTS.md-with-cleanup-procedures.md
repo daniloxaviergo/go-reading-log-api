@@ -70,6 +70,18 @@ Include code snippets, warnings about production DB risks, and cross-references 
 - Verify parallel test safety section aligns with RDL-052 implementation details
 <!-- SECTION:PLAN:END -->
 
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Updated AGENTS.md documentation to include comprehensive cleanup procedures for test databases. Added a new "Cleanup Procedures" section under "Common Tasks" with four subsections:
+1. Auto-cleanup mechanism: Documented `TestHelper.Close()` usage in integration tests.
+2. Orphan cleanup process: Explained the `CleanOrphans` function in `internal/adapter/postgres/cleanup.go`.
+3. Manual cleanup commands: Provided safe commands (`make test-clean`, DB recreation steps) with critical warnings against production use.
+4. Parallel test safety: Described goroutine ID-based database naming to prevent conflicts.
+
+All code snippets and examples were verified against current implementation (RDL-048, RDL-049, RDL-051, RDL-052). No code changes were made—only documentation updates. All acceptance criteria and Definition of Done items were validated through manual review and test execution.
+<!-- SECTION:FINAL_SUMMARY:END -->
+
 ## Definition of Done
 <!-- DOD:BEGIN -->
 - [x] #1 All unit tests pass use testing-expert subagent for test execution and verification
