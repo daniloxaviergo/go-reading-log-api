@@ -2,9 +2,10 @@
 id: RDL-054
 title: '[doc-004 Phase 3.1] Update AGENTS.md with cleanup procedures'
 status: To Do
-assignee: []
+assignee:
+  - workflow
 created_date: '2026-04-15 12:15'
-updated_date: '2026-04-16 11:11'
+updated_date: '2026-04-16 19:21'
 labels:
   - documentation
   - guide
