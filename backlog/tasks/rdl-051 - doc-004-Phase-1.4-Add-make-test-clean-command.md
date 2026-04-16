@@ -2,10 +2,9 @@
 id: RDL-051
 title: '[doc-004 Phase 1.4] Add make test-clean command'
 status: Done
-assignee:
-  - next-task
+assignee: []
 created_date: '2026-04-15 12:14'
-updated_date: '2026-04-16 10:14'
+updated_date: '2026-04-16 10:38'
 labels:
   - build
   - automation
