@@ -262,7 +262,7 @@ go tool pprof -http=:8080 profile.out
 - [ ] #4 Clean Architecture layers properly followed
 - [ ] #5 Error responses consistent with existing patterns
 - [ ] #6 HTTP status codes correct for response type
-- [x] #7 Database queries optimized with proper indexes
+- [ ] #7 Database queries optimized with proper indexes
 - [x] #8 Documentation updated in QWEN.md
 - [x] #9 New code paths include error path tests
 - [x] #10 HTTP handlers test both success and error responses
