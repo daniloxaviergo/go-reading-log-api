@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-15 12:14'
-updated_date: '2026-04-16 09:49'
+updated_date: '2026-04-16 09:51'
 labels:
   - build
   - automation
@@ -185,6 +185,38 @@ psql -U postgres -d reading_log -c "SELECT datname FROM pg_database WHERE datnam
 - Create test databases, verify cleanup works
 - Check exit codes and error handling
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - RDL-051: Add make test-clean command
+
+### Status: In Progress
+### Date: 2026-04-16
+
+### What Was Done:
+1. **Analyzed current state:**
+   - Reviewed `test/test_helper.go` - found `cleanupOrphanedDatabases` function exists (lines 323-371)
+   - Reviewed `Makefile` - found broken `test-clean` target (lines 104-111)
+   - Identified that the Makefile's `test-clean` currently tries to run a test instead of actual cleanup
+
+2. **Implementation Decisions:**
+   - Create standalone cleanup script `test/cleanup_orphaned_databases.go`
+   - The script will wrap the existing `cleanupOrphanedDatabases` function
+   - Provide progress feedback and graceful error handling
+   - Update Makefile to call the standalone script
+
+### Next Steps:
+1. Create `test/cleanup_orphaned_databases.go` standalone script
+2. Update Makefile `test-clean` target to use the new script
+3. Add `test-cleanup` alias to Makefile
+4. Add unit tests for the new script
+5. Run tests using testing-expert subagent
+6. Verify acceptance criteria
+
+### Blockers:
+- None identified
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
