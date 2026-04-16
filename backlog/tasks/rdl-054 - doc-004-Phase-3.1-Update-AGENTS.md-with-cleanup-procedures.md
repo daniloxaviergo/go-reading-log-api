@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-15 12:15'
-updated_date: '2026-04-16 19:26'
+updated_date: '2026-04-16 19:37'
 labels:
   - documentation
   - guide
@@ -26,7 +26,7 @@ Update the AGENTS.md documentation file to include the new test database cleanup
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Document auto-cleanup mechanism
+- [x] #1 Document auto-cleanup mechanism
 - [ ] #2 Document orphan cleanup process
 - [ ] #3 Document manual cleanup commands
 - [ ] #4 Include parallel test safety measures
