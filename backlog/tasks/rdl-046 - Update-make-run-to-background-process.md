@@ -2,10 +2,9 @@
 id: RDL-046
 title: Update make run to background process
 status: To Do
-assignee:
-  - workflow
+assignee: []
 created_date: '2026-04-14 11:06'
-updated_date: '2026-04-16 20:27'
+updated_date: '2026-04-16 20:28'
 labels: []
 dependencies: []
 ---
