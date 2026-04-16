@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-15 12:15'
-updated_date: '2026-04-16 12:09'
+updated_date: '2026-04-16 12:13'
 labels:
   - benchmark
   - performance
@@ -26,7 +26,7 @@ Create performance benchmarks to measure the impact of the parallel test databas
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Measure test execution time before/after changes
+- [x] #1 Measure test execution time before/after changes
 - [ ] #2 Ensure < 10% performance regression
 <!-- AC:END -->
 
