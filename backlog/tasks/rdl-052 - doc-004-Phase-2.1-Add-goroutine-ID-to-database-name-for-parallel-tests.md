@@ -26,7 +26,7 @@ Modify the database name generation logic in test/test_helper.go to include a un
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 No two parallel tests create databases with the same name
+- [x] #1 No two parallel tests create databases with the same name
 - [ ] #2 Test execution speed is not significantly impacted
 - [ ] #3 Database cleanup doesn't interfere with parallel tests
 <!-- AC:END -->
