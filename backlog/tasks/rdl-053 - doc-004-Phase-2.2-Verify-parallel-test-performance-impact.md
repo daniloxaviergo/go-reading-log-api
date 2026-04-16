@@ -261,7 +261,7 @@ go tool pprof -http=:8080 profile.out
 - [ ] #3 go fmt and go vet pass with no errors
 - [ ] #4 Clean Architecture layers properly followed
 - [ ] #5 Error responses consistent with existing patterns
-- [x] #6 HTTP status codes correct for response type
+- [ ] #6 HTTP status codes correct for response type
 - [x] #7 Database queries optimized with proper indexes
 - [x] #8 Documentation updated in QWEN.md
 - [x] #9 New code paths include error path tests
