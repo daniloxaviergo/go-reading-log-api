@@ -264,7 +264,7 @@ go tool pprof -http=:8080 profile.out
 - [ ] #6 HTTP status codes correct for response type
 - [ ] #7 Database queries optimized with proper indexes
 - [ ] #8 Documentation updated in QWEN.md
-- [x] #9 New code paths include error path tests
+- [ ] #9 New code paths include error path tests
 - [x] #10 HTTP handlers test both success and error responses
 - [x] #11 Integration tests verify actual database interactions
 - [x] #12 Tests use testing-expert subagent for test execution and verification
