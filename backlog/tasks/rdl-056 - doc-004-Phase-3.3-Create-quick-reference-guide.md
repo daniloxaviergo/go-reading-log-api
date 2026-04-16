@@ -3,7 +3,7 @@ id: RDL-056
 title: '[doc-004 Phase 3.3] Create quick reference guide'
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-15 12:15'
 updated_date: '2026-04-16 20:18'
 labels:
