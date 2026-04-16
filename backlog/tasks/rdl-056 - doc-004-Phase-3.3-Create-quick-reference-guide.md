@@ -1,7 +1,7 @@
 ---
 id: RDL-056
 title: '[doc-004 Phase 3.3] Create quick reference guide'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-15 12:15'
