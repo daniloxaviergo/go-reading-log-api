@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - next-task
 created_date: '2026-04-15 12:14'
-updated_date: '2026-04-16 00:45'
+updated_date: '2026-04-16 00:46'
 labels:
   - cleanup
   - infrastructure
@@ -27,7 +27,7 @@ Implement the cleanupOrphanedDatabases() function in test/test_helper.go to iden
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 Databases older than 24 hours are identified and dropped
-- [ ] #2 Current test database is excluded from cleanup
+- [x] #2 Current test database is excluded from cleanup
 - [ ] #3 Cleanup runs in under 1 minute for 6,000+ databases
 - [ ] #4 Errors are logged but don't fail test execution
 <!-- AC:END -->
