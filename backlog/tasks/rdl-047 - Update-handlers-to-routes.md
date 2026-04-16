@@ -3,9 +3,9 @@ id: RDL-047
 title: Update handlers to routes
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-14 11:08'
-updated_date: '2026-04-16 20:58'
+updated_date: '2026-04-16 20:59'
 labels: []
 dependencies: []
 ---
