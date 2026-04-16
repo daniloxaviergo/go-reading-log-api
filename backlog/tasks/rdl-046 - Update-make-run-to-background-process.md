@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - Catarina
 created_date: '2026-04-14 11:06'
-updated_date: '2026-04-16 20:28'
+updated_date: '2026-04-16 20:31'
 labels: []
 dependencies: []
 ---
@@ -17,6 +17,52 @@ update the command `make run` to background
 check if exist another process and kill
 start up in background
 <!-- SECTION:DESCRIPTION:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+### 1. Technical Approach
+
+Current `make run` command runs the server directly using `go run`, which starts in foreground. To change this behavior:
+- Check if port (default 3000) is in use via `lsof`
+- Kill any existing process on that port
+- Start the built binary in background with `nohup` and log output to server.log
+- Handle SERVER_PORT environment variable dynamically for flexibility
+
+This approach ensures a clean startup sequence while maintaining compatibility with existing development workflows. The solution avoids complex PID file management and leverages standard Unix utilities.
+
+### 2. Files to Modify
+
+- **Makefile**: Modify the `run` target implementation only
+
+### 3. Dependencies
+
+- lsof utility (commonly available on Unix-based systems)
+- No additional dependencies beyond standard Go toolchain
+- Server port configuration via environment variables (SERVER_PORT)
+
+### 4. Code Patterns
+
+- Maintain existing Makefile color-coded output using tput formatting
+- Use shell command chaining with semicolons and backslashes for multi-line commands
+- Properly handle environment variable defaults ($${SERVER_PORT:-3000})
+- Follow existing error handling patterns (e.g., check for lsof availability)
+
+### 5. Testing Strategy
+
+- Manual verification:
+  - Start server via `make run`, verify it runs in background (check with `ps aux | grep server`)
+  - Run `make run` again, confirm existing process is killed and new instance starts
+  - Check server.log contains output after starting
+- Add test case to developer documentation showing expected behavior
+
+### 6. Risks and Considerations
+
+- lsof may not be available on minimal environments (but acceptable for dev workflow)
+- Killing processes by port could affect other services if multiple applications use same port in development environment
+- server.log file growth requires cleanup instructions (will add to AGENTS.md documentation)
+- Port conflict resolution works best when SERVER_PORT is consistent across commands
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
