@@ -259,7 +259,7 @@ go tool pprof -http=:8080 profile.out
 - [ ] #1 All unit tests pass use testing-expert subagent for test execution and verification
 - [ ] #2 All integration tests pass use testing-expert subagent for test execution and verification
 - [ ] #3 go fmt and go vet pass with no errors
-- [x] #4 Clean Architecture layers properly followed
+- [ ] #4 Clean Architecture layers properly followed
 - [x] #5 Error responses consistent with existing patterns
 - [x] #6 HTTP status codes correct for response type
 - [x] #7 Database queries optimized with proper indexes
