@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-15 12:14'
-updated_date: '2026-04-16 10:07'
+updated_date: '2026-04-16 10:08'
 labels:
   - build
   - automation
@@ -28,7 +28,7 @@ Add a make test-clean command to the Makefile that provides a manual cleanup mec
 <!-- AC:BEGIN -->
 - [x] #1 Command is available in Makefile
 - [x] #2 It drops all orphaned test databases
-- [ ] #3 It provides progress feedback
+- [x] #3 It provides progress feedback
 - [ ] #4 It handles errors gracefully
 <!-- AC:END -->
 
