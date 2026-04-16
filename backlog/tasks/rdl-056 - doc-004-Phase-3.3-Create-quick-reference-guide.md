@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-15 12:15'
-updated_date: '2026-04-16 20:07'
+updated_date: '2026-04-16 20:18'
 labels:
   - documentation
   - reference
@@ -74,6 +74,12 @@ This structure aligns with the project's existing documentation style while impr
 - **Validation rule accuracy**: Double-check rules against actual code (e.g., `page <= total_page` must be enforced in application logic)
 - **Format consistency**: Maintain existing markdown style (tables, code blocks) to avoid breaking documentation flow
 <!-- SECTION:PLAN:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Added Quick Reference Guide section in QWEN.md under Common Tasks. Includes database cleanup commands (make test-clean, manual SQL cleanup), validation rules table for projects/logs tables, and troubleshooting steps for test database issues. All tests passed with cached results. No code changes introduced; documentation only update.
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
