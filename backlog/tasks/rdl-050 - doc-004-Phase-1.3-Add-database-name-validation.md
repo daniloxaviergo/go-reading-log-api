@@ -2,10 +2,9 @@
 id: RDL-050
 title: '[doc-004 Phase 1.3] Add database name validation'
 status: To Do
-assignee:
-  - next-task
+assignee: []
 created_date: '2026-04-15 12:14'
-updated_date: '2026-04-16 00:48'
+updated_date: '2026-04-16 09:39'
 labels:
   - validation
   - security
