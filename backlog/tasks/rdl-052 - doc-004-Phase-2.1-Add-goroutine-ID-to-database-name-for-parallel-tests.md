@@ -1,11 +1,11 @@
 ---
 id: RDL-052
 title: '[doc-004 Phase 2.1] Add goroutine ID to database name for parallel tests'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-15 12:15'
-updated_date: '2026-04-16 10:56'
+updated_date: '2026-04-16 10:57'
 labels:
   - parallel
   - concurrency
