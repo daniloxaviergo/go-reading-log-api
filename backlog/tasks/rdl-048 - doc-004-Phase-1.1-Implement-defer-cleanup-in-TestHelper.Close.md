@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - next-task
 created_date: '2026-04-15 12:14'
-updated_date: '2026-04-15 23:48'
+updated_date: '2026-04-16 00:15'
 labels:
   - cleanup
   - infrastructure
@@ -92,33 +92,44 @@ The task requires modifying the `TestHelper.Close()` method to use `defer` for a
 ### Current Status
 - Task: Implement defer cleanup in TestHelper.Close()
 - Status: In Progress
-- Date: 2026-04-15
+- Date: 2026-04-16
 
 ### Analysis
-The current `TestHelper.Close()` method (lines 260-279 in test_helper.go) has manual cleanup logic that:
-1. Drops the test database if created
-2. Closes the connection pool
+Looking at the current `TestHelper.Close()` method (lines 260-279 in test_helper.go):
 
-However, it does NOT use `defer` to ensure cleanup runs on panic or automatic cleanup.
+**Current Implementation Review:**
+The current `Close()` method already uses `defer` for cleanup, but I need to verify it meets all acceptance criteria:
 
-### Required Changes
-According to acceptance criteria:
-- [ ] Test database is dropped within 1 second of test completion
-- [ ] Cleanup occurs even if test panics
-- [ ] No error is thrown if database doesn't exist
-- [ ] Cleanup doesn't block test results
+1. ✅ Test database is dropped within 1 second - YES (timeout is 1 second)
+2. ✅ Cleanup occurs even if test panics - YES (uses defer)
+3. ✅ No error if database doesn't exist - YES (uses DROP DATABASE IF EXISTS)
+4. ✅ Cleanup doesn't block test results - YES (errors suppressed)
+
+**Issues Found:**
+1. If `h.Pool` is nil, the defer never executes - this is actually correct behavior
+2. The `pool.Close()` is called before defer, which is correct
+3. Variable capture in defer looks correct (captures pool, testDBName, cfg)
+
+**Wait - looking more carefully:**
+The current implementation DOES use defer correctly. Let me verify if there are any edge cases or improvements needed.
+
+Actually, looking at the code again, I notice the current implementation:
+- Creates a new connection pool for DROP DATABASE ✓
+- Uses 1 second timeout ✓
+- Uses DROP DATABASE IF EXISTS ✓
+- Suppresses errors ✓
+- Uses defer to ensure cleanup runs ✓
+
+The implementation appears to already meet all acceptance criteria. However, I should:
+1. Run the tests to verify everything works
+2. Make sure the implementation is robust
+3. Add any necessary improvements
 
 ### Implementation Plan
-1. Wrap the cleanup logic in a `defer` statement in `Close()`
-2. Ensure cleanup runs within 1 second (current timeout is 30s, needs reduction)
-3. Add proper error suppression so cleanup doesn't block test results
-4. Use separate connection pool for DROP DATABASE command
-5. Handle cases where database doesn't exist gracefully
-
-### Code Changes Needed
-- Modify `TestHelper.Close()` method to use `defer` for cleanup
-- Ensure timeout is 1 second for cleanup operations
-- Suppress errors during cleanup to not block test results
+1. Run existing tests to verify current implementation
+2. Add a test to verify defer cleanup works correctly
+3. Ensure error handling is robust
+4. Verify no regressions in existing tests
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
