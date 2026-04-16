@@ -4,6 +4,7 @@ title: '[doc-004 Phase 3.1] Update AGENTS.md with cleanup procedures'
 status: To Do
 assignee: []
 created_date: '2026-04-15 12:15'
+updated_date: '2026-04-16 11:02'
 labels:
   - documentation
   - guide
@@ -29,6 +30,39 @@ Update the AGENTS.md documentation file to include the new test database cleanup
 - [ ] #3 Document manual cleanup commands
 - [ ] #4 Include parallel test safety measures
 <!-- AC:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - RDL-054: Update AGENTS.md with cleanup procedures
+
+### Status: In Progress
+### Date: 2026-04-16
+
+### What Was Done:
+1. **Read the current AGENTS.md file** to understand the existing structure
+2. **Identified sections to add:**
+   - Test database cleanup procedures
+   - Auto-cleanup mechanism details
+   - Orphan cleanup process
+   - Manual cleanup commands
+   - Parallel test safety measures
+
+3. **Drafted documentation updates:**
+   - Added new section "Test Database Cleanup"
+   - Documented auto-cleanup mechanism using defer
+   - Documented orphan cleanup function
+   - Documented manual cleanup commands (make test-clean)
+   - Documented parallel test safety with goroutine ID
+
+### Next Steps:
+1. Verify acceptance criteria are met
+2. Check Definition of Done items
+3. Finalize task documentation
+
+### Blockers:
+- None identified
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
