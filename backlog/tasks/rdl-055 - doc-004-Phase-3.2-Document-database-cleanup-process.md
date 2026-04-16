@@ -29,7 +29,7 @@ Create comprehensive documentation for the database cleanup process covering the
 - [x] #1 Document 24-hour orphan detection strategy
 - [x] #2 Document database name validation rules
 - [x] #3 Document SQL cleanup patterns
-- [x] #4 Include troubleshooting steps
+- [ ] #4 Include troubleshooting steps
 <!-- AC:END -->
 
 ## Implementation Notes
