@@ -27,7 +27,7 @@ Add a make test-clean command to the Makefile that provides a manual cleanup mec
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 Command is available in Makefile
-- [ ] #2 It drops all orphaned test databases
+- [x] #2 It drops all orphaned test databases
 - [ ] #3 It provides progress feedback
 - [ ] #4 It handles errors gracefully
 <!-- AC:END -->
