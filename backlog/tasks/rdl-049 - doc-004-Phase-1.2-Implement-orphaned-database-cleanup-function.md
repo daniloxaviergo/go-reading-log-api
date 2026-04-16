@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - next-task
 created_date: '2026-04-15 12:14'
-updated_date: '2026-04-16 00:39'
+updated_date: '2026-04-16 00:45'
 labels:
   - cleanup
   - infrastructure
@@ -396,25 +396,54 @@ The function is also accessible via `make test-clean` for manual cleanup when ne
 <!-- SECTION:NOTES:BEGIN -->
 ## Implementation Progress for RDL-049
 
-### Completed:
-- [x] Analyzed existing test_helper.go structure
-- [x] Identified where cleanupOrphanedDatabases should be implemented
-- [x] Understood current Close() implementation pattern
+### Completed Steps:
 
-### In Progress:
-- [ ] Implement cleanupOrphanedDatabases() function
-- [ ] Update TestHelper.Close() to call cleanup
-- [ ] Add unit tests for orphaned database cleanup
-- [ ] Add integration tests
-- [ ] Update Makefile with test-clean command
-- [ ] Run all tests with testing-expert subagent
+**Step 1: Add cleanupOrphanedDatabases() function to test/test_helper.go**
+- ✅ Implemented `cleanupOrphanedDatabases()` function that queries pg_database for `reading_log_test_%` pattern
+- ✅ Excludes current test database using `excludeName` parameter
+- ✅ Uses context timeout (60 seconds) to prevent indefinite blocking
+- ✅ Logs errors without failing test execution
+- ✅ Uses `DROP DATABASE IF EXISTS` for safe deletion
 
-### Next Steps:
-1. Add cleanupOrphanedDatabases function to query pg_database for orphaned databases
-2. Implement batch cleanup with context timeout
-3. Update Close() to call cleanup before dropping current test DB
-4. Write comprehensive tests
-5. Verify with subagent "testing-expert"
+**Step 2: Update TestHelper.Close() to call cleanup**
+- ✅ Added call to `cleanupOrphanedDatabases()` in defer block
+- ✅ Creates separate connection pool for cleanup operations
+- ✅ Passes current test database name to exclude from cleanup
+- ✅ Maintains 1-second timeout for current DB drop
+
+**Step 3: Add unit tests**
+- ✅ `TestCleanupOrphanedDatabases` - Basic cleanup functionality
+- ✅ `TestCleanupOrphanedDatabases_ExcludeCurrent` - Current DB exclusion
+- ✅ `TestCleanupOrphanedDatabases_NonExistentDB` - Error handling
+- ✅ `TestCleanupOrphanedDatabases_MultipleDBs` - Multiple database handling
+
+**Step 4: Add integration tests**
+- ✅ Tests create and clean up test databases
+- ✅ Verify cleanup doesn't drop current test database
+- ✅ Tests complete within time limit
+
+**Step 5: Update Makefile**
+- ✅ Added `test-clean` target
+- ✅ Added `test-clean` to help text
+- ✅ Colorized output for consistency
+
+**Step 6: Verify with existing test suite**
+- ✅ All existing tests pass
+- ✅ New tests pass
+- ✅ No regressions introduced
+
+### Test Results:
+```
+ok  	go-reading-log-api-next/test	32.065s
+ok  	go-reading-log-api-next/test/integration	3.818s
+ok  	go-reading-log-api-next/test/unit	0.003s
+```
+
+### Code Quality:
+- ✅ `go fmt` passes with no errors
+- ✅ `go vet` passes with no errors
+- ✅ Clean Architecture layers properly followed
+- ✅ Error responses consistent with existing patterns
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
