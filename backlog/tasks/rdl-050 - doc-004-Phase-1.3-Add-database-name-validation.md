@@ -3,9 +3,9 @@ id: RDL-050
 title: '[doc-004 Phase 1.3] Add database name validation'
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-15 12:14'
-updated_date: '2026-04-16 00:36'
+updated_date: '2026-04-16 00:38'
 labels:
   - validation
   - security
