@@ -1,7 +1,7 @@
 ---
 id: RDL-051
 title: '[doc-004 Phase 1.4] Add make test-clean command'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-15 12:14'
