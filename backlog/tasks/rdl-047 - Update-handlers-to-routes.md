@@ -1,7 +1,7 @@
 ---
 id: RDL-047
 title: Update handlers to routes
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-14 11:08'
