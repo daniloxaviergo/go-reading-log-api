@@ -25,7 +25,7 @@ Create performance benchmarks to measure the impact of the parallel test databas
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Measure test execution time before/after changes
+- [x] #1 Measure test execution time before/after changes
 - [ ] #2 Ensure < 10% performance regression
 <!-- AC:END -->
 
