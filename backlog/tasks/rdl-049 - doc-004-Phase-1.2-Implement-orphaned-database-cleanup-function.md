@@ -3,9 +3,9 @@ id: RDL-049
 title: '[doc-004 Phase 1.2] Implement orphaned database cleanup function'
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-15 12:14'
-updated_date: '2026-04-16 00:10'
+updated_date: '2026-04-16 00:12'
 labels:
   - cleanup
   - infrastructure
