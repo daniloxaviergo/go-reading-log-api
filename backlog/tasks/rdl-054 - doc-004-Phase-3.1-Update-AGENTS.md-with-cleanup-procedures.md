@@ -1,11 +1,11 @@
 ---
 id: RDL-054
 title: '[doc-004 Phase 3.1] Update AGENTS.md with cleanup procedures'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-15 12:15'
-updated_date: '2026-04-16 19:40'
+updated_date: '2026-04-16 19:41'
 labels:
   - documentation
   - guide
