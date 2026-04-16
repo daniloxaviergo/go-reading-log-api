@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-15 12:15'
-updated_date: '2026-04-16 19:24'
+updated_date: '2026-04-16 19:25'
 labels:
   - documentation
   - guide
@@ -31,6 +31,44 @@ Update the AGENTS.md documentation file to include the new test database cleanup
 - [ ] #3 Document manual cleanup commands
 - [ ] #4 Include parallel test safety measures
 <!-- AC:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+### 1. Technical Approach
+Update AGENTS.md by adding a new "Cleanup Procedures" section under "Common Tasks". Break down into four subsections matching acceptance criteria:
+- Auto-cleanup mechanism (TestHelper.Close() usage)
+- Orphan cleanup process (database adapter function)
+- Manual cleanup commands (`make test-clean`, DB recreation steps)
+- Parallel test safety (goroutine ID database naming)
+Include code snippets, warnings about production DB risks, and cross-references to related tasks.
+
+### 2. Files to Modify
+- `/home/danilo/scripts/github/go-reading-log-api-next/AGENTS.md`
+
+### 3. Dependencies
+- RDL-048: `TestHelper.Close()` auto-cleanup implementation (already complete)
+- RDL-049: Orphaned database cleanup function (implemented in adapter)
+- RDL-051: `make test-clean` command added to Makefile
+- RDL-052: Goroutine ID-based database naming for parallel tests
+
+### 4. Code Patterns
+- Use markdown code blocks with triple backticks for commands and Go snippets
+- Format steps as numbered lists for clarity
+- Highlight critical warnings in **bold** (e.g., "DO NOT run on production databases")
+- Reference task IDs and PRD documents where applicable
+
+### 5. Testing Strategy
+- Manual review by team members to verify accuracy of commands and procedures
+- Cross-check all examples against current codebase behavior (e.g., verify `make test-clean` exists in Makefile)
+- No automated tests required since this is documentation-only change
+
+### 6. Risks and Considerations
+- **Critical risk**: Explicitly state that database cleanup commands must ONLY be used on test databases (`reading_log_test`). Include warnings like "WARNING: Running DROP DATABASE on production will cause permanent data loss"
+- Differentiate between safe commands (`make test-clean`) vs manual SQL operations
+- Ensure all references to task IDs (RDL-048 etc.) and file paths are current
+- Verify parallel test safety section aligns with RDL-052 implementation details
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
