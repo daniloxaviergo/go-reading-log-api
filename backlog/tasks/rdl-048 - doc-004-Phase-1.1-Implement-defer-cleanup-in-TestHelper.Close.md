@@ -28,7 +28,7 @@ Update the TestHelper.Close() method in test/test_helper.go to automatically dro
 <!-- AC:BEGIN -->
 - [x] #1 Test database is dropped within 1 second of test completion
 - [x] #2 Cleanup occurs even if test panics
-- [ ] #3 No error is thrown if database doesn't exist
+- [x] #3 No error is thrown if database doesn't exist
 - [ ] #4 Cleanup doesn't block test results
 <!-- AC:END -->
 
