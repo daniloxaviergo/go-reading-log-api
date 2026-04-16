@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - next-task
 created_date: '2026-04-15 12:14'
-updated_date: '2026-04-16 00:15'
+updated_date: '2026-04-16 00:18'
 labels:
   - cleanup
   - infrastructure
@@ -26,7 +26,7 @@ Update the TestHelper.Close() method in test/test_helper.go to automatically dro
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Test database is dropped within 1 second of test completion
+- [x] #1 Test database is dropped within 1 second of test completion
 - [ ] #2 Cleanup occurs even if test panics
 - [ ] #3 No error is thrown if database doesn't exist
 - [ ] #4 Cleanup doesn't block test results
