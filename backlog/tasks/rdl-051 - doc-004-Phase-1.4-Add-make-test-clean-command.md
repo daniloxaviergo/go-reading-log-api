@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-15 12:14'
-updated_date: '2026-04-16 09:51'
+updated_date: '2026-04-16 09:53'
 labels:
   - build
   - automation
@@ -206,13 +206,18 @@ psql -U postgres -d reading_log -c "SELECT datname FROM pg_database WHERE datnam
    - Provide progress feedback and graceful error handling
    - Update Makefile to call the standalone script
 
+3. **Implementation Completed:**
+   - Created `test/cleanup_orphaned_databases.go` (4760 bytes)
+   - Updated `Makefile` - fixed `test-clean` target and added `test-cleanup` alias
+   - Added comprehensive unit tests to `test_helper_test.go`
+
+### Running Tests with testing-expert...
+
 ### Next Steps:
-1. Create `test/cleanup_orphaned_databases.go` standalone script
-2. Update Makefile `test-clean` target to use the new script
-3. Add `test-cleanup` alias to Makefile
-4. Add unit tests for the new script
-5. Run tests using testing-expert subagent
-6. Verify acceptance criteria
+1. Run tests using testing-expert subagent
+2. Verify acceptance criteria
+3. Check Definition of Done items
+4. Finalize task
 
 ### Blockers:
 - None identified
