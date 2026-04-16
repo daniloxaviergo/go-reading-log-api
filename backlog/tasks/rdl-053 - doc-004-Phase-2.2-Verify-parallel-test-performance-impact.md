@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-15 12:15'
-updated_date: '2026-04-16 11:24'
+updated_date: '2026-04-16 11:25'
 labels:
   - benchmark
   - performance
@@ -59,6 +59,199 @@ This task requires creating performance benchmarks to measure the impact of para
 - Uses Go's native benchmarking framework for reliability
 - Provides detailed metrics for regression detection
 - Aligns with the PRD's acceptance criteria for < 10% performance regression
+
+---
+
+### 2. Files to Modify
+
+| File | Action | Description |
+|------|--------|-------------|
+| `test/performance/parallel_test_benchmark.go` | **Create** | New benchmark file for parallel test performance testing |
+| `test/performance/comparison_test.go` | **Modify** | Add parallel test comparison benchmarks (if not exists) |
+| `Makefile` | **Modify** | Add `benchmark-parallel` target |
+| `docs/performance-benchmarks.md` | **Create** | Documentation for benchmark results and methodology |
+
+**Detailed File Changes:**
+
+**New File: `test/performance/parallel_test_benchmark.go`** (~300-400 lines)
+- `BenchmarkParallelTestStartup` - Measure database creation + connection time
+- `BenchmarkParallelTestExecution` - Measure test execution with 8+ parallel goroutines
+- `BenchmarkParallelCleanup` - Measure cleanup performance with many orphaned databases
+- `BenchmarkDatabaseUniqueness` - Verify no collisions with unique database names
+
+**Modification: `Makefile`** (add near line 100)
+```makefile
+benchmark-parallel:
+	@echo "$(BLUE)Running parallel performance benchmarks...$(NC)"
+	@export $$(xargs < .env.test | grep -v '^#' | xargs) && \
+		$(GO) test -bench=BenchmarkParallel -benchmem -count=5 $(TEST_PKG)/performance
+	@echo "$(GREEN)Benchmark complete$(NC)"
+```
+
+---
+
+### 3. Dependencies
+
+**Prerequisites:**
+- Go 1.25.7 (already in use by the project) ✓
+- pgx/v5 library (already installed) ✓
+- PostgreSQL running and accessible
+- `.env.test` file with database credentials
+
+**No new dependencies required.**
+
+**Existing Dependencies Used:**
+- `github.com/jackc/pgx/v5/pgxpool` - Database connection pooling
+- `github.com/joho/godotenv` - Environment variable loading
+- `go-reading-log-api-next/test` - Test helper functions
+- `go-reading-log-api-next/internal/config` - Configuration loading
+
+---
+
+### 4. Code Patterns
+
+**Follow existing patterns from the codebase:**
+
+1. **Benchmark Structure** (from `test/performance/comparison_test.go`):
+```go
+func BenchmarkOperationName(b *testing.B) {
+    helper := setupBenchmarkDatabase(b)
+    defer cleanupBenchmarkDatabase(b, helper)
+    
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        // Benchmark code here
+    }
+}
+```
+
+2. **Parallel Test Pattern** (from `test/performance/comparison_test.go`):
+```go
+b.SetParallelism(8)  // Test with 8 parallel goroutines
+b.RunParallel(func(pb *testing.PB) {
+    for pb.Next() {
+        // Parallel test code here
+    }
+})
+```
+
+3. **Metrics Reporting**:
+```go
+avgTime := totalTime / time.Duration(b.N)
+b.ReportMetric(float64(avgTime)/float64(time.Millisecond), "ms/op")
+b.ReportAllocs()
+```
+
+4. **Context Usage**: All database operations use context with timeout:
+```go
+ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+defer cancel()
+```
+
+**Naming Conventions:**
+- Benchmark functions: `BenchmarkParallelTestStartup`, `BenchmarkParallelTestExecution`
+- Helper functions: `setupParallelBenchmark`, `cleanupParallelBenchmark`
+- Variable names: `numParallel`, `testDBName`, `benchmarkResults`
+
+---
+
+### 5. Testing Strategy
+
+**Benchmark Tests to Implement:**
+
+| Benchmark | Purpose | Threshold | Metrics |
+|-----------|---------|-----------|---------|
+| `BenchmarkParallelTestStartup` | Measure DB creation + connection time | < 200ms | avg, p95 |
+| `BenchmarkParallelTestExecution` | Measure test execution with 8 goroutines | < 10% regression | ops/sec |
+| `BenchmarkParallelCleanup` | Measure cleanup with 6000+ orphans | < 60s | total time |
+| `BenchmarkDatabaseUniqueness` | Verify no collisions with unique names | 0 collisions | count |
+
+**Test Execution:**
+```bash
+# Run parallel benchmarks
+make benchmark-parallel
+
+# Or run directly
+go test -bench=BenchmarkParallel -benchmem -count=5 ./test/performance
+
+# Generate report
+go tool pprof -http=:8080 profile.out
+```
+
+**Acceptance Verification:**
+1. Run benchmarks 3 times each for statistical reliability
+2. Calculate average and p95 metrics
+3. Compare against thresholds:
+   - Startup time: < 200ms ✓
+   - Execution regression: < 10% ✓
+   - Cleanup time: < 60s ✓
+4. Generate JSON report with all metrics
+
+---
+
+### 6. Risks and Considerations
+
+**Blocking Issues:**
+- None identified. Implementation uses existing patterns from `test/performance/` directory.
+
+**Potential Pitfalls:**
+1. **Test Database Cleanup Interference**: Parallel cleanup might interfere with ongoing tests
+   - *Mitigation*: Use unique database names per test, cleanup only orphaned databases
+
+2. **PostgreSQL Connection Pool Limits**: 8+ parallel tests might exhaust connection pool
+   - *Mitigation*: Monitor connection count, use connection pooling with appropriate max connections
+
+3. **Disk I/O Contention**: Multiple database creates/drops might cause I/O contention
+   - *Mitigation*: Run benchmarks on isolated test environment, not shared development database
+
+4. **Statistical Variance**: Benchmark results might vary between runs
+   - *Mitigation*: Run each benchmark multiple times, use p95 for threshold comparison
+
+**Trade-offs:**
+- Using 8 parallel goroutines balances realistic parallelism with resource constraints
+- 60-second timeout for cleanup prevents hanging but might fail on very large orphan sets
+- p95 metrics chosen over p99 for more stable threshold comparisons
+
+**Deployment Considerations:**
+- No migration required (no schema changes)
+- No downtime required
+- Benchmarks can be run in CI/CD pipeline
+- Results should be stored for regression tracking
+
+**Verification Checklist:**
+- [ ] `make benchmark-parallel` runs without error
+- [ ] All benchmarks complete within expected time
+- [ ] JSON report is generated with all metrics
+- [ ] Metrics meet acceptance thresholds
+- [ ] No test database collisions occur
+- [ ] Cleanup completes within 60 seconds
+
+---
+
+### 7. Implementation Steps
+
+**Step 1: Create `test/performance/parallel_test_benchmark.go`**
+- Import required packages (context, testing, time, etc.)
+- Implement `setupParallelBenchmark` helper
+- Implement `BenchmarkParallelTestStartup`
+- Implement `BenchmarkParallelTestExecution` with 8 goroutines
+- Implement `BenchmarkParallelCleanup`
+- Implement `BenchmarkDatabaseUniqueness`
+
+**Step 2: Update `Makefile`**
+- Add `benchmark-parallel` target
+- Add colorized output for consistency
+
+**Step 3: Generate and Verify Results**
+- Run benchmarks 3 times each
+- Calculate average metrics
+- Verify against thresholds
+- Generate JSON report
+
+**Step 4: Documentation**
+- Update `docs/performance-benchmarks.md` with methodology
+- Document threshold definitions
+- Include example benchmark results
 <!-- SECTION:PLAN:END -->
 
 ## Definition of Done
