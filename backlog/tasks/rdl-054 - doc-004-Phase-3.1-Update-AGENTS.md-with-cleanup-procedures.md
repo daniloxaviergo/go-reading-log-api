@@ -27,7 +27,7 @@ Update the AGENTS.md documentation file to include the new test database cleanup
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 Document auto-cleanup mechanism
-- [ ] #2 Document orphan cleanup process
+- [x] #2 Document orphan cleanup process
 - [ ] #3 Document manual cleanup commands
 - [ ] #4 Include parallel test safety measures
 <!-- AC:END -->
