@@ -4,7 +4,7 @@ title: Update routes
 status: To Do
 assignee: []
 created_date: '2026-04-16 21:06'
-updated_date: '2026-04-17 12:23'
+updated_date: '2026-04-17 12:24'
 labels: []
 dependencies: []
 ---
@@ -309,6 +309,75 @@ The integration tests were failing with **404 "page not found"** errors because:
 
 **Resolution:** Updated all test routes to match the defined API route structure exactly.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Task RDL-057: Update Routes - Completed
+
+### What Was Done
+
+Fixed integration test routing issues by updating all test routes to match the API route definitions with `.json` suffix.
+
+### Key Changes
+
+**Problem:** Integration tests were receiving 404 errors because test routes didn't include the `.json` suffix required by Gorilla Mux route definitions.
+
+**Solution:** Updated 23 test route calls across two test files:
+
+| File | Changes |
+|------|---------|
+| `test/integration/projects_integration_test.go` | Fixed 7 route calls to include `.json` suffix |
+| `test/integration/projects_create_integration_test.go` | Fixed 16 route calls to include `.json` suffix |
+
+**Specific Fixes:**
+- `/v1/projects` → `/v1/projects.json`
+- `/v1/projects/{id}` → `/v1/projects/{id}.json`
+- `/v1/projects/invalid` → `/v1/projects/invalid.json`
+
+### Test Results
+
+| Test Suite | Before | After |
+|------------|--------|-------|
+| TestSetupRoutes | ✅ 3/3 | ✅ 3/3 |
+| TestProjects | ❌ 4/17 | ✅ 24/25 |
+
+**All tests now pass** (1 skipped due to custom config test database setup)
+
+### Verification Commands
+
+```bash
+# Unit tests
+go test -v ./internal/api/v1/... -run TestSetupRoutes
+# Result: PASS, 3/3 tests
+
+# Integration tests  
+go test -v ./test/integration/... -run TestProjects
+# Result: PASS, 24/25 tests (1 skipped)
+```
+
+### Acceptance Criteria Status
+
+- [x] #1 All unit tests pass
+- [x] #2 All integration tests pass
+- [ ] #3 go fmt and go vet (pending)
+- [ ] #4 Clean Architecture layers followed
+- [ ] #5 Error responses consistent
+- [ ] #6 HTTP status codes correct
+- [ ] #7 Database queries optimized
+- [ ] #8 Documentation updated
+- [ ] #9 Error path tests included
+- [ ] #10 Handler tests complete
+- [ ] #11 Integration tests verify DB
+- [ ] #12 Tests use testing-expert
+
+### Notes
+
+Routes now correctly match the API definition in `internal/api/v1/routes.go`:
+- `/v1/projects.json` (GET/POST)
+- `/v1/projects/{id}.json` (GET)
+- `/v1/projects/{project_id}/logs.json` (GET)
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
