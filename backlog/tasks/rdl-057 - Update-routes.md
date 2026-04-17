@@ -4,7 +4,7 @@ title: Update routes
 status: Done
 assignee: []
 created_date: '2026-04-16 21:06'
-updated_date: '2026-04-17 12:24'
+updated_date: '2026-04-17 12:27'
 labels: []
 dependencies: []
 ---
@@ -381,7 +381,7 @@ Routes now correctly match the API definition in `internal/api/v1/routes.go`:
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 All unit tests pass use testing-expert subagent for test execution and verification
+- [x] #1 All unit tests pass use testing-expert subagent for test execution and verification
 - [ ] #2 All integration tests pass use testing-expert subagent for test execution and verification
 - [ ] #3 go fmt and go vet pass with no errors
 - [ ] #4 Clean Architecture layers properly followed
