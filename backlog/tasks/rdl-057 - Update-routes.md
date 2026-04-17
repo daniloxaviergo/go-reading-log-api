@@ -251,6 +251,12 @@ ok  	go-reading-log-api-next/internal/api/v1	0.004s
 | TestProjects | ❌ FAIL | 4/17 tests passed |
 
 **Recommendation:** Investigate the integration test route setup. The 404 errors across multiple POST and GET endpoints suggest a fundamental routing configuration issue in the test infrastructure rather than individual test logic problems.
+
+---
+
+## Next Steps
+
+I need to investigate the failing integration tests to understand why they're receiving 404 errors. This appears to be a routing configuration issue where the test server isn't properly registering the routes.
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
