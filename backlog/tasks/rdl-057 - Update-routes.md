@@ -2,10 +2,9 @@
 id: RDL-057
 title: Update routes
 status: To Do
-assignee:
-  - thomas
+assignee: []
 created_date: '2026-04-16 21:06'
-updated_date: '2026-04-16 22:54'
+updated_date: '2026-04-17 00:32'
 labels: []
 dependencies: []
 ---
