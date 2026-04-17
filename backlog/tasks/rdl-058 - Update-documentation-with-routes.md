@@ -3,9 +3,9 @@ id: RDL-058
 title: Update documentation with routes
 status: To Do
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-17 20:43'
-updated_date: '2026-04-17 20:47'
+updated_date: '2026-04-17 20:52'
 labels: []
 dependencies: []
 ---
