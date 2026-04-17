@@ -4,7 +4,7 @@ title: Update routes
 status: To Do
 assignee: []
 created_date: '2026-04-16 21:06'
-updated_date: '2026-04-17 12:08'
+updated_date: '2026-04-17 12:09'
 labels: []
 dependencies: []
 ---
@@ -30,13 +30,12 @@ update for new routes: test/compare_responses.sh
 <!-- SECTION:PLAN:BEGIN -->
 ### 1. Technical Approach
 
-The task requires ensuring **consistent route definitions** across the entire codebase. While `routes.go` already uses `/v1/...` (without `/api` prefix), there are inconsistencies in tests and documentation that reference `/api/v1/...`.
+The task requires ensuring **consistent route definitions** across the entire codebase. The Go API uses `/v1/...` (without `/api` prefix), but there are inconsistencies in tests and documentation that reference `/api/v1/...`.
 
 **Key Changes:**
-1. **Verify route consistency**: Confirm all route references use `/v1/...` without `/api` prefix
-2. **Update test files**: Fix any tests referencing `/api/v1` to use `/v1`
+1. **Fix test routes**: Update all test files to use `/v1/...` instead of `/api/v1/...`
+2. **Verify `.json` suffix**: Confirm all project endpoints include `.json` suffix as per PRD
 3. **Update documentation**: Align all docs with current route structure
-4. **Ensure `.json` suffix**: Verify all project endpoints include `.json` suffix as per PRD
 
 **Architecture Decision:** Follow the Rails API route structure exactly:
 - `/v1/projects.json` (GET) - List all projects
@@ -54,10 +53,9 @@ The task requires ensuring **consistent route definitions** across the entire co
 
 | File | Action | Description |
 |------|--------|-------------|
-| `internal/api/v1/routes_test.go` | **MODIFY** | Update test routes from `/api/v1/...` to `/v1/...` |
-| `test/integration/projects_integration_test.go` | **MODIFY** | Fix route reference on line 30-31 (`/api/v1/projects.json` → `/v1/projects.json`) |
-| `test/compare_responses.sh` | **MODIFY** | Update API URL defaults from `.../api/v1` to `.../v1` |
-| `docs/endpoint-comparison-report-v1-projects.md` | **MODIFY** | Update documentation to reflect `/v1` routes |
+| `internal/api/v1/routes_test.go` | **MODIFY** | Change `/api/v1/projects.json` to `/v1/projects.json` (lines 56, 64, 70) |
+| `test/integration/projects_integration_test.go` | **MODIFY** | Change `/api/v1/projects.json` to `/v1/projects.json` (lines 30-31) |
+| `docs/endpoint-comparison-report-v1-projects.md` | **MODIFY** | Update documentation to reflect `/v1` routes instead of `/api/v1` |
 | `docs/rdl-057-route-updates.md` | **CREATE** | Document the route consistency verification and fixes |
 
 ---
@@ -86,7 +84,7 @@ r.HandleFunc("/v1/projects.json", handler).Methods("GET")
 r.HandleFunc("/v1/projects/{id}.json", handler).Methods("GET")
 r.HandleFunc("/v1/projects/{project_id}/logs.json", handler).Methods("GET")
 
-// URL configuration for comparison script:
+// URL configuration for comparison script (already correct):
 GO_API_URL="http://localhost:3000/v1"
 RAILS_API_URL="http://localhost:3001/v1"
 
@@ -180,10 +178,8 @@ go vet ./...
 
 ### 8. Implementation Checklist
 
-- [ ] Audit all files for `/api/v1` references using `grep`
 - [ ] Update `internal/api/v1/routes_test.go` - change `/api/v1` to `/v1`
 - [ ] Update `test/integration/projects_integration_test.go` - fix route on lines 30-31
-- [ ] Update `test/compare_responses.sh` - change default URLs from `.../api/v1` to `.../v1`
 - [ ] Update documentation files referencing `/api/v1`
 - [ ] Run unit tests and verify pass
 - [ ] Run integration tests and verify pass
