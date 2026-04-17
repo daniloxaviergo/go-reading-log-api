@@ -4,7 +4,7 @@ title: Update routes
 status: To Do
 assignee: []
 created_date: '2026-04-16 21:06'
-updated_date: '2026-04-17 10:55'
+updated_date: '2026-04-17 10:57'
 labels: []
 dependencies: []
 ---
@@ -17,10 +17,10 @@ The endpoints should be equals responses
 - /v1/projects/{project_id}/logs.json
 - /v1/projects.json
 
-update the prd to correct url, should be `.json` at the end
-- /v1/projects/{project_id}.json
-- /v1/projects/{project_id}/logs.json
-- /v1/projects.json
+remove prefix api
+/api/v1/projects.json -> /v1/projects.json
+
+dont remove suffix `.json` only remove prefix `api`
 
 update for new routes: test/compare_responses.sh
 <!-- SECTION:DESCRIPTION:END -->
