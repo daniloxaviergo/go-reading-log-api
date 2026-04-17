@@ -4,7 +4,7 @@ title: Update routes
 status: To Do
 assignee: []
 created_date: '2026-04-16 21:06'
-updated_date: '2026-04-17 12:12'
+updated_date: '2026-04-17 12:16'
 labels: []
 dependencies: []
 ---
@@ -192,31 +192,65 @@ go vet ./...
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-## Implementation Progress - RDL-057: Update Routes
+## Test Execution Progress
 
-**Date:** 2026-04-17
-**Status:** In Progress
+### Command 1: Unit Tests (TestSetupRoutes)
+**Status:** ✅ PASS
 
-### What I'm Doing
-Analyzing the current route structure and identifying all locations where `/api/v1` needs to be changed to `/v1`.
+```
+=== RUN   TestSetupRoutes
+--- PASS: TestSetupRoutes (0.00s)
+=== RUN   TestSetupRoutes_Routes
+--- PASS: TestSetupRoutes_Routes (0.00s)
+=== RUN   TestSetupRoutes_MiddlewareChain
+--- PASS: TestSetupRoutes_MiddlewareChain (0.00s)
+PASS
+ok  	go-reading-log-api-next/internal/api/v1	0.004s
+```
 
-### Initial Assessment
-Based on the implementation plan, I need to:
-1. Update test files that reference `/api/v1/projects.json` to use `/v1/projects.json`
-2. Verify the `.json` suffix is preserved (not removed)
-3. Update documentation to reflect correct routes
-4. Run all tests using testing-expert subagent
+**Result:** All 3 tests passed successfully.
 
-### Files Identified for Modification
-- `internal/api/v1/routes_test.go` - Lines 56, 64, 70 reference `/api/v1`
-- `test/integration/projects_integration_test.go` - Lines 30-31 reference `/api/v1`
-- Documentation files referencing old routes
+---
 
-### Next Steps
-1. Read current test files to confirm exact content
-2. Make precise edits to change `/api/v1` to `/v1`
-3. Run tests using testing-expert subagent
-4. Verify all acceptance criteria are met
+### Command 2: Integration Tests (TestProjects)
+**Status:** ❌ FAIL
+
+**Summary:**
+- Total tests run: 17
+- Passed: 4
+- Failed: 12
+- Skipped: 1
+
+**Failing Tests Analysis:**
+
+| Test | Expected | Actual | Issue |
+|------|----------|--------|-------|
+| TestProjectsCreateIntegration | 201 | 404 | POST endpoint not found |
+| TestProjectsCreateValidationErrors/* | 400/201 | 404 | POST endpoint not found |
+| TestProjectsShowIntegration | 200 | 404 | GET by ID endpoint not found |
+| TestProjectsShowWithLogs | 200 | 404 | GET with logs endpoint not found |
+| TestProjectsResponseFormat | Missing fields | 404 | Response parsing failed |
+| TestProjectsConcurrentReads | 5 success | 0 | Endpoint not reachable |
+
+**Root Cause:** The integration tests are receiving **404 "page not found"** responses, which suggests:
+1. Routes may not be properly registered in the test server
+2. The API version prefix `/api/v1/` may be missing from test requests
+3. Test database setup may have issues
+
+**Investigation Needed:**
+- Check `test/integration/projects_integration_test.go` for route configuration
+- Verify `TestHelper` creates routes correctly
+- Confirm expected API endpoint paths match implementation
+
+---
+
+### Summary
+| Command | Status | Results |
+|---------|--------|---------|
+| TestSetupRoutes | ✅ PASS | 3/3 tests passed |
+| TestProjects | ❌ FAIL | 4/17 tests passed |
+
+**Recommendation:** Investigate the integration test route setup. The 404 errors across multiple POST and GET endpoints suggest a fundamental routing configuration issue in the test infrastructure rather than individual test logic problems.
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
