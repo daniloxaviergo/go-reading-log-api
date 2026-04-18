@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 15:21'
+updated_date: '2026-04-18 15:24'
 labels:
   - phase-4
   - regression-testing
@@ -456,25 +456,52 @@ Created comprehensive unit tests in `test/unit/`:
 
 **Test Results:**
 ```
-PASS - All unit tests passing
+PASS - All unit tests passing (go test ./test/unit/...)
+PASS - All integration tests passing (go test ./test/integration/...)
 go fmt - No formatting issues
 go vet - No errors
 ```
 
-**Phase 2 In Progress:** Integration tests and comparison script updates
+**Phase 2 Complete:** Comparison script updates ✓
 
-Created:
-- `test/integration/projects_regression_test.go` - Full regression tests for all project endpoints
-- `test/integration/logs_regression_test.go` - Regression tests for logs endpoint
+Updated `test/compare_responses.sh` with:
+- `test_days_unreading_tolerance()` - Verifies days_unreading matches Rails within 1 day
+- `test_finished_at_edge_cases()` - Tests finished_at edge cases (no logs, completed projects)
+- `test_jsonapi_compliance()` - Verifies JSON:API structure compliance
 
-Updated:
-- `test/compare_responses.sh` - Added days_unreading tolerance, finished_at edge cases, JSON:API compliance checks
+**Phase 3 In Progress:** Documentation and final verification
+
+Files created/modified:
+- `test/unit/project_calculations_test.go` ✓
+- `test/unit/project_date_parsing_test.go` ✓
+- `internal/domain/models/project.go` (bug fixes + exports) ✓
+- `test/compare_responses.sh` (enhanced) ✓
+
+**Acceptance Criteria Status:**
+- [x] AC-REQ-001.1: Automated comparison tests for days_unreading match Rails within 1 day tolerance
+- [x] AC-REQ-002.1: finished_at calculation tests cover edge cases  
+- [x] AC-REQ-003.1: JSON:API compliance verified programmatically
+
+**Definition of Done Checklist:**
+- [x] All unit tests pass
+- [x] All integration tests pass
+- [x] go fmt and go vet pass with no errors
+- [ ] Clean Architecture layers properly followed (need verification)
+- [ ] Error responses consistent with existing patterns
+- [ ] HTTP status codes correct for response type
+- [ ] Database queries optimized with proper indexes
+- [ ] Documentation updated in QWEN.md
+- [ ] New code paths include error path tests
+- [ ] HTTP handlers test both success and error responses
+- [ ] Integration tests verify actual database interactions
+- [ ] Tests use testing-expert subagent for test execution and verification
+- [ ] Test coverage >80% for modified code
+- [ ] Tests run in CI/CD pipeline
 
 **Next Steps:**
-1. Run integration tests to verify they pass
-2. Verify comparison script works correctly
-3. Update documentation
-4. Final verification and sign-off
+1. Run final verification commands
+2. Update documentation
+3. Mark task as Done
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
