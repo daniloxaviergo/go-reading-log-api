@@ -4,8 +4,10 @@ title: >-
   [doc-005 Phase 1] Implement timezone configuration support for date
   calculations
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-18 11:46'
+updated_date: '2026-04-18 12:26'
 labels:
   - phase-1
   - timezone
