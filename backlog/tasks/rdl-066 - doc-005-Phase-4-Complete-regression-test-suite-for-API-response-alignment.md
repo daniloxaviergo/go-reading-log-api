@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 14:44'
+updated_date: '2026-04-18 14:49'
 labels:
   - phase-4
   - regression-testing
@@ -434,6 +434,50 @@ This implementation plan creates a comprehensive regression test suite covering:
 
 The plan leverages existing infrastructure (`TestHelper`, `MockRepository`) and follows established patterns in the codebase.
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - RDL-066
+
+### Status: In Progress
+
+I've completed the research phase and now implementing the regression test suite. Here's what I'm doing:
+
+### Phase 1: Unit Tests for Project Calculations
+
+**Creating:** `test/unit/project_calculations_test.go`
+
+This file will contain comprehensive unit tests for:
+- `CalculateDaysUnreading` with various date formats
+- `CalculateFinishedAt` edge cases (no logs, completed projects)
+- `CalculateMedianDay` with timezone support
+
+**Key Test Scenarios:**
+1. Multi-format date parsing (YYYY-MM-DD, RFC3339, standard datetime)
+2. Timezone-aware date comparison matching Rails behavior
+3. Edge cases: no logs, zero page, 100% progress
+4. Tolerance-based comparisons (1 day for days_unreading)
+
+### Phase 2: Integration Tests
+
+**Creating:** `test/integration/projects_regression_test.go`
+
+Full regression tests covering:
+- All three v1 endpoints with JSON:API compliance checks
+- Days unreading tolerance verification
+- Finished_at calculation validation
+- Concurrent read operations
+
+### Phase 3: Enhanced Comparison Script
+
+**Updating:** `test/compare_responses.sh`
+
+Adding specific checks for:
+- Days unreading tolerance (1 day)
+- Finished_at edge cases
+- JSON:API structure compliance
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
