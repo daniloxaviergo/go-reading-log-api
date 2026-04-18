@@ -5,7 +5,7 @@ title: >-
   tags
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-18 11:47'
 updated_date: '2026-04-18 14:37'
 labels:
