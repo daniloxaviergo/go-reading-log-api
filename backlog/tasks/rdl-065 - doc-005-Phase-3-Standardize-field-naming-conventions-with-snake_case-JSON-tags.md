@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 14:31'
+updated_date: '2026-04-18 14:32'
 labels:
   - phase-3
   - naming-convention
@@ -242,6 +242,35 @@ gofmt -w .
 
 **Estimated Effort:** 1-2 hours for comprehensive verification and documentation.
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - RDL-065
+
+**Date:** 2026-04-18
+**Task:** Standardize field naming conventions with snake_case JSON tags
+
+### Step 1: Comprehensive Codebase Scan
+
+Starting comprehensive scan of all DTO files to verify snake_case compliance.
+
+**Files to Audit:**
+- `internal/domain/dto/project_response.go`
+- `internal/domain/dto/log_response.go`
+- `internal/domain/dto/project_request.go`
+- `internal/domain/dto/log_request.go`
+- `internal/domain/dto/health_check_response.go`
+- `internal/domain/dto/jsonapi_response.go`
+- `internal/domain/models/project.go`
+- `internal/domain/models/log.go`
+
+**Verification Strategy:**
+1. Scan all struct definitions for JSON tags
+2. Verify all tags use snake_case (underscore separator)
+3. Confirm no kebab-case (hyphen separator) exists
+4. Check that all public fields have explicit json tags
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
