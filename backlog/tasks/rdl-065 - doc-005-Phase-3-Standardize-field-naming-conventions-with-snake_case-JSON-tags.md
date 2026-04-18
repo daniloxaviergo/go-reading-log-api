@@ -5,9 +5,9 @@ title: >-
   tags
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 14:30'
+updated_date: '2026-04-18 14:31'
 labels:
   - phase-3
   - naming-convention
