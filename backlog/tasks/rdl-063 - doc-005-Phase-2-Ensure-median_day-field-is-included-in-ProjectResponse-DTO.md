@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 13:14'
+updated_date: '2026-04-18 13:16'
 labels:
   - phase-2
   - median-day
@@ -226,6 +226,27 @@ After implementation, verify:
 - Acceptance Criteria: AC-REQ-003.1 - Inspect JSON response structure shows median_day
 - Implementation matches Rails behavior: `median_day` = `page / days_reading` rounded to 2 decimals
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress
+
+### Analysis Complete
+- Identified that `CalculateMedianDay()` method exists in domain model (internal/domain/models/project.go)
+- Identified that `MedianDay` field exists in `ProjectResponse` DTO with correct JSON tag
+- Found root cause: Repository methods `GetWithLogs()` and `GetAllWithLogs()` calculate other derived fields but do not call `CalculateMedianDay()`
+
+### Implementation Plan
+1. Add `projectResp.MedianDay = project.CalculateMedianDay()` in `GetWithLogs()` method
+2. Add `projectResp.MedianDay = project.CalculateMedianDay()` in `GetAllWithLogs()` method
+3. Run tests to verify functionality
+
+### Next Steps
+- Execute implementation changes
+- Run unit and integration tests
+- Verify acceptance criteria are met
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
