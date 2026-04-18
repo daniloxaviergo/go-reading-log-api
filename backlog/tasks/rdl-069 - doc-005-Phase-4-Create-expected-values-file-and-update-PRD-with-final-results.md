@@ -4,8 +4,10 @@ title: >-
   [doc-005 Phase 4] Create expected values file and update PRD with final
   results
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-18 11:48'
+updated_date: '2026-04-18 16:07'
 labels:
   - phase-4
   - test-automation
