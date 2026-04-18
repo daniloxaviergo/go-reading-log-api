@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:46'
-updated_date: '2026-04-18 13:03'
+updated_date: '2026-04-18 13:05'
 labels:
   - phase-2
   - finished-at
@@ -271,6 +271,71 @@ PASS: TestProject_CalculateFinishedAt_MultiFormat
 - Mark task as Done (all acceptance criteria met)
 - Update PRD doc-005 with completion status
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Task RDL-062 Complete
+
+### What Was Done
+
+This task verified the existing `CalculateFinishedAt()` implementation in `internal/domain/models/project.go` meets all PRD doc-005 acceptance criteria for project completion estimation.
+
+### Key Changes
+
+**No code changes required** - the implementation was already complete from previous tasks (RDL-024, RDL-060, RDL-061). This task focused on verification and documentation.
+
+### Verification Results
+
+#### Acceptance Criteria Status
+| Criterion | Status | Evidence |
+|-----------|--------|----------|
+| AC-REQ-002.1: finished_at returns calculated date when page < total_page | ✅ VERIFIED | `TestProject_CalculateFinishedAt_MultiFormat` passes |
+| AC-REQ-002.2: finished_at returns null when page >= total_page and no logs exist | ✅ VERIFIED | `TestProject_CalculateFinishedAt_100PercentProgress/finished_book_no_logs` passes |
+
+#### Definition of Done Status
+| Item | Status |
+|------|--------|
+| All unit tests pass | ✅ PASS (32 tests) |
+| All integration tests pass | ✅ PASS (24 tests) |
+| go fmt and go vet pass | ✅ NO ERRORS |
+| Clean Architecture layers followed | ✅ COMPLIANT (only internal imports) |
+| Formula: finished_at = today + ((total_page - page) / median_day).round() | ✅ IMPLEMENTED |
+
+#### Edge Cases Verified
+- ✅ no started_at → returns nil
+- ✅ page <= 0 → returns nil  
+- ✅ page >= total_page, no logs → returns nil
+- ✅ page >= total_page, with logs → returns most recent log date
+- ✅ zero median_day → returns nil
+
+### Test Results Summary
+```
+ok  	go-reading-log-api-next/internal/domain/models	(cached)
+ok  	go-reading-log-api-next/internal/api/v1/handlers	(cached)
+ok  	go-reading-log-api-next/test/integration	(cached)
+```
+
+### Files Reviewed
+- `internal/domain/models/project.go` - Implementation verified (lines 301-418)
+- `internal/domain/models/project_test.go` - Tests verified
+
+### Build Verification
+```bash
+$ make build
+Build complete: bin/server
+```
+
+### Risks & Considerations
+- Timezone edge cases handled via context configuration
+- Integer rounding matches Rails behavior for days_to_finish
+- No maximum future date limit (allows indefinite projection)
+
+### Related Documentation
+- PRD: doc-005 Section REQ-002
+- Task: RDL-062
+- Implementation Notes: See task history for detailed verification log
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
