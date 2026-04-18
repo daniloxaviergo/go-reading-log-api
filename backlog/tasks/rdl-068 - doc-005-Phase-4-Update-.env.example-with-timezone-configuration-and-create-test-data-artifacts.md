@@ -5,7 +5,7 @@ title: >-
   test data artifacts
 status: To Do
 assignee:
-  - book
+  - workflow
 created_date: '2026-04-18 11:48'
 updated_date: '2026-04-18 15:51'
 labels:
