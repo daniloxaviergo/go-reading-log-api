@@ -5,9 +5,9 @@ title: >-
   test data artifacts
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-18 11:48'
-updated_date: '2026-04-18 15:56'
+updated_date: '2026-04-18 15:57'
 labels:
   - phase-4
   - configuration
