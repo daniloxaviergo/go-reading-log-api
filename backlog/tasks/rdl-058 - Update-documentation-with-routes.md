@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - Thomas
 created_date: '2026-04-17 20:43'
-updated_date: '2026-04-18 09:10'
+updated_date: '2026-04-18 09:21'
 labels: []
 dependencies: []
 ordinal: 2000
@@ -135,11 +135,53 @@ I have analyzed the codebase and understand the API structure. Here's what I've 
 3. **Phase 1 limitation**: Logs creation is commented out - will be added in Phase 2
 4. **Response format**: JSON responses match Rails API serializer output
 
-#### Documentation to Update
+#### Documentation Updated
 
-I need to update:
-- `docs/README.go-project.md` - Add comprehensive API documentation section
-- `QWEN.md` - Update API endpoints table and add details
+I have updated the following documentation files:
+
+**1. QWEN.md**
+- Added comprehensive API Endpoints section with:
+  - Health check endpoint (`/healthz`)
+  - Projects endpoints (List, Get by ID, Create)
+  - Logs endpoints (List for project)
+  - Request/response examples with JSON
+  - Error handling documentation
+  - Calculated fields explanation
+  - Phase 1 limitations
+  - Quick reference curl examples
+
+**2. docs/README.go-project.md**
+- Added comprehensive API Endpoints section (same content as QWEN.md)
+- Included detailed endpoint tables
+- Added calculated fields documentation
+- Included error handling guide
+- Added phase 1 limitations note
+- Provided quick reference with curl examples
+
+#### Testing Results
+
+✅ **All tests passing** (verified with testing-expert subagent)
+- Unit tests: PASS
+- Integration tests: PASS
+- Middleware tests: PASS
+- Config tests: PASS
+- Domain tests: PASS
+
+#### Code Quality Checks
+
+✅ **go fmt**: No formatting issues
+✅ **go vet**: No linting errors
+
+#### Next Steps
+
+The task is essentially complete. The documentation now accurately reflects:
+- All current API routes and their implementations
+- Request/response formats for each endpoint
+- Error handling patterns
+- Calculated fields and their formulas
+- Phase 1 limitations (read-only logs)
+
+Would you like me to make any additional changes or finalize the task?
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
