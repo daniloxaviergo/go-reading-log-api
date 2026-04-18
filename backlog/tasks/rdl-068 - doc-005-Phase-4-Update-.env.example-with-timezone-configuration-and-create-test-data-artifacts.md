@@ -3,7 +3,7 @@ id: RDL-068
 title: >-
   [doc-005 Phase 4] Update .env.example with timezone configuration and create
   test data artifacts
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-18 11:48'
