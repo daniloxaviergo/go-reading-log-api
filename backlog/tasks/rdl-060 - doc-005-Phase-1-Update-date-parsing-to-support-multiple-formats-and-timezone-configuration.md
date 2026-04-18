@@ -238,7 +238,7 @@ lastReadDate = time.Date(lastReadDate.Year(), lastReadDate.Month(), lastReadDate
 - [x] #3 go fmt and go vet pass with no errors
 - [x] #4 Clean Architecture layers properly followed
 - [x] #5 Error responses consistent with existing patterns
-- [ ] #6 HTTP status codes correct for response type
+- [x] #6 HTTP status codes correct for response type
 - [ ] #7 Database queries optimized with proper indexes
 - [ ] #8 Documentation updated in QWEN.md
 - [ ] #9 New code paths include error path tests
