@@ -5,9 +5,9 @@ title: >-
   results
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-18 11:48'
-updated_date: '2026-04-18 17:22'
+updated_date: '2026-04-18 17:23'
 labels:
   - phase-4
   - test-automation
