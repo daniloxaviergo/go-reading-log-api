@@ -4,7 +4,7 @@ title: Compare rails vs go projects
 status: To Do
 assignee: []
 created_date: '2026-04-18 00:24'
-updated_date: '2026-04-18 10:39'
+updated_date: '2026-04-18 10:41'
 labels: []
 dependencies: []
 ordinal: 1000
@@ -124,18 +124,168 @@ curl http://localhost:3001/api/v1/projects/450.json
 <!-- SECTION:NOTES:BEGIN -->
 ## Implementation Progress - RDL-059
 
-### Status: IN PROGRESS (Data Collection Phase)
+### Status: IN PROGRESS (Data Collection Complete, Documentation In Progress)
 
-#### Phase 1: Comparison Script Execution ✅ IN PROGRESS
+#### Phase 1: Comparison Script Execution ✅ COMPLETED
 
 **Objective:** Use `test/compare_responses.sh` to compare responses for `v1/projects/450.json`
 
-**Status:** Preparing to execute comparison script
+**Results:**
+- Script executed successfully
+- Detected structural differences between Go and Rails APIs
+- **6 tests failed out of 6** - all endpoints showed structural mismatches
 
-**Next Steps:**
-1. Execute the comparison script to gather response data
-2. Analyze differences between Go and Rails APIs
-3. Document findings in `docs/diff_show_project.md`
+**Key Findings:**
+
+| Endpoint | Go Response Structure | Rails Response Structure |
+|----------|----------------------|-------------------------|
+| `/v1/projects` | Flat JSON array | JSON:API with `data` wrapper |
+| `/v1/projects/:id` | Flat object | JSON:API with `attributes` |
+| `/v1/projects/:id/logs` | Array with nested project | JSON:API with `relationships` |
+
+---
+
+#### Phase 2: Detailed Analysis ✅ COMPLETED
+
+**Comparison Points Analyzed:**
+
+1. **HTTP Status Codes:** Both APIs return 200 OK for successful requests
+2. **JSON Structure:** 
+   - Go: Simple flat structure
+   - Rails: JSON:API specification (`data`, `attributes`, `relationships`)
+3. **Field Naming:**
+   - Go: snake_case (e.g., `started_at`, `logs_count`)
+   - Rails: kebab-case in attributes (e.g., `started-at`, `logs-count`)
+4. **Calculated Fields:**
+   - `days_unreading`: Go=58, Rails=16 (DIFFERENCE - needs investigation)
+   - `median_day`: Only in Rails response
+   - `finished_at`: Go=null, Rails="2026-04-02" (DIFFERENCE)
+5. **Datetime Formats:**
+   - Go: RFC3339 with timezone (e.g., `"2026-02-19T00:00:00Z"`)
+   - Rails: ISO 8601 with offset (e.g., `"2026-02-19T00:00:00.000-03:00"`)
+
+**Critical Discrepancies Identified:**
+
+1. **days_unreading calculation differs:** Go shows 58 days, Rails shows 16 days
+   - This indicates different business logic for calculating days since last reading
+   
+2. **finished_at field:** 
+   - Go: Returns null even when status is "finished"
+   - Rails: Calculates and returns estimated completion date
+
+3. **median_day field:**
+   - Go: Missing from response (but calculated in model)
+   - Rails: Included in attributes
+
+4. **Nested project data in logs:**
+   - Go: Full project object embedded in each log
+   - Rails: Relationship reference only (more efficient)
+
+---
+
+#### Phase 3: Documentation In Progress
+
+**Deliverable:** `docs/diff_show_project.md` with detailed discrepancy analysis
+
+**Draft Structure:**
+```markdown
+# Project 450 Response Comparison Report
+
+## Executive Summary
+Comparing Go API vs Rails API responses for endpoint: v1/projects/450.json
+
+### Overall Assessment
+⚠️ **CRITICAL**: Multiple structural and data discrepancies detected
+
+| Category | Count |
+|----------|-------|
+| Structural Differences | 3 |
+| Value Discrepancies | 2 |
+| Missing Fields | 1 |
+
+---
+
+## Endpoint Comparison
+
+### 1. Index Endpoint (GET /v1/projects)
+
+#### Go Response Structure
+```json
+[
+  {
+    "id": 450,
+    "name": "História da Igreja VIII.1",
+    ...
+  }
+]
+```
+
+#### Rails Response Structure
+```json
+{
+  "data": [
+    {
+      "id": "450",
+      "type": "projects",
+      "attributes": { ... }
+    }
+  ]
+}
+```
+
+**Discrepancy Type:** STRUCTURAL
+
+---
+
+## Detailed Field Analysis
+
+| Field | Go Value | Rails Value | Match | Notes |
+|-------|----------|-------------|-------|-------|
+| id | 450 (int) | "450" (string) | ⚠️ Type only | ID type differs |
+| name | História... | História... | ✓ | Identical |
+| started_at | 2026-02-19T00:00:00Z | 2026-02-19 | ⚠️ Format | Time component missing in Rails |
+| progress | 100 | 100.0 | ✓ | Functionally equivalent |
+| total_page | 691 | 691 | ✓ | Identical |
+| page | 691 | 691 | ✓ | Identical |
+| status | finished | finished | ✓ | Identical |
+| logs_count | 38 | 38 | ✓ | Identical |
+| days_unreading | 58 | 16 | ✗ **CRITICAL** | Different calculation logic |
+| median_day | (missing) | 11.91 | ⚠️ Missing | Not returned by Go API |
+| finished_at | null | 2026-04-02 | ✗ **CRITICAL** | Rails calculates, Go returns null |
+
+---
+
+## Critical Issues Requiring Investigation
+
+### Issue #1: days_unreading Calculation Discrepancy
+- **Severity:** HIGH
+- **Go Value:** 58 days
+- **Rails Value:** 16 days
+- **Root Cause:** Different date calculation logic or data source
+- **Impact:** User-facing feature inconsistency
+
+### Issue #2: finished_at Field Inconsistency
+- **Severity:** MEDIUM
+- **Go Value:** null
+- **Rails Value:** 2026-04-02
+- **Root Cause:** Go implementation doesn't calculate completion date
+- **Impact:** Missing useful information for users
+
+---
+
+## Recommendations
+
+1. **Immediate:** Investigate `days_unreading` calculation in both implementations
+2. **Short-term:** Add `finished_at` calculation to Go API
+3. **Medium-term:** Align JSON structure (consider adopting JSON:API for consistency)
+4. **Long-term:** Unify business logic for calculated fields
+```
+
+---
+
+#### Phase 4: Test Execution
+
+Running comprehensive tests to ensure no regressions:
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
