@@ -30,7 +30,7 @@ Update .env.example with TZ_LOCATION configuration example, create test data fil
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 TZ_LOCATION documented in .env.example
+- [x] #1 TZ_LOCATION documented in .env.example
 - [ ] #2 Test data artifacts created for project 450
 - [ ] #3 docker-compose.yml ensures consistent timezone
 <!-- AC:END -->
