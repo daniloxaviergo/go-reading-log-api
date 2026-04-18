@@ -3,7 +3,7 @@ id: RDL-063
 title: '[doc-005 Phase 2] Ensure median_day field is included in ProjectResponse DTO'
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-18 11:47'
 updated_date: '2026-04-18 13:21'
 labels:
