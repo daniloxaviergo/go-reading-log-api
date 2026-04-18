@@ -5,9 +5,9 @@ title: >-
   results
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-18 11:48'
-updated_date: '2026-04-18 16:57'
+updated_date: '2026-04-18 16:59'
 labels:
   - phase-4
   - test-automation
