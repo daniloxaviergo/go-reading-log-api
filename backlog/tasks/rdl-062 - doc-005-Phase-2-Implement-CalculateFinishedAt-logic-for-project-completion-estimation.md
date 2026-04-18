@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:46'
-updated_date: '2026-04-18 13:01'
+updated_date: '2026-04-18 13:03'
 labels:
   - phase-2
   - finished-at
@@ -215,6 +215,62 @@ Use `testing-expert` subagent to run all tests and verify coverage.
 
 **Ready for Implementation:** Yes, pending user approval of this plan.
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - RDL-062
+
+### Date: 2026-04-18
+
+### Task Status
+Verified and completed the CalculateFinishedAt() implementation for project completion estimation.
+
+### What Was Done
+
+#### 1. Code Review & Verification
+- Reviewed existing `CalculateFinishedAt()` implementation in `internal/domain/models/project.go` (lines 301-418)
+- Verified formula implementation: `finished_at = today + ((total_page - page) / median_day).round()`
+- Confirmed edge case handling matches PRD requirements
+
+#### 2. Acceptance Criteria Verification
+
+**AC-REQ-002.1:** "finished_at returns calculated date when page < total_page"
+- ✓ Verified through existing tests in `TestProject_CalculateFinishedAt_MultiFormat`
+- Formula correctly calculates: days_to_finish = (total_page - page) / median_day
+- Returns future date as expected
+
+**AC-REQ-002.2:** "finished_at returns null when page >= total_page and no logs exist"
+- ✓ Verified through existing test `TestProject_CalculateFinishedAt_100PercentProgress/finished_book_no_logs`
+- Test confirms nil is returned when page == total_page and logs is empty
+
+#### 3. Code Quality Checks
+- `go fmt`: No formatting issues found
+- `go vet`: No warnings or errors
+
+#### 4. Edge Cases Verified
+| Case | Result |
+|------|--------|
+| no started_at | returns nil ✓ |
+| page <= 0 | returns nil ✓ |
+| page >= total_page, no logs | returns nil ✓ |
+| page >= total_page, with logs | returns most recent log date ✓ |
+| zero median_day | returns nil ✓ |
+
+### Files Reviewed
+- `internal/domain/models/project.go` - Implementation verified
+- `internal/domain/models/project_test.go` - Tests verified
+
+### Test Results
+```
+PASS: TestProject_CalculateFinishedAt_100PercentProgress
+PASS: TestProject_CalculateFinishedAt_MultiFormat
+```
+
+### Next Steps
+- Mark task as Done (all acceptance criteria met)
+- Update PRD doc-005 with completion status
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
