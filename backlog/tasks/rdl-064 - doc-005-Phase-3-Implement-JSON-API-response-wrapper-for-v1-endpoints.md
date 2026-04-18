@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 13:36'
+updated_date: '2026-04-18 13:42'
 labels:
   - phase-3
   - json-api
@@ -334,34 +334,25 @@ func TestProjectsHandler_Index_JSONAPI(t *testing.T) {
 <!-- SECTION:NOTES:BEGIN -->
 ## Implementation Progress - RDL-064
 
-### Status: In Progress
+### Status: In Progress (Updating Tests)
 
-I've reviewed the task requirements and existing codebase. The task requires implementing JSON:API response wrapper for v1 endpoints following Decision 2 in doc-005.
+I've successfully updated the handler code to use JSON:API envelope format. Now I need to update the tests to verify the new response structure.
 
-**Key Requirements:**
-1. Implement JSON:API wrapper format `{data: {...}}` for v1 endpoints
-2. Serialize ID field as string type per JSON:API 1.0 specification
-3. Update projects_handler.go and logs_handler.go
+**Completed Changes:**
+1. ✅ Updated `projects_handler.go` - Index, Show, Create methods now wrap responses in JSON:API envelope
+2. ✅ Updated `logs_handler.go` - Index method now wraps responses in JSON:API envelope  
+3. ✅ Updated `jsonapi_response.go` - Added `NewJSONAPIEnvelopeWithArray` for collections, ID as string
+4. ⏳ Updating tests to verify JSON:API structure
 
-**Existing Infrastructure:**
-- `internal/domain/dto/jsonapi_response.go` already exists with `JSONAPIEnvelope`, `JSONAPIData`, and `ProjectJSONAPIResponse` types
-- Need to integrate these into HTTP handlers
-
-**Implementation Plan:**
-1. Update `projects_handler.go` - Index, Show, Create methods to wrap responses
-2. Update `logs_handler.go` - Index method to wrap responses
-3. Ensure ID conversion to string using `strconv.FormatInt`
-4. Set Content-Type header to `application/vnd.api+json`
+**Test Failures Identified:**
+- Logs handler tests expect flat array but get envelope with `data` wrapper
+- Projects handler create tests need to check envelope structure
 
 **Next Steps:**
-- Implement JSON:API wrapping in projects handler
-- Implement JSON:API wrapping in logs handler  
-- Update tests to verify JSON:API structure
-- Run go fmt and go vet
-- Execute all tests
-
-### Blockers/Notes:
-- None identified - implementation is straightforward using existing DTOs
+- Update test assertions to decode from envelope structure
+- Verify ID is string type
+- Verify Content-Type header is `application/vnd.api+json`
+- Run all tests to confirm pass
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
