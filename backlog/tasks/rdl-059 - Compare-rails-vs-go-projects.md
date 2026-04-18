@@ -4,7 +4,7 @@ title: Compare rails vs go projects
 status: To Do
 assignee: []
 created_date: '2026-04-18 00:24'
-updated_date: '2026-04-18 10:41'
+updated_date: '2026-04-18 10:43'
 labels: []
 dependencies: []
 ordinal: 1000
@@ -287,6 +287,115 @@ Comparing Go API vs Rails API responses for endpoint: v1/projects/450.json
 
 Running comprehensive tests to ensure no regressions:
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+# RDL-059: Compare Rails vs Go Projects - Final Summary
+
+## What Was Done
+
+This task involved comparing the Rails API vs Go API implementations for the `v1/projects/450.json` endpoint and documenting detailed differences.
+
+### Execution Steps Completed:
+
+1. **Comparison Script Execution**
+   - Ran `test/compare_responses.sh` to compare both APIs
+   - Result: 6 tests failed out of 6 (all endpoints showed structural mismatches)
+
+2. **Detailed Response Analysis**
+   - Extracted and compared responses for project 450 from both APIs
+   - Analyzed structure, field values, and calculated fields
+
+3. **Documentation Created**
+   - Created `docs/diff_show_project.md` with comprehensive comparison report
+
+---
+
+## Key Findings
+
+### Critical Discrepancies Identified:
+
+| Issue | Severity | Go Value | Rails Value | Impact |
+|-------|----------|----------|-------------|--------|
+| `days_unreading` calculation | HIGH | 58 days | 16 days | Different business logic |
+| `finished_at` field | MEDIUM | null | 2026-04-02 | Missing completion date |
+| `median_day` field | LOW | Missing | 11.91 | Reading pace info unavailable |
+
+### Structural Differences:
+
+| Aspect | Go API | Rails API |
+|--------|--------|-----------|
+| Specification | Custom flat structure | JSON:API 1.0 |
+| ID type | Integer | String |
+| Field naming | snake_case | kebab-case |
+| Nested data | Embedded objects | Relationship references |
+
+---
+
+## Files Modified
+
+**New Files:**
+- `docs/diff_show_project.md` - Comprehensive comparison report with:
+  - Executive summary of discrepancies
+  - Detailed field-by-field analysis
+  - Critical issues requiring investigation
+  - Recommendations by priority
+  - Methodology and raw response data
+
+---
+
+## Acceptance Criteria Status
+
+No acceptance criteria were defined for this task. The Definition of Done items are not applicable as this is a diagnostic/exploration task rather than a feature implementation.
+
+---
+
+## Testing Results
+
+| Test Suite | Result |
+|------------|--------|
+| Unit tests | ✅ PASS |
+| Integration tests | ✅ PASS |
+| `go fmt` | ✅ PASS (no changes needed) |
+| `go vet` | ✅ PASS (no errors) |
+
+**Note:** No code changes were introduced - this was a diagnostic task only.
+
+---
+
+## Risks and Considerations
+
+- **No code changes:** This task is purely diagnostic - no regressions introduced
+- **Findings require investigation:** The identified discrepancies need further root cause analysis
+- **Recommendations created:** Priority-based suggestions for future work
+
+---
+
+## Follow-up Actions Recommended
+
+1. **Investigate `days_unreading` calculation** - Create new task to analyze and unify logic
+2. **Implement `finished_at` calculation** - Add completion date projection to Go API
+3. **Add `median_day` field** - Include reading pace in API response
+4. **Consider JSON:API adoption** - Evaluate standardization effort
+
+---
+
+## Verification Checklist
+
+- [x] Comparison script executed successfully
+- [x] Detailed analysis completed for project 450
+- [x] Documentation created at `docs/diff_show_project.md`
+- [x] All existing tests still pass
+- [x] No code changes introduced (diagnostic task)
+- [x] Findings documented with severity levels
+- [x] Recommendations provided for next steps
+
+---
+
+*Task completed: 2026-04-18*
+*Status: Done*
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
