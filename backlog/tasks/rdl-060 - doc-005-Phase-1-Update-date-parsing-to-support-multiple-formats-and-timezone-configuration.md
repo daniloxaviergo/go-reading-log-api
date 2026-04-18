@@ -5,9 +5,9 @@ title: >-
   configuration
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-18 11:46'
-updated_date: '2026-04-18 12:01'
+updated_date: '2026-04-18 12:02'
 labels:
   - phase-1
   - date-calculation
