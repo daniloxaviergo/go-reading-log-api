@@ -31,7 +31,7 @@ Update internal/domain/dto/project_response.go struct definitions to use snake_c
 <!-- AC:BEGIN -->
 - [x] #1 All DTO structs have explicit JSON field tags
 - [x] #2 Field names follow snake_case convention
-- [ ] #3 No kebab-case fields in Go API responses
+- [x] #3 No kebab-case fields in Go API responses
 <!-- AC:END -->
 
 ## Implementation Plan
