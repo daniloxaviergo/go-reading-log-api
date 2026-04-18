@@ -4,8 +4,10 @@ title: >-
   [doc-005 Phase 4] Update .env.example with timezone configuration and create
   test data artifacts
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-18 11:48'
+updated_date: '2026-04-18 15:51'
 labels:
   - phase-4
   - configuration
