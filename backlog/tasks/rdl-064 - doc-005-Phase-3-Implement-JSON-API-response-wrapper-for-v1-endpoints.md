@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 13:28'
+updated_date: '2026-04-18 13:31'
 labels:
   - phase-3
   - json-api
@@ -44,8 +44,9 @@ This task requires updating the Go API's v1 endpoints to return JSON:API formatt
 **Key Design Choices:**
 1. **Reuse existing DTOs** - The `ProjectJSONAPIResponse` type already exists and wraps `ProjectResponse`; we'll extend it to support collections
 2. **Handler-level wrapping** - Wrap response data at the handler level using `JSONAPIEnvelope` before serialization
-3. **ID as string** - Convert integer IDs to strings per JSON:API 1.0 specification
+3. **ID as string** - Convert integer IDs to strings per JSON:API 1.0 specification using `strconv.FormatInt`
 4. **Content-Type header** - Use `application/vnd.api+json` for JSON:API compliant responses
+5. **Collection handling** - For list endpoints, wrap array items in individual `JSONAPIData` objects
 
 **Why This Approach:**
 - Minimal code duplication by reusing existing DTO infrastructure
@@ -98,14 +99,14 @@ type JSONAPIData struct {
     ID         interface{} `json:"id,omitempty"`
 }
 
-// 2. Pattern for single resource response
+// 2. Pattern for single resource response (Show/Get)
 func (h *ProjectsHandler) Show(w http.ResponseWriter, r *http.Request) {
-    // ... get project ...
+    // ... get project from repo ...
     
     // Wrap in JSON:API envelope
     envelope := dto.NewJSONAPIEnvelope(dto.JSONAPIData{
         Type:       "projects",
-        ID:         strconv.FormatInt(project.ID, 10), // ID as string
+        ID:         strconv.FormatInt(project.ID, 10), // ID as string per JSON:API spec
         Attributes: project,
     })
     
@@ -113,23 +114,39 @@ func (h *ProjectsHandler) Show(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(envelope)
 }
 
-// 3. Pattern for collection response
+// 3. Pattern for collection response (Index/List)
 func (h *ProjectsHandler) Index(w http.ResponseWriter, r *http.Request) {
-    // ... get projects ...
+    // ... get projects from repo ...
     
-    // Convert to JSON:API data objects
+    // Convert each project to JSON:API data object
     dataObjects := make([]dto.JSONAPIData, len(projects))
     for i, p := range projects {
         dataObjects[i] = dto.JSONAPIData{
             Type:       "projects",
-            ID:         strconv.FormatInt(p.ID, 10),
+            ID:         strconv.FormatInt(p.ID, 10), // ID as string
             Attributes: p,
         }
     }
     
-    envelope := dto.NewJSONAPIEnvelope(dataObjects[0]) // Single object wrapper
+    // Wrap collection in envelope
+    envelope := dto.NewJSONAPIEnvelope(dataObjects)
     
     w.Header().Set("Content-Type", "application/vnd.api+json")
+    json.NewEncoder(w).Encode(envelope)
+}
+
+// 4. Pattern for Create (single resource, 201 status)
+func (h *ProjectsHandler) Create(w http.ResponseWriter, r *http.Request) {
+    // ... create project ...
+    
+    envelope := dto.NewJSONAPIEnvelope(dto.JSONAPIData{
+        Type:       "projects",
+        ID:         strconv.FormatInt(createdProject.ID, 10),
+        Attributes: createdProject,
+    })
+    
+    w.Header().Set("Content-Type", "application/vnd.api+json")
+    w.WriteHeader(http.StatusCreated)
     json.NewEncoder(w).Encode(envelope)
 }
 ```
@@ -155,7 +172,7 @@ response := dto.NewProjectJSONAPIResponse(project)
 ```go
 // Test JSON:API envelope structure for single resource
 func TestProjectsHandler_Show_JSONAPI(t *testing.T) {
-    // ... setup ...
+    // ... setup with mock repo ...
     
     handler.Show(w, req)
     
@@ -185,7 +202,7 @@ func TestProjectsHandler_Show_JSONAPI(t *testing.T) {
 
 // Test JSON:API envelope structure for collection
 func TestProjectsHandler_Index_JSONAPI(t *testing.T) {
-    // ... setup with multiple projects ...
+    // ... setup with multiple projects in mock repo ...
     
     handler.Index(w, req)
     
@@ -201,11 +218,18 @@ func TestProjectsHandler_Index_JSONAPI(t *testing.T) {
     if len(dataArray) != expectedCount {
         t.Errorf("Expected %d projects, got %d", expectedCount, len(dataArray))
     }
+    
+    // Verify all IDs are strings
+    for _, item := range dataArray {
+        if _, ok := item.ID.(string); !ok {
+            t.Error("All IDs must be strings")
+        }
+    }
 }
 ```
 
 **Integration Tests:**
-- Compare full response against Rails API format
+- Compare full response against Rails API format using `test/compare_responses.sh`
 - Verify all calculated fields (progress, finished_at, median_day, days_unreading)
 - Test with actual database records via `test.SetupTestDB()`
 
@@ -219,6 +243,8 @@ func TestProjectsHandler_Index_JSONAPI(t *testing.T) {
 5. Error responses maintain consistent format
 6. All calculated fields present in attributes
 7. Content-Type header is application/vnd.api+json
+8. HTTP status codes correct (200 for GET, 201 for POST)
+9. Error responses don't use JSON:API envelope (keep existing format)
 ```
 
 ---
@@ -240,6 +266,7 @@ func TestProjectsHandler_Index_JSONAPI(t *testing.T) {
 1. **ID as String** - Required by JSON:API 1.0 spec; use `strconv.FormatInt` for conversion
 2. **Content-Type** - Use `application/vnd.api+json` to indicate JSON:API compliance
 3. **Envelope Structure** - Match Rails Active Model Serializers format exactly
+4. **Error Responses** - Keep existing error format (don't wrap in JSON:API) for simplicity
 
 **Deployment Considerations:**
 - No database migrations required
