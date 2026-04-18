@@ -5,7 +5,7 @@ status: Done
 assignee:
   - Thomas
 created_date: '2026-04-17 20:43'
-updated_date: '2026-04-18 09:22'
+updated_date: '2026-04-18 09:23'
 labels: []
 dependencies: []
 ordinal: 2000
@@ -183,6 +183,91 @@ The task is essentially complete. The documentation now accurately reflects:
 
 Would you like me to make any additional changes or finalize the task?
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Task RDL-058 - Update Documentation with Routes
+
+### What Was Done
+
+This task focused on updating project documentation to accurately reflect the current API routes and their implementations. The implementation involved:
+
+1. **Codebase Analysis**
+   - Read and analyzed `internal/api/v1/routes.go` to understand all registered endpoints
+   - Reviewed handler implementations in `internal/api/v1/handlers/`
+   - Examined DTOs in `internal/domain/dto/` for request/response formats
+
+2. **Documentation Updates**
+
+**QWEN.md:**
+- Added comprehensive API Endpoints section with detailed information about:
+  - Health check endpoint (`/healthz`)
+  - Projects endpoints (List, Get by ID, Create)
+  - Logs endpoints (List for project)
+  - Request/response examples with JSON samples
+  - Error handling documentation
+  - Calculated fields explanation with formulas
+  - Phase 1 limitations (read-only logs)
+  - Quick reference with curl examples
+
+**docs/README.go-project.md:**
+- Added comprehensive API Endpoints section matching QWEN.md content
+- Included detailed endpoint tables
+- Added calculated fields documentation
+- Included error handling guide
+- Added phase 1 limitations note
+- Provided quick reference with curl examples
+
+3. **Verification**
+   - All tests passing (verified with testing-expert subagent)
+   - go fmt: No formatting issues
+   - go vet: No linting errors
+
+### Key Findings
+
+- **Route prefix**: Uses `/v1/` not `/api/v1/` as previously documented
+- **Logs endpoint path**: Uses `{project_id}` path parameter
+- **Phase 1 limitation**: Logs creation is read-only; POST/DELETE will be added in Phase 2
+
+### Files Modified
+
+- `/home/danilo/scripts/github/go-reading-log-api-next/QWEN.md`
+- `/home/danilo/scripts/github/go-reading-log-api-next/docs/README.go-project.md`
+
+### Testing Results
+
+✅ **All tests passing** (verified with testing-expert subagent)
+- Unit tests: PASS
+- Integration tests: PASS
+- Middleware tests: PASS
+- Config tests: PASS
+- Domain tests: PASS
+
+✅ **go fmt**: No formatting issues
+✅ **go vet**: No linting errors
+
+### Acceptance Criteria Status
+
+| Criterion | Status |
+|-----------|--------|
+| #1 All unit tests pass | ✅ Complete |
+| #2 All integration tests pass | ✅ Complete |
+| #3 go fmt and go vet pass | ✅ Complete |
+| #4 Clean Architecture layers properly followed | ✅ N/A (no code changes) |
+| #5 Error responses consistent with existing patterns | ✅ N/A (no code changes) |
+| #6 HTTP status codes correct for response type | ✅ N/A (no code changes) |
+| #7 Database queries optimized with proper indexes | ✅ N/A (no code changes) |
+| #8 Documentation updated in QWEN.md | ✅ Complete |
+| #9 New code paths include error path tests | ✅ N/A (no code changes) |
+| #10 HTTP handlers test both success and error responses | ✅ N/A (no code changes) |
+| #11 Integration tests verify actual database interactions | ✅ N/A (no code changes) |
+| #12 Tests use testing-expert subagent for test execution and verification | ✅ Complete |
+
+### Definition of Done Status
+
+All relevant DoD items have been satisfied. The task is ready for completion.
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
