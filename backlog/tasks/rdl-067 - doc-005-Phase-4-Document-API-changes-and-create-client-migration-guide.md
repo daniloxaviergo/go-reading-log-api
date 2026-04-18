@@ -28,7 +28,7 @@ Create documentation files docs/api-response-alignment.md and docs/date-calculat
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 API response comparison documentation complete
-- [ ] #2 Migration guide for breaking changes published
+- [x] #2 Migration guide for breaking changes published
 - [ ] #3 Field calculation formulas documented
 <!-- AC:END -->
 
