@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 13:16'
+updated_date: '2026-04-18 13:17'
 labels:
   - phase-2
   - median-day
@@ -237,15 +237,14 @@ After implementation, verify:
 - Identified that `MedianDay` field exists in `ProjectResponse` DTO with correct JSON tag
 - Found root cause: Repository methods `GetWithLogs()` and `GetAllWithLogs()` calculate other derived fields but do not call `CalculateMedianDay()`
 
-### Implementation Plan
-1. Add `projectResp.MedianDay = project.CalculateMedianDay()` in `GetWithLogs()` method
-2. Add `projectResp.MedianDay = project.CalculateMedianDay()` in `GetAllWithLogs()` method
-3. Run tests to verify functionality
+### Implementation Complete
+Added `projectResp.MedianDay = project.CalculateMedianDay()` in:
+1. `GetWithLogs()` method (line ~200)
+2. `GetAllWithLogs()` method (line ~380)
 
-### Next Steps
-- Execute implementation changes
-- Run unit and integration tests
-- Verify acceptance criteria are met
+### Running Tests
+
+Running unit tests for median day calculation:
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
