@@ -5,7 +5,7 @@ title: >-
   calculations
 status: To Do
 assignee:
-  - workflow
+  - thomas
 created_date: '2026-04-18 11:46'
 updated_date: '2026-04-18 12:37'
 labels:
