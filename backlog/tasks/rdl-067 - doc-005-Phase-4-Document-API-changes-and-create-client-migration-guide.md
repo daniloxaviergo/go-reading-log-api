@@ -3,9 +3,9 @@ id: RDL-067
 title: '[doc-005 Phase 4] Document API changes and create client migration guide'
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-18 11:48'
-updated_date: '2026-04-18 15:35'
+updated_date: '2026-04-18 15:36'
 labels:
   - phase-4
   - documentation
