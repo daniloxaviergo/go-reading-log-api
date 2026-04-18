@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - Thomas
 created_date: '2026-04-17 20:43'
-updated_date: '2026-04-18 09:21'
+updated_date: '2026-04-18 09:22'
 labels: []
 dependencies: []
 ordinal: 2000
@@ -193,7 +193,7 @@ Would you like me to make any additional changes or finalize the task?
 - [ ] #5 Error responses consistent with existing patterns
 - [ ] #6 HTTP status codes correct for response type
 - [ ] #7 Database queries optimized with proper indexes
-- [ ] #8 Documentation updated in QWEN.md
+- [x] #8 Documentation updated in QWEN.md
 - [ ] #9 New code paths include error path tests
 - [ ] #10 HTTP handlers test both success and error responses
 - [ ] #11 Integration tests verify actual database interactions
