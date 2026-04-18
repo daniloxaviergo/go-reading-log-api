@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:48'
-updated_date: '2026-04-18 15:36'
+updated_date: '2026-04-18 15:40'
 labels:
   - phase-4
   - documentation
@@ -275,6 +275,75 @@ func TestCalculateMedianDay(t *testing.T) {
 5. Implementation details
 6. Testing considerations
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Task RDL-067 - Implementation Progress
+
+### Status: In Progress
+
+### Date: 2026-04-18
+
+---
+
+### What I'm Doing
+
+I'm creating comprehensive API documentation for Phase 4 changes as specified in task RDL-067. The task requires:
+
+1. **api-response-alignment.md** - Complete API response comparison documentation
+2. **date-calculation-specification.md** - Detailed spec for date/time calculations
+
+---
+
+### Analysis Completed
+
+I've reviewed the following existing documentation:
+- `docs/README.go-project.md` - Main project documentation
+- `docs/diff_show_project.md` - Project 450 comparison report
+- `docs/endpoint-comparison-report-v1-projects.md` - Endpoint comparison details
+- `docs/rdl-039-comparison-report.md` - Earlier comparison documentation
+- `internal/domain/models/project.go` - Domain model with calculation methods
+
+---
+
+### Key Findings for Documentation
+
+**Date Calculation Implementation (from project.go):**
+
+1. **CalculateDaysUnreading()**
+   - Uses multi-format date parsing (YYYY-MM-DD, RFC3339, standard datetime)
+   - Timezone-aware comparison matching Rails' Date.today
+   - Falls back to BRT timezone if not configured
+   - Returns 0 for edge cases
+
+2. **CalculateMedianDay()**
+   - Formula: `(page / days_reading).round(2)`
+   - Uses date-only comparison for consistency
+   - Returns 0.00 for edge cases (no started_at, zero days)
+
+3. **CalculateFinishedAt()**
+   - Projects completion based on median_day reading rate
+   - Formula: `days_to_finish = (total_page - page) / median_day`
+   - Returns most recent log date if book is finished
+   - Returns nil for edge cases
+
+4. **CalculateProgress()**
+   - Formula: `(page / total_page) * 100` rounded to 2 decimals
+   - Clamped to 0.00-100.00 range
+
+5. **CalculateStatus()**
+   - Priority order: finished → unstarted → running → sleeping → stopped
+   - Based on days_unreading and page/total_page ratio
+
+---
+
+### Next Steps
+
+I will now create the two documentation files:
+1. `docs/api-response-alignment.md` - API response comparison and migration guide
+2. `docs/date-calculation-specification.md` - Date/time calculation specification
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
