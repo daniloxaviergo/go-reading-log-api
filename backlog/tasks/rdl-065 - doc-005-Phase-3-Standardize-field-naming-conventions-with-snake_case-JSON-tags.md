@@ -3,11 +3,11 @@ id: RDL-065
 title: >-
   [doc-005 Phase 3] Standardize field naming conventions with snake_case JSON
   tags
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 14:36'
+updated_date: '2026-04-18 14:37'
 labels:
   - phase-3
   - naming-convention
