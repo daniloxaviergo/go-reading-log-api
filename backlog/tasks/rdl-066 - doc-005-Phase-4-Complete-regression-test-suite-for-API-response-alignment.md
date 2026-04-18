@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 15:03'
+updated_date: '2026-04-18 15:21'
 labels:
   - phase-4
   - regression-testing
@@ -442,21 +442,39 @@ The plan leverages existing infrastructure (`TestHelper`, `MockRepository`) and 
 
 ### Status: In Progress
 
-**Phase 1 Complete:** Unit tests created for project calculations
+**Phase 1 Complete:** Unit tests for project calculations ✓
 
 Created comprehensive unit tests in `test/unit/`:
 - `project_calculations_test.go` - Tests for CalculateDaysUnreading, CalculateFinishedAt, CalculateMedianDay
 - `project_date_parsing_test.go` - Tests for multi-format date parsing with timezone support
 
-**Known Issues:**
-- Some date-based tests fail because test data uses 2024 dates but current date is 2026
-- This is expected behavior - the calculation logic is correct, just test data needs updating
+**Bug Fixes Applied:**
+1. Fixed `CalculateDaysUnreading` to find the MOST RECENT log (was returning first valid log)
+2. Fixed `CalculateStatus` logic: check "finished" BEFORE "unstarted" 
+3. Fixed `CalculateFinishedAt` to return nil when no logs exist
+4. Added public `ParseLogDate` and `ParseLogDateWithTimezone` functions for testing
+
+**Test Results:**
+```
+PASS - All unit tests passing
+go fmt - No formatting issues
+go vet - No errors
+```
+
+**Phase 2 In Progress:** Integration tests and comparison script updates
+
+Created:
+- `test/integration/projects_regression_test.go` - Full regression tests for all project endpoints
+- `test/integration/logs_regression_test.go` - Regression tests for logs endpoint
+
+Updated:
+- `test/compare_responses.sh` - Added days_unreading tolerance, finished_at edge cases, JSON:API compliance checks
 
 **Next Steps:**
-1. Create integration tests for full endpoint regression
-2. Enhance comparison script with days_unreading tolerance checks
-3. Add JSON:API compliance verification
-4. Update documentation
+1. Run integration tests to verify they pass
+2. Verify comparison script works correctly
+3. Update documentation
+4. Final verification and sign-off
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
