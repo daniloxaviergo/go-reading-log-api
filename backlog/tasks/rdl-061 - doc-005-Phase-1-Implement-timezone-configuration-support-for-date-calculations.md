@@ -5,9 +5,9 @@ title: >-
   calculations
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-18 11:46'
-updated_date: '2026-04-18 12:32'
+updated_date: '2026-04-18 12:37'
 labels:
   - phase-1
   - timezone
