@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:48'
-updated_date: '2026-04-18 16:00'
+updated_date: '2026-04-18 16:04'
 labels:
   - phase-4
   - configuration
@@ -241,20 +241,44 @@ I've reviewed the implementation plan and current state of files. Here's what I 
 
 ### Implementation Plan Execution:
 
-#### Phase 1: Docker Compose Timezone Configuration
-- Add `TZ_LOCATION` environment variable to PostgreSQL, Go API, and Rails API services
-- Ensure consistent timezone across all containers using `${TZ_LOCATION}` reference
+#### Phase 1: Docker Compose Timezone Configuration ✅ COMPLETED
+- Added `TZ_LOCATION` environment variable to PostgreSQL, Go API, and Rails API services
+- Used `${TZ_LOCATION:-America/Sao_Paulo}` pattern for consistent timezone across all containers
+- Added explanatory comments for timezone configuration
 
-#### Phase 2: Test Data Artifacts Creation
-- Create `test/data/` directory structure
-- Capture project 450 responses from both Go and Rails APIs
-- Store as JSON files for regression testing
+#### Phase 2: Test Data Artifacts Creation ✅ COMPLETED
+- Created `test/data/` directory structure
+- Captured project 450 responses from both Go and Rails APIs
+- Stored as JSON files with metadata comments:
+  - `project-450-go.json` - Go API response (snake_case fields)
+  - `project-450-rails.json` - Rails API response (JSON:API format)
+  - `project-450-go-logs.json` - Go API logs response
+  - `project-450-rails-logs.json` - Rails API logs response (JSON:API with included relationships)
+
+#### Files Modified:
+| File | Changes |
+|------|---------|
+| `docker-compose.yml` | Added TZ environment variable to all 3 services |
+| `.env.example` | No changes needed (already has TZ_LOCATION) |
+
+#### Files Created:
+| File | Purpose |
+|------|---------|
+| `test/data/project-450-go.json` | Recorded Go API response for project 450 |
+| `test/data/project-450-rails.json` | Recorded Rails API response for project 450 |
+| `test/data/project-450-go-logs.json` | Recorded Go API logs for project 450 |
+| `test/data/project-450-rails-logs.json` | Recorded Rails API logs for project 450 |
+
+### Key Observations:
+1. **API Response Differences**: The Go and Rails APIs return different response formats (snake_case vs JSON:API)
+2. **Date Format Differences**: Rails uses ISO 8601 with timezone offset, Go uses RFC3339
+3. **Field Naming**: Rails uses `started-at`, `total-page`, etc.; Go uses `started_at`, `total_page`
+4. **Calculated Fields**: Rails includes `median-day` and `finished-at`; Go has different calculation logic
 
 ### Next Steps:
-1. Update docker-compose.yml with timezone configuration
-2. Create test/data directory
-3. Capture API responses for project 450
-4. Format and document test data artifacts
+1. Verify docker-compose configuration with `make docker-up`
+2. Run comparison script to validate test data
+3. Check all acceptance criteria
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
