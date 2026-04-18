@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 14:34'
+updated_date: '2026-04-18 14:35'
 labels:
   - phase-3
   - naming-convention
@@ -30,7 +30,7 @@ Update internal/domain/dto/project_response.go struct definitions to use snake_c
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 All DTO structs have explicit JSON field tags
-- [ ] #2 Field names follow snake_case convention
+- [x] #2 Field names follow snake_case convention
 - [ ] #3 No kebab-case fields in Go API responses
 <!-- AC:END -->
 
