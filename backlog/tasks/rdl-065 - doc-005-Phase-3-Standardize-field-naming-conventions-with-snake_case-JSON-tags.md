@@ -4,8 +4,10 @@ title: >-
   [doc-005 Phase 3] Standardize field naming conventions with snake_case JSON
   tags
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-18 11:47'
+updated_date: '2026-04-18 14:21'
 labels:
   - phase-3
   - naming-convention
