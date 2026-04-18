@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:46'
-updated_date: '2026-04-18 12:03'
+updated_date: '2026-04-18 12:05'
 labels:
   - phase-1
   - date-calculation
@@ -152,17 +152,39 @@ lastReadDate = time.Date(lastReadDate.Year(), lastReadDate.Month(), lastReadDate
 
 **Status:** In Progress
 
-### What I'm Doing Now
-Researching the codebase to understand current date parsing implementation and identifying all locations that need modification.
+### What I've Learned So Far
 
-### Steps Being Executed
-1. Examining current `project.go` implementation
-2. Reviewing existing date parsing logic
-3. Understanding timezone handling in Rails comparison
-4. Identifying test coverage gaps
+**Current State Analysis:**
 
-### Blockers/Questions
-None yet - conducting initial research phase.
+1. **project.go** (`internal/domain/models/project.go`):
+   - `CalculateDaysUnreading()` currently only parses "YYYY-MM-DD" format
+   - Uses `time.UTC` for date comparison (not timezone-aware)
+   - Rails uses `Date.today` which is timezone-aware
+   - The 42-day discrepancy is likely caused by timezone differences
+
+2. **config.go** (`internal/config/config.go`):
+   - Does NOT have timezone configuration yet
+   - Needs `TZLocation` field and loading logic
+
+3. **project_test.go** (`internal/domain/models/project_test.go`):
+   - Has basic tests for CalculateDaysUnreading
+   - Missing tests for multi-format date parsing
+   - Missing timezone-specific edge case tests
+
+4. **LogResponse** (`internal/domain/dto/log_response.go`):
+   - `Data` field is `*string` containing the date
+   - Expected format: "YYYY-MM-DD" currently
+
+### Implementation Plan Refined:
+
+| File | Change |
+|------|--------|
+| `config.go` | Add `TZLocation *time.Location` field + loading from env |
+| `project.go` | Update `CalculateDaysUnreading()` with multi-format parsing + timezone-aware comparison |
+| `project_test.go` | Add tests for 3 formats (YYYY-MM-DD, RFC3339, datetime) + timezone edge cases |
+| `.env.example` | Add `TZ_LOCATION` example |
+
+**Key Decision:** The 42-day discrepancy is likely because Rails uses local timezone (Brazil/BRT) while Go uses UTC. I need to make the comparison timezone-aware.
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
