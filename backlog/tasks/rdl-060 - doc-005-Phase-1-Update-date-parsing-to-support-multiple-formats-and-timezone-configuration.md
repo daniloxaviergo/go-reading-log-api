@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:46'
-updated_date: '2026-04-18 12:21'
+updated_date: '2026-04-18 12:22'
 labels:
   - phase-1
   - date-calculation
@@ -240,7 +240,7 @@ lastReadDate = time.Date(lastReadDate.Year(), lastReadDate.Month(), lastReadDate
 - [x] #5 Error responses consistent with existing patterns
 - [x] #6 HTTP status codes correct for response type
 - [x] #7 Database queries optimized with proper indexes
-- [ ] #8 Documentation updated in QWEN.md
+- [x] #8 Documentation updated in QWEN.md
 - [ ] #9 New code paths include error path tests
 - [ ] #10 HTTP handlers test both success and error responses
 - [ ] #11 Integration tests verify actual database interactions
