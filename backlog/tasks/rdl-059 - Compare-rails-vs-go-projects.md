@@ -2,10 +2,9 @@
 id: RDL-059
 title: Compare rails vs go projects
 status: To Do
-assignee:
-  - next-task
+assignee: []
 created_date: '2026-04-18 00:24'
-updated_date: '2026-04-18 00:25'
+updated_date: '2026-04-18 00:26'
 labels: []
 dependencies: []
 ---
