@@ -4,8 +4,10 @@ title: >-
   [doc-005 Phase 1] Update date parsing to support multiple formats and timezone
   configuration
 status: To Do
-assignee: []
+assignee:
+  - wokflow
 created_date: '2026-04-18 11:46'
+updated_date: '2026-04-18 11:56'
 labels:
   - phase-1
   - date-calculation
