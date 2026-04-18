@@ -3,7 +3,7 @@ id: RDL-060
 title: >-
   [doc-005 Phase 1] Update date parsing to support multiple formats and timezone
   configuration
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-18 11:46'
