@@ -4,9 +4,10 @@ title: >-
   [doc-005 Phase 1] Update date parsing to support multiple formats and timezone
   configuration
 status: To Do
-assignee: []
+assignee:
+  - workflow
 created_date: '2026-04-18 11:46'
-updated_date: '2026-04-18 11:57'
+updated_date: '2026-04-18 11:58'
 labels:
   - phase-1
   - date-calculation
