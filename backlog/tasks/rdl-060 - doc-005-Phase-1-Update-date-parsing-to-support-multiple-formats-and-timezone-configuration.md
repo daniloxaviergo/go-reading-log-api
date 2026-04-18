@@ -31,7 +31,7 @@ Implement multi-format date parsing in internal/domain/models/project.go to fix 
 <!-- AC:BEGIN -->
 - [x] #1 parseLogDate supports at least 3 date formats (YYYY-MM-DD, RFC3339, standard datetime)
 - [x] #2 CalculateDaysUnreading uses timezone-aware comparison matching Rails
-- [ ] #3 Unit tests validate edge cases with different date formats
+- [x] #3 Unit tests validate edge cases with different date formats
 <!-- AC:END -->
 
 ## Implementation Plan
