@@ -3,7 +3,7 @@ id: RDL-066
 title: '[doc-005 Phase 4] Complete regression test suite for API response alignment'
 status: To Do
 assignee:
-  - workflow
+  - catarina
 created_date: '2026-04-18 11:47'
 updated_date: '2026-04-18 14:37'
 labels:
