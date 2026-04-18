@@ -4,8 +4,10 @@ title: >-
   [doc-005 Phase 2] Implement CalculateFinishedAt logic for project completion
   estimation
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-18 11:46'
+updated_date: '2026-04-18 12:50'
 labels:
   - phase-2
   - finished-at
