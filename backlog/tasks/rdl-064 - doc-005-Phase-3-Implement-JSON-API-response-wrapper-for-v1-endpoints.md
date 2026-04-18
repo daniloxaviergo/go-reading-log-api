@@ -3,9 +3,9 @@ id: RDL-064
 title: '[doc-005 Phase 3] Implement JSON:API response wrapper for v1 endpoints'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 14:20'
+updated_date: '2026-04-18 14:21'
 labels:
   - phase-3
   - json-api
