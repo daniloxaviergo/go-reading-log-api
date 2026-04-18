@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:46'
-updated_date: '2026-04-18 12:37'
+updated_date: '2026-04-18 12:40'
 labels:
   - phase-1
   - timezone
@@ -315,6 +315,88 @@ make docker-down && make docker-up
 **Complexity:** Low-Medium
 **Risk Level:** Low
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress: RDL-061 - Timezone Configuration Support
+
+### Status: In Progress - Phase 1 Complete
+
+---
+
+### Completed Work
+
+#### Phase 1: Configuration Enhancement ✅
+
+**File Modified:** `internal/config/config.go`
+
+**Changes Made:**
+1. Added `Timezone` field to `Config` struct
+2. Implemented `parseTZLocation()` function with BRT fallback
+3. Updated `LoadConfig()` to initialize timezone from environment variable
+
+**Code Changes:**
+```go
+type Config struct {
+    // ... existing fields ...
+    Timezone *time.Location  // NEW: Stores parsed timezone location
+}
+
+func LoadConfig() (*Config, error) {
+    // ... existing env var loading ...
+    
+    // New timezone configuration
+    tzStr := getEnv("TZ_LOCATION", "")
+    config.Timezone = parseTZLocation(tzStr)
+    
+    return config, nil
+}
+
+func parseTZLocation(tzStr string) *time.Location {
+    if tzStr == "" {
+        return time.FixedZone("BRT", -3*60*60) // Default to Brazil timezone
+    }
+    loc, err := time.LoadLocation(tzStr)
+    if err != nil {
+        log.Printf("Warning: Failed to load timezone '%s', using BRT fallback", tzStr)
+        return time.FixedZone("BRT", -3*60*60)
+    }
+    return loc
+}
+```
+
+---
+
+### Next Steps
+
+#### Phase 2: Model Updates (In Progress)
+
+**Files to Modify:**
+- `internal/domain/models/project.go`
+- `internal/api/v1/handlers/projects_handler.go`
+- `internal/adapter/postgres/project_repository.go`
+
+**Tasks:**
+1. Update `CalculateDaysUnreading()`, `CalculateMedianDay()`, `CalculateFinishedAt()` to use context-based timezone
+2. Add `GetTimezoneFromContext()` helper function
+3. Update handlers to pass timezone to project context
+4. Update repository to inject timezone in calculation methods
+
+---
+
+### Blockers/Issues
+
+None currently.
+
+---
+
+### Learnings
+
+- Context-based timezone passing provides better testability than global state
+- Date-only comparison (stripping time components) ensures consistent day boundaries across timezones
+- Environment variable with fallback provides both configurability and safety
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
