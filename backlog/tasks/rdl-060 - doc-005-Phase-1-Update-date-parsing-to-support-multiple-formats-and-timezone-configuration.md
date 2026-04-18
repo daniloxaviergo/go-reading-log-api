@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:46'
-updated_date: '2026-04-18 12:18'
+updated_date: '2026-04-18 12:19'
 labels:
   - phase-1
   - date-calculation
@@ -30,7 +30,7 @@ Implement multi-format date parsing in internal/domain/models/project.go to fix 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 parseLogDate supports at least 3 date formats (YYYY-MM-DD, RFC3339, standard datetime)
-- [ ] #2 CalculateDaysUnreading uses timezone-aware comparison matching Rails
+- [x] #2 CalculateDaysUnreading uses timezone-aware comparison matching Rails
 - [ ] #3 Unit tests validate edge cases with different date formats
 <!-- AC:END -->
 
