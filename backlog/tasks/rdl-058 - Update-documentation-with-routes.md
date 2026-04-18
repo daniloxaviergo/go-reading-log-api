@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - Thomas
 created_date: '2026-04-17 20:43'
-updated_date: '2026-04-18 00:30'
+updated_date: '2026-04-18 00:31'
 labels: []
 dependencies: []
 ordinal: 2000
@@ -108,6 +108,39 @@ The task requires updating documentation to reflect the current API routes and t
 
 **No code changes required** - this is purely a documentation task.
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - Task RDL-058
+
+### Status: In Progress
+
+I have analyzed the codebase and understand the API structure. Here's what I've discovered:
+
+#### Current API Routes (from routes.go)
+
+| Method | Path | Handler | Description |
+|--------|------|---------|-------------|
+| GET | /healthz | HealthHandler.Healthz | Health check endpoint |
+| GET | /v1/projects.json | ProjectsHandler.Index | List all projects with eager-loaded logs |
+| POST | /v1/projects.json | ProjectsHandler.Create | Create a new project |
+| GET | /v1/projects/{id}.json | ProjectsHandler.Show | Get project by ID with eager-loaded logs |
+| GET | /v1/projects/{project_id}/logs.json | LogsHandler.Index | Get first 4 logs for a project |
+
+#### Key Findings
+
+1. **Route prefix discrepancy**: Routes use `/v1/` not `/api/v1/` as mentioned in some documentation
+2. **Logs endpoint path**: Uses `{project_id}` path parameter, not nested under `/api/v1/`
+3. **Phase 1 limitation**: Logs creation is commented out - will be added in Phase 2
+4. **Response format**: JSON responses match Rails API serializer output
+
+#### Documentation to Update
+
+I need to update:
+- `docs/README.go-project.md` - Add comprehensive API documentation section
+- `QWEN.md` - Update API endpoints table and add details
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
