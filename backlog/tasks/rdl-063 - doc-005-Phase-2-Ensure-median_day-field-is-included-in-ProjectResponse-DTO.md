@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 13:17'
+updated_date: '2026-04-18 13:19'
 labels:
   - phase-2
   - median-day
@@ -242,9 +242,58 @@ Added `projectResp.MedianDay = project.CalculateMedianDay()` in:
 1. `GetWithLogs()` method (line ~200)
 2. `GetAllWithLogs()` method (line ~380)
 
-### Running Tests
+### Test Results
 
-Running unit tests for median day calculation:
+**Unit Tests:**
+```
+=== RUN   TestProject_CalculateMedianDay_Timezone
+--- PASS: TestProject_CalculateMedianDay_Timezone (0.00s)
+PASS
+ok      go-reading-log-api-next/internal/domain/models        0.002s
+```
+
+**Full Test Suite:**
+All tests pass:
+- `internal/api/v1` - PASS
+- `internal/api/v1/handlers` - PASS
+- `internal/config` - PASS
+- `internal/domain/dto` - PASS
+- `internal/domain/models` - PASS
+- `test` - PASS (31.433s)
+- `test/integration` - PASS (3.319s)
+
+**Code Quality:**
+- `go fmt` - No errors
+- `go vet` - No errors
+- Build - Successful
+
+### Acceptance Criteria Status
+- [x] #1 median_day field present in ProjectResponse struct - VERIFIED
+- [x] #2 Field serialized correctly to JSON with proper rounding - VERIFIED (CalculateMedianDay rounds to 2 decimals)
+- [ ] #3 AC-REQ-003.1 verified: Inspect JSON response structure shows median_day - NEEDS MANUAL VERIFICATION
+
+### Changes Made
+File: `internal/adapter/postgres/project_repository.go`
+
+**Change 1 (GetWithLogs method):**
+```go
+project.Progress = domainProject.CalculateProgress()
+project.MedianDay = domainProject.CalculateMedianDay()  // ADDED
+finishedAtPtr := domainProject.CalculateFinishedAt(logResponses)
+```
+
+**Change 2 (GetAllWithLogs method):**
+```go
+projectResp.Progress = project.CalculateProgress()
+projectResp.MedianDay = project.CalculateMedianDay()  // ADDED
+projectResp.FinishedAt = formatTimePtr(project.CalculateFinishedAt(logsForProject))
+```
+
+### Verification Notes
+1. The `CalculateMedianDay()` method already handles edge cases (no started_at, zero/negative days)
+2. Field type is `*float64` with `omitempty` JSON tag - matches existing pattern
+3. Rounding to 2 decimal places implemented in domain model using `math.Round`
+4. Clean Architecture followed: domain model calculates, repository populates DTO
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
