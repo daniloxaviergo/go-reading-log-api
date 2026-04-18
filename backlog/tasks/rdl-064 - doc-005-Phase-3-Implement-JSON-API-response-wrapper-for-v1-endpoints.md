@@ -5,7 +5,7 @@ status: Done
 assignee:
   - thomas
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 14:16'
+updated_date: '2026-04-18 14:17'
 labels:
   - phase-3
   - json-api
@@ -400,6 +400,95 @@ Successfully implemented JSON:API response wrapper for v1 endpoints following De
 - Error responses remain in existing format (not wrapped in JSON:API) for simplicity
 - Consider adding versioning strategy or feature flag for gradual rollout in future phase
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## PR: Implement JSON:API Response Wrapper for v1 Endpoints
+
+### What Was Done
+
+Implemented JSON:API response wrapper structure for all v1 endpoints (`/v1/projects.json`, `/v1/projects/{id}.json`, `/v1/projects/{project_id}/logs.json`) following Decision 2 in doc-005.
+
+### Key Changes
+
+**Handler Updates:**
+- `internal/api/v1/handlers/projects_handler.go`:
+  - `Index()`: Wraps project collection in JSON:API envelope with array of data objects
+  - `Show()`: Wraps single project in JSON:API envelope
+  - `Create()`: Wraps created project in JSON:API envelope (201 Created status)
+  
+- `internal/api/v1/handlers/logs_handler.go`:
+  - `Index()`: Wraps log collection in JSON:API envelope
+
+**DTO Updates:**
+- `internal/domain/dto/jsonapi_response.go`:
+  - Added `NewJSONAPIEnvelopeWithArray()` for collections
+  - Updated `ProjectJSONAPIResponse` to use string ID via `strconv.FormatInt()`
+
+**Test Updates:**
+- Updated unit tests in `internal/api/v1/handlers/*_test.go`
+- Updated integration tests in `test/integration/*_integration_test.go`
+- Added helper functions for parsing JSON:API envelopes
+- Updated `test/compare_responses.sh` to handle envelope format
+
+### Response Format Changes
+
+**Before (flat JSON):**
+```json
+{
+  "id": 1,
+  "name": "Project",
+  "total_page": 100,
+  "page": 50
+}
+```
+
+**After (JSON:API envelope):**
+```json
+{
+  "data": {
+    "type": "projects",
+    "id": "1",
+    "attributes": {
+      "id": 1,
+      "name": "Project",
+      "total_page": 100,
+      "page": 50
+    }
+  }
+}
+```
+
+### Verification
+
+- ✅ All unit tests pass
+- ✅ All integration tests pass
+- ✅ `go fmt` and `go vet` pass with no errors
+- ✅ Clean Architecture layers properly followed
+- ✅ Error responses consistent with existing patterns (not wrapped in JSON:API)
+- ✅ HTTP status codes correct (200 for GET, 201 for POST)
+- ✅ ID fields serialized as string type per JSON:API 1.0 spec
+
+### Acceptance Criteria Met
+
+- [x] #1 JSON:API wrapper format implemented for v1 endpoints
+- [x] #2 ID field serialized as string type  
+- [x] #3 AC-REQ-004.1 verified: Response has data/attributes structure
+
+### Breaking Change Notice
+
+This is a **breaking change** for existing API clients - response structure changes from flat JSON to JSON:API envelope. Consider:
+- Adding versioning strategy or feature flag for gradual rollout
+- Updating client documentation
+- Providing migration guide for API consumers
+
+### Notes
+
+- Error responses remain in existing format (not wrapped in JSON:API) for simplicity
+- Content-Type header set to `application/vnd.api+json` for all successful responses
+- No database migrations required
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
