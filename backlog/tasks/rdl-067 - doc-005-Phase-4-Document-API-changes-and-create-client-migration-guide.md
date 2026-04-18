@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:48'
-updated_date: '2026-04-18 15:48'
+updated_date: '2026-04-18 15:49'
 labels:
   - phase-4
   - documentation
@@ -29,7 +29,7 @@ Create documentation files docs/api-response-alignment.md and docs/date-calculat
 <!-- AC:BEGIN -->
 - [x] #1 API response comparison documentation complete
 - [x] #2 Migration guide for breaking changes published
-- [ ] #3 Field calculation formulas documented
+- [x] #3 Field calculation formulas documented
 <!-- AC:END -->
 
 ## Implementation Plan
