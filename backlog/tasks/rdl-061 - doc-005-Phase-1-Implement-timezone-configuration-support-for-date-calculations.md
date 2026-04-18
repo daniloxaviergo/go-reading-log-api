@@ -5,9 +5,9 @@ title: >-
   calculations
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-18 11:46'
-updated_date: '2026-04-18 12:49'
+updated_date: '2026-04-18 12:50'
 labels:
   - phase-1
   - timezone
