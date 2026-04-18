@@ -2,8 +2,10 @@
 id: RDL-063
 title: '[doc-005 Phase 2] Ensure median_day field is included in ProjectResponse DTO'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-18 11:47'
+updated_date: '2026-04-18 13:06'
 labels:
   - phase-2
   - median-day
