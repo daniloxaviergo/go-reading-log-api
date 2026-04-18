@@ -5,7 +5,7 @@ status: Done
 assignee:
   - Thomas
 created_date: '2026-04-17 20:43'
-updated_date: '2026-04-18 09:23'
+updated_date: '2026-04-18 09:26'
 labels: []
 dependencies: []
 ordinal: 2000
@@ -118,15 +118,12 @@ The task requires updating documentation to reflect the current API routes and t
 
 **Task completed successfully.**
 
-### Build Verification
-✅ **Build successful**: Application compiles without errors
-- Binary created: `/tmp/server` (15MB)
-
 ### Documentation Updates Summary
 
 **Files Modified:**
 1. `QWEN.md` - Added comprehensive API Endpoints section
 2. `docs/README.go-project.md` - Added comprehensive API Endpoints section
+3. `AGENTS.md` - Added comprehensive API Endpoints section
 
 **Documentation Contents:**
 - Health check endpoint (`/healthz`)
@@ -137,6 +134,10 @@ The task requires updating documentation to reflect the current API routes and t
 - Calculated fields explanation with formulas
 - Phase 1 limitations (read-only logs)
 - Quick reference with curl examples
+
+### Build Verification
+✅ **Build successful**: Application compiles without errors
+- Binary created: `/tmp/server` (15MB)
 
 ### Test Results
 ✅ **All tests passing** (verified with testing-expert subagent)
