@@ -5,7 +5,7 @@ title: >-
   test data artifacts
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-18 11:48'
 updated_date: '2026-04-18 16:07'
 labels:
