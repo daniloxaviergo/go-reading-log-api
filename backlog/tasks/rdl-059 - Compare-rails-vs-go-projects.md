@@ -3,7 +3,7 @@ id: RDL-059
 title: Compare rails vs go projects
 status: To Do
 assignee:
-  - workflow
+  - thomas
 created_date: '2026-04-18 00:24'
 updated_date: '2026-04-18 00:25'
 labels: []
