@@ -1,10 +1,10 @@
 ---
 id: RDL-059
 title: Compare rails vs go projects
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-04-18 00:24'
-updated_date: '2026-04-18 10:43'
+updated_date: '2026-04-18 10:44'
 labels: []
 dependencies: []
 ordinal: 1000
