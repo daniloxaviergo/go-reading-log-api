@@ -5,9 +5,9 @@ title: >-
   test data artifacts
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-18 11:48'
-updated_date: '2026-04-18 16:06'
+updated_date: '2026-04-18 16:07'
 labels:
   - phase-4
   - configuration
