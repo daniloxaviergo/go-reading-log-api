@@ -5,7 +5,7 @@ status: Done
 assignee:
   - Thomas
 created_date: '2026-04-17 20:43'
-updated_date: '2026-04-18 09:26'
+updated_date: '2026-04-18 09:27'
 labels: []
 dependencies: []
 ordinal: 2000
@@ -184,27 +184,24 @@ This task focused on updating project documentation to accurately reflect the cu
 
 2. **Documentation Updates**
 
-**QWEN.md:**
-- Added comprehensive API Endpoints section with detailed information about:
-  - Health check endpoint (`/healthz`)
-  - Projects endpoints (List, Get by ID, Create)
-  - Logs endpoints (List for project)
-  - Request/response examples with JSON samples
-  - Error handling documentation
-  - Calculated fields explanation with formulas
-  - Phase 1 limitations (read-only logs)
-  - Quick reference with curl examples
+**Files Modified:**
+- `QWEN.md` - Added comprehensive API Endpoints section
+- `docs/README.go-project.md` - Added comprehensive API Endpoints section
+- `AGENTS.md` - Added comprehensive API Endpoints section
 
-**docs/README.go-project.md:**
-- Added comprehensive API Endpoints section matching QWEN.md content
-- Included detailed endpoint tables
-- Added calculated fields documentation
-- Included error handling guide
-- Added phase 1 limitations note
-- Provided quick reference with curl examples
+**Documentation Contents (all files):**
+- Health check endpoint (`/healthz`)
+- Projects endpoints (List, Get by ID, Create)
+- Logs endpoints (List for project)
+- Request/response examples with JSON samples
+- Error handling documentation
+- Calculated fields explanation with formulas
+- Phase 1 limitations (read-only logs)
+- Quick reference with curl examples
 
 3. **Verification**
    - All tests passing (verified with testing-expert subagent)
+   - Build successful
    - go fmt: No formatting issues
    - go vet: No linting errors
 
@@ -218,6 +215,7 @@ This task focused on updating project documentation to accurately reflect the cu
 
 - `/home/danilo/scripts/github/go-reading-log-api-next/QWEN.md`
 - `/home/danilo/scripts/github/go-reading-log-api-next/docs/README.go-project.md`
+- `/home/danilo/scripts/github/go-reading-log-api-next/AGENTS.md`
 
 ### Testing Results
 
@@ -227,6 +225,8 @@ This task focused on updating project documentation to accurately reflect the cu
 - Middleware tests: PASS
 - Config tests: PASS
 - Domain tests: PASS
+
+✅ **Build successful**: Binary created at `/tmp/server` (15MB)
 
 ✅ **go fmt**: No formatting issues
 ✅ **go vet**: No linting errors
