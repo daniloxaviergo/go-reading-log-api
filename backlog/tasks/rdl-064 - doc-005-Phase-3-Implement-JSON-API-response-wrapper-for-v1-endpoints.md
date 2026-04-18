@@ -29,7 +29,7 @@ Implement JSON:API response wrapper structure in internal/api/v1/handlers/projec
 <!-- AC:BEGIN -->
 - [x] #1 JSON:API wrapper format implemented for v1 endpoints
 - [x] #2 ID field serialized as string type
-- [ ] #3 AC-REQ-004.1 verified: Response has data/attributes structure
+- [x] #3 AC-REQ-004.1 verified: Response has data/attributes structure
 <!-- AC:END -->
 
 ## Implementation Plan
