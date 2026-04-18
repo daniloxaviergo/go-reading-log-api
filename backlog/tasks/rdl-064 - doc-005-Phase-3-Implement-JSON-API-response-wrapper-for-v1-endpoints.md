@@ -5,7 +5,7 @@ status: Done
 assignee:
   - thomas
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 14:17'
+updated_date: '2026-04-18 14:18'
 labels:
   - phase-3
   - json-api
@@ -27,7 +27,7 @@ Implement JSON:API response wrapper structure in internal/api/v1/handlers/projec
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 JSON:API wrapper format implemented for v1 endpoints
+- [x] #1 JSON:API wrapper format implemented for v1 endpoints
 - [ ] #2 ID field serialized as string type
 - [ ] #3 AC-REQ-004.1 verified: Response has data/attributes structure
 <!-- AC:END -->
