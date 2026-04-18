@@ -3,7 +3,7 @@ id: RDL-062
 title: >-
   [doc-005 Phase 2] Implement CalculateFinishedAt logic for project completion
   estimation
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-18 11:46'
