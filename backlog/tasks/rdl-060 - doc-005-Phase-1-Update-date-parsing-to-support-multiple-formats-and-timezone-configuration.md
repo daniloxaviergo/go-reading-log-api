@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-18 11:46'
-updated_date: '2026-04-18 11:58'
+updated_date: '2026-04-18 12:01'
 labels:
   - phase-1
   - date-calculation
@@ -33,6 +33,117 @@ Implement multi-format date parsing in internal/domain/models/project.go to fix 
 - [ ] #2 CalculateDaysUnreading uses timezone-aware comparison matching Rails
 - [ ] #3 Unit tests validate edge cases with different date formats
 <!-- AC:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+### 1. Technical Approach
+
+The implementation will address the 42-day discrepancy between Go and Rails API by updating date parsing to support multiple formats with timezone-aware comparison.
+
+**Key Changes:**
+- Update `parseLogDate()` function in `project.go` to support YYYY-MM-DD, RFC3339, and standard datetime formats
+- Introduce timezone configuration via environment variable with Brazil timezone (BRT) as fallback
+- Modify `CalculateDaysUnreading()` to use timezone-aware date comparison matching Rails' `Date.today`
+- Add comprehensive unit tests for edge cases
+
+**Architecture Decisions:**
+- Keep timezone configuration in existing `config.go` to maintain single source of truth
+- Use `time.FixedZone` for Brazil timezone as it matches Rails behavior
+- Maintain backward compatibility by keeping existing format parsing while adding new ones
+
+---
+
+### 2. Files to Modify
+
+| File | Changes |
+|------|---------|
+| `internal/domain/models/project.go` | Update `CalculateDaysUnreading()` with multi-format date parsing; Add timezone configuration support |
+| `internal/config/config.go` | Add `TZLocation` field and environment variable loading |
+| `internal/domain/models/project_test.go` | Add unit tests for date parsing edge cases |
+| `.env.example` | Add `TZ_LOCATION` configuration example |
+
+---
+
+### 3. Dependencies
+
+- [x] Existing config infrastructure in `config.go`
+- [x] Domain model structure in `project.go`
+- [ ] No external dependencies required (uses standard library `time` package)
+
+---
+
+### 4. Code Patterns
+
+**Date Parsing Pattern:**
+```go
+func parseLogDate(dateStr string) (time.Time, bool) {
+    formats := []string{
+        "2006-01-02",
+        "2006-01-02T15:04:05Z",
+        "2006-01-02 15:04:05",
+    }
+    for _, format := range formats {
+        if t, err := time.Parse(format, dateStr); err == nil {
+            return t, true
+        }
+    }
+    return time.Time{}, false
+}
+```
+
+**Timezone Configuration Pattern:**
+```go
+var TZLocation = time.FixedZone("BRT", -3*60*60) // Brazil timezone
+
+// In config loading
+if tzStr := os.Getenv("TZ_LOCATION"); tzStr != "" {
+    if loc, err := time.LoadLocation(tzStr); err == nil {
+        TZLocation = loc
+    }
+}
+```
+
+**Date Comparison Pattern (matching Rails):**
+```go
+nowDate := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, TZLocation)
+lastReadDate = time.Date(lastReadDate.Year(), lastReadDate.Month(), lastReadDate.Day(), 0, 0, 0, 0, TZLocation)
+```
+
+---
+
+### 5. Testing Strategy
+
+**Unit Tests to Add:**
+- Test `parseLogDate()` with YYYY-MM-DD format
+- Test `parseLogDate()` with RFC3339 format
+- Test `parseLogDate()` with standard datetime format
+- Test `CalculateDaysUnreading()` with various log dates
+- Test edge case: no logs, no started_at → returns 0
+- Test edge case: future dates → returns 0
+
+**Test Files:**
+- `internal/domain/models/project_test.go` - Unit tests for date parsing
+- `test/compare_responses.sh` - Integration test comparing Go vs Rails responses
+
+---
+
+### 6. Risks and Considerations
+
+| Risk | Mitigation |
+|------|------------|
+| Breaking existing log parsing | Keep all format attempts in fallback chain |
+| Timezone loading failure | Fallback to BRT with logging warning |
+| Performance impact of multiple format attempts | Minimal - only affects log date parsing, not main query path |
+| Inconsistent behavior across environments | Document timezone configuration requirement |
+
+**Blocking Issues:**
+- None identified
+
+**Trade-offs:**
+- Support for multiple formats increases code complexity slightly but ensures compatibility with diverse log data
+- Timezone configuration adds flexibility but requires documentation to prevent environment-specific discrepancies
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
