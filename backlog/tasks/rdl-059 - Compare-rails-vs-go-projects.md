@@ -4,7 +4,7 @@ title: Compare rails vs go projects
 status: To Do
 assignee: []
 created_date: '2026-04-18 00:24'
-updated_date: '2026-04-18 09:30'
+updated_date: '2026-04-18 09:32'
 labels: []
 dependencies: []
 ordinal: 1000
@@ -44,7 +44,6 @@ This task requires comparing the Rails vs Go project implementations for the `v1
 - `internal/domain/dto/project_response.go` - Go project DTO
 - `rails-app/app/controllers/api/v1/projects_controller.rb` - Rails projects controller
 - `rails-app/app/models/project.rb` - Rails Project model
-- `test/compare_responses.sh` - Comparison script
 
 ---
 
