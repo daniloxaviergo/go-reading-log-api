@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 13:13'
+updated_date: '2026-04-18 13:14'
 labels:
   - phase-2
   - median-day
@@ -27,7 +27,7 @@ Update internal/domain/dto/project_response.go to ensure the median_day field is
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 median_day field present in ProjectResponse struct
+- [x] #1 median_day field present in ProjectResponse struct
 - [ ] #2 Field serialized correctly to JSON with proper rounding
 - [ ] #3 AC-REQ-003.1 verified: Inspect JSON response structure shows median_day
 <!-- AC:END -->
