@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:46'
-updated_date: '2026-04-18 12:05'
+updated_date: '2026-04-18 12:18'
 labels:
   - phase-1
   - date-calculation
@@ -185,6 +185,50 @@ lastReadDate = time.Date(lastReadDate.Year(), lastReadDate.Month(), lastReadDate
 | `.env.example` | Add `TZ_LOCATION` example |
 
 **Key Decision:** The 42-day discrepancy is likely because Rails uses local timezone (Brazil/BRT) while Go uses UTC. I need to make the comparison timezone-aware.
+
+### Implementation Completed
+
+**Files Modified:**
+
+1. **internal/config/config.go**
+   - Added `TZLocation *time.Location` field to Config struct
+   - Added `parseTZLocation()` function with BRT fallback
+   - Updated `LoadConfig()` to initialize timezone from environment variable
+
+2. **internal/domain/models/project.go**
+   - Added `parseLogDate()` function supporting 3 formats:
+     - YYYY-MM-DD (e.g., "2024-01-15")
+     - RFC3339 (e.g., "2024-01-15T10:30:00Z")
+     - Standard datetime (e.g., "2024-01-15 10:30:00")
+   - Updated `CalculateDaysUnreading()` to use multi-format parsing and timezone-aware comparison
+   - Updated `CalculateMedianDay()` to use timezone-aware comparison
+   - Updated `CalculateFinishedAt()` to use multi-format parsing and timezone-aware comparison
+   - Added `getTimezoneFromContext()` helper function
+
+3. **internal/config/config_test.go**
+   - Added 4 new test functions for timezone configuration:
+     - `TestLoadConfigTimezoneDefault` - Verifies BRT default
+     - `TestLoadConfigTimezoneFromEnv` - Verifies env var loading
+     - `TestLoadConfigTimezoneInvalidFallback` - Verifies fallback on invalid value
+     - `TestLoadConfigTimezoneEmptyFallback` - Verifies fallback on empty value
+
+4. **internal/domain/models/project_test.go**
+   - Added 5 new test functions for date parsing:
+     - `TestProject_ParseLogDate` - Tests all 3 date formats
+     - `TestProject_CalculateDaysUnreading_MultiFormat` - Tests CalculateDaysUnreading with different formats
+     - `TestProject_CalculateDaysUnreading_Timezone` - Tests timezone-aware comparison
+     - `TestProject_CalculateMedianDay_Timezone` - Tests median day with timezone
+     - `TestProject_CalculateFinishedAt_MultiFormat` - Tests finished at calculation with different formats
+
+5. **.env.example**
+   - Added `TZ_LOCATION` configuration example with documentation
+
+**Test Results:**
+- All unit tests pass ✓
+- All integration tests pass ✓
+- go fmt passes ✓
+- go vet passes ✓
+- Build succeeds ✓
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
