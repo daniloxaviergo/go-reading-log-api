@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 13:42'
+updated_date: '2026-04-18 13:59'
 labels:
   - phase-3
   - json-api
@@ -334,25 +334,24 @@ func TestProjectsHandler_Index_JSONAPI(t *testing.T) {
 <!-- SECTION:NOTES:BEGIN -->
 ## Implementation Progress - RDL-064
 
-### Status: In Progress (Updating Tests)
+### Status: In Progress (Fixing Integration Tests)
 
-I've successfully updated the handler code to use JSON:API envelope format. Now I need to update the tests to verify the new response structure.
-
-**Completed Changes:**
+**Completed:**
 1. ✅ Updated `projects_handler.go` - Index, Show, Create methods now wrap responses in JSON:API envelope
 2. ✅ Updated `logs_handler.go` - Index method now wraps responses in JSON:API envelope  
 3. ✅ Updated `jsonapi_response.go` - Added `NewJSONAPIEnvelopeWithArray` for collections, ID as string
-4. ⏳ Updating tests to verify JSON:API structure
+4. ✅ Updated unit tests to verify JSON:API structure
+5. ⏳ Updating integration tests to handle JSON:API envelope
 
-**Test Failures Identified:**
-- Logs handler tests expect flat array but get envelope with `data` wrapper
-- Projects handler create tests need to check envelope structure
+**Integration Test Failures:**
+- Tests expect flat JSON but receive JSON:API envelope
+- Need to update `test/integration/*_integration_test.go` files
+- Need to check `test/compare_responses.sh` as well
 
 **Next Steps:**
-- Update test assertions to decode from envelope structure
-- Verify ID is string type
-- Verify Content-Type header is `application/vnd.api+json`
-- Run all tests to confirm pass
+- Update integration tests to decode from envelope structure
+- Update comparison script to expect envelope format
+- Run full test suite to verify all pass
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
