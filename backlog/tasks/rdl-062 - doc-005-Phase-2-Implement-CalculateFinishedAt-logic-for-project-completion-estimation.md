@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:46'
-updated_date: '2026-04-18 12:58'
+updated_date: '2026-04-18 13:01'
 labels:
   - phase-2
   - finished-at
@@ -29,7 +29,7 @@ Implement or verify the CalculateFinishedAt() method in internal/domain/models/p
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 CalculateFinishedAt returns calculated date when page < total_page
+- [x] #1 CalculateFinishedAt returns calculated date when page < total_page
 - [ ] #2 CalculateFinishedAt returns null when page >= total_page and no logs exist
 - [ ] #3 AC-REQ-002.1 and AC-REQ-002.2 acceptance criteria verified
 <!-- AC:END -->
