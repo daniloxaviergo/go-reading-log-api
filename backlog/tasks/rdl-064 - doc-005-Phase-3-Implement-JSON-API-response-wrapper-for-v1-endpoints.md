@@ -5,7 +5,7 @@ status: Done
 assignee:
   - thomas
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 14:19'
+updated_date: '2026-04-18 14:20'
 labels:
   - phase-3
   - json-api
@@ -492,7 +492,7 @@ This is a **breaking change** for existing API clients - response structure chan
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 All unit tests pass use testing-expert subagent for test execution and verification
+- [x] #1 All unit tests pass use testing-expert subagent for test execution and verification
 - [ ] #2 All integration tests pass use testing-expert subagent for test execution and verification
 - [ ] #3 go fmt and go vet pass with no errors
 - [ ] #4 Clean Architecture layers properly followed
