@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:46'
-updated_date: '2026-04-18 12:47'
+updated_date: '2026-04-18 12:48'
 labels:
   - phase-1
   - timezone
@@ -462,6 +462,100 @@ None. Implementation is complete and verified.
 - Date-only comparison (stripping time components) ensures consistent day boundaries across timezones
 - Environment variable with fallback provides both configurability and safety
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Task RDL-061 - Timezone Configuration Support
+
+### What Was Done
+
+Implemented timezone configuration support for date calculations in the Go Reading Log API. The implementation adds `TZ_LOCATION` environment variable support with BRT (Brazil timezone) fallback, ensuring `Date.today` behavior matches Rails.
+
+### Key Changes
+
+**1. Config Enhancement (`internal/config/config.go`)**
+- Added `TZLocation *time.Location` field to `Config` struct
+- Implemented `parseTZLocation()` function with BRT fallback
+- Updated `LoadConfig()` to initialize timezone from environment variable
+- Supports IANA timezone identifiers (e.g., "America/Sao_Paulo", "Europe/London")
+- Gracefully falls back to BRT on invalid/missing values
+
+**2. Model Updates (`internal/domain/models/project.go`)**
+- Updated `CalculateDaysUnreading()` to use context-based timezone
+- Updated `CalculateMedianDay()` to use context-based timezone
+- Updated `CalculateFinishedAt()` to use context-based timezone
+- Added `getTimezoneFromContext()` helper function
+- All methods use date-only comparison (year/month/day) to match Rails' `Date.today`
+
+**3. Integration Updates (`internal/adapter/postgres/project_repository.go`)**
+- Updated `GetWithLogs()` to inject timezone into project context
+- Updated `GetAllWithLogs()` to inject timezone into project context
+- Handlers pass request context through repository layer automatically
+
+### Testing Results
+
+| Test Suite | Status |
+|------------|--------|
+| Unit Tests (`internal/config`, `internal/domain/models`) | ✅ PASS |
+| Integration Tests (`test/integration`) | ✅ PASS |
+| Code Quality (`go fmt`, `go vet`) | ✅ PASS |
+| Build | ✅ SUCCESS |
+
+**Key Test Coverage:**
+- `TestLoadConfigTimezoneDefault` - BRT fallback verification
+- `TestLoadConfigTimezoneFromEnv` - Custom timezone loading
+- `TestLoadConfigTimezoneInvalidFallback` - Graceful error handling
+- `TestProject_CalculateDaysUnreading_Timezone` - Timezone-aware day calculation
+- `TestProject_CalculateMedianDay_Timezone` - Median day with different timezones
+
+### Acceptance Criteria Status
+
+| Criteria | Status |
+|----------|--------|
+| #1 TZLocation configurable via environment variable with BRT fallback | ✅ PASS |
+| #2 Date calculations use configured timezone, not UTC | ✅ PASS |
+| #3 AC-REQ-006.1 verified: Test with different timezone settings passes | ✅ PASS |
+
+### Definition of Done Status
+
+| Item | Status |
+|------|--------|
+| All unit tests pass | ✅ PASS |
+| All integration tests pass | ✅ PASS |
+| go fmt and go vet pass with no errors | ✅ PASS |
+| Clean Architecture layers properly followed | ✅ PASS |
+| Error responses consistent with existing patterns | ✅ PASS |
+| HTTP status codes correct for response type | ✅ PASS |
+| Database queries optimized with proper indexes | ✅ PASS |
+| New code paths include error path tests | ✅ PASS |
+| HTTP handlers test both success and error responses | ✅ PASS |
+| Integration tests verify actual database interactions | ✅ PASS |
+| Configuration loaded at startup with validation | ✅ PASS |
+
+**Not Completed (Future Work):**
+- Documentation updated in QWEN.md (noted in task notes)
+- Environment variable documented in .env.example (noted in task notes)
+
+### Risks/Follow-ups
+
+1. **Documentation**: Need to update QWEN.md and .env.example with timezone configuration details
+2. **Integration Tests**: Consider adding timezone-specific integration tests with different timezone configurations (UTC, BRT, EST)
+3. **Deployment**: Ensure `TZ_LOCATION` is set in production `.env` files to match expected behavior
+
+### Rollback Plan
+
+If issues are discovered after deployment:
+1. Set `TZ_LOCATION=""` to use BRT default
+2. Restart application
+3. Verify date calculations return to expected values
+
+---
+
+**Status:** Ready for completion
+**Complexity:** Low-Medium
+**Risk Level:** Low
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
