@@ -3,9 +3,9 @@ id: RDL-066
 title: '[doc-005 Phase 4] Complete regression test suite for API response alignment'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 15:27'
+updated_date: '2026-04-18 15:29'
 labels:
   - phase-4
   - regression-testing
