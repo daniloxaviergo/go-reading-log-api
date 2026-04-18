@@ -2,8 +2,7 @@
 id: RDL-058
 title: Update documentation with routes
 status: To Do
-assignee:
-  - next-task
+assignee: []
 created_date: '2026-04-17 20:43'
 updated_date: '2026-04-18 00:26'
 labels: []
