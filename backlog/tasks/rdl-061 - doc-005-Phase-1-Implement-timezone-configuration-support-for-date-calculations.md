@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-18 11:46'
-updated_date: '2026-04-18 12:40'
+updated_date: '2026-04-18 12:42'
 labels:
   - phase-1
   - timezone
@@ -321,7 +321,7 @@ make docker-down && make docker-up
 <!-- SECTION:NOTES:BEGIN -->
 ## Implementation Progress: RDL-061 - Timezone Configuration Support
 
-### Status: In Progress - Phase 1 Complete
+### Status: In Progress - Phase 2 Complete
 
 ---
 
@@ -340,15 +340,15 @@ make docker-down && make docker-up
 ```go
 type Config struct {
     // ... existing fields ...
-    Timezone *time.Location  // NEW: Stores parsed timezone location
+    TZLocation *time.Location  // NEW: Stores parsed timezone location
 }
 
-func LoadConfig() (*Config, error) {
+func LoadConfig() *Config {
     // ... existing env var loading ...
     
     // New timezone configuration
     tzStr := getEnv("TZ_LOCATION", "")
-    config.Timezone = parseTZLocation(tzStr)
+    config.TZLocation = parseTZLocation(tzStr)
     
     return config, nil
 }
@@ -368,20 +368,52 @@ func parseTZLocation(tzStr string) *time.Location {
 
 ---
 
+#### Phase 2: Model Updates ✅
+
+**File Modified:** `internal/domain/models/project.go`
+
+**Changes Made:**
+1. Updated `CalculateDaysUnreading()` to use context-based timezone
+2. Updated `CalculateMedianDay()` to use context-based timezone  
+3. Updated `CalculateFinishedAt()` to use context-based timezone
+4. Added `getTimezoneFromContext()` helper function
+
+**Key Implementation Details:**
+
+All three calculation methods now:
+- Extract timezone from context using `getTimezoneFromContext()`
+- Use `time.Date()` with year/month/day components to strip time information (matching Rails' `Date.today`)
+- Apply the configured timezone when creating date boundaries
+
+**Code Pattern Used:**
+```go
+// Use the project's context to get timezone configuration
+ctx := p.GetContext()
+tzLocation := getTimezoneFromContext(ctx)
+
+// Use date-only comparison to match Rails behavior (Date.today)
+nowDate := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, tzLocation)
+lastReadDate = time.Date(lastReadDate.Year(), lastReadDate.Month(), lastReadDate.Day(), 0, 0, 0, 0, tzLocation)
+
+// Calculate difference in days
+diff := nowDate.Sub(lastReadDate)
+days := int(diff.Hours() / 24)
+```
+
+---
+
 ### Next Steps
 
-#### Phase 2: Model Updates (In Progress)
+#### Phase 3: Integration Updates (In Progress)
 
 **Files to Modify:**
-- `internal/domain/models/project.go`
 - `internal/api/v1/handlers/projects_handler.go`
 - `internal/adapter/postgres/project_repository.go`
 
 **Tasks:**
-1. Update `CalculateDaysUnreading()`, `CalculateMedianDay()`, `CalculateFinishedAt()` to use context-based timezone
-2. Add `GetTimezoneFromContext()` helper function
-3. Update handlers to pass timezone to project context
-4. Update repository to inject timezone in calculation methods
+1. Update handlers to pass timezone to project context
+2. Update repository to inject timezone in calculation methods
+3. Verify all code paths use configured timezone
 
 ---
 
