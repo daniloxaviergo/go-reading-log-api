@@ -3,7 +3,7 @@ id: RDL-064
 title: '[doc-005 Phase 3] Implement JSON:API response wrapper for v1 endpoints'
 status: To Do
 assignee:
-  - workflow
+  - catarina
 created_date: '2026-04-18 11:47'
 updated_date: '2026-04-18 13:21'
 labels:
