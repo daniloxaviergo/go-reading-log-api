@@ -1,11 +1,11 @@
 ---
 id: RDL-073
 title: '[doc-007 Phase 1] Update GetProjectLogs handler logic for new structure'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-21 12:11'
-updated_date: '2026-04-21 13:09'
+updated_date: '2026-04-21 13:10'
 labels:
   - refactoring
   - backend
