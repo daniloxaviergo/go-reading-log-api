@@ -2,8 +2,10 @@
 id: RDL-081
 title: '[doc-008 Phase 1] Implement DashboardHandler with all 8 endpoints'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-21 15:49'
+updated_date: '2026-04-21 17:59'
 labels:
   - phase-1
   - handler
