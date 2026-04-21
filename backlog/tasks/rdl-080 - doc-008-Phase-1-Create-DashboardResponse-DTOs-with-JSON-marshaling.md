@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-21 15:49'
-updated_date: '2026-04-21 17:05'
+updated_date: '2026-04-21 17:14'
 labels:
   - phase-1
   - dto
@@ -39,15 +39,14 @@ Implement internal/domain/dto/dashboard_response.go defining all response struct
 <!-- SECTION:PLAN:BEGIN -->
 ### 1. Technical Approach
 
-This task involves creating **DashboardResponse DTOs** with proper JSON marshaling, validation methods, and comprehensive test coverage. The approach follows Clean Architecture principles and extends the existing repository layer created in RDL-079.
+This task involves **completing the DashboardResponse DTO implementation** with proper JSON marshaling, validation methods, and comprehensive test coverage. The approach extends the existing partial implementation in `internal/domain/dto/dashboard_response.go`.
 
-**Architecture Decision**: Create a dedicated `dashboard_response.go` file in `internal/domain/dto/` that defines all response structures for Phase 1 dashboard endpoints. This aligns with Decision 5 from doc-008 which specifies ECharts-style JSON configurations as the response format.
+**Architecture Decision**: Extend the existing dashboard_response.go file to include all response structures for Phase 1 dashboard endpoints. This aligns with Decision 5 from doc-008 which specifies ECharts-style JSON configurations as the response format.
 
 **Key Design Considerations**:
-- Use `json` tags for proper serialization matching Rails API conventions
+- Use `json` tags for proper serialization matching Rails API conventions (snake_case)
 - Implement validation methods for each DTO to ensure data integrity
-- Include context embedding for request lifecycle tracking
-- Follow existing patterns in `internal/domain/dto/` (see `projects_handler.go`)
+- Include context embedding for request lifecycle tracking (matching existing pattern in DailyStats, ProjectAggregate, etc.)
 - Support all 8 dashboard endpoints: day.json, projects.json, last_days.json, faults.json, speculate_actual.json, faults_week_day.json, mean_progress.json, last_year_total.json
 
 **Response Structure Overview**:
@@ -62,13 +61,15 @@ This task involves creating **DashboardResponse DTOs** with proper JSON marshali
 | `/v1/dashboard/echart/mean_progress.json` | `EchartConfig` | Line chart with visual map colors |
 | `/v1/dashboard/echart/last_year_total.json` | `EchartConfig` | Weekly trend with average line |
 
+---
+
 ### 2. Files to Modify
 
 #### New Files to Create:
 
 ```
 internal/domain/dto/
-└── dashboard_response.go          # All response DTOs with JSON marshaling
+└── dashboard_response.go          # Complete response DTOs (extension of existing partial file)
 ```
 
 #### Modified Files:
@@ -79,6 +80,8 @@ internal/api/v1/handlers/dashboard_handler.go  # HTTP handlers (RDL-081)
 test/unit/dashboard_response_test.go           # Unit tests for DTOs
 ```
 
+---
+
 ### 3. Dependencies
 
 **Prerequisites for Implementation**:
@@ -87,13 +90,17 @@ test/unit/dashboard_response_test.go           # Unit tests for DTOs
 - [x] `internal/repository/dashboard_repository.go` interface (RDL-079)
 - [x] `internal/adapter/postgres/dashboard_repository.go` implementation (RDL-079)
 - [x] `internal/service/user_config_service.go` (RDL-078)
+- [x] Existing partial `dashboard_response.go` with DailyStats, ProjectAggregate, FaultStats, WeekdayFaults
 
 **External Dependencies** (already in go.mod):
 - No new dependencies required
 
+---
+
 ### 4. Code Patterns
 
-**Pattern 1: DTO Definition with JSON Tags**
+**Pattern 1: Extended DTO Definition with JSON Tags**
+
 ```go
 // internal/domain/dto/dashboard_response.go
 package dto
@@ -135,6 +142,7 @@ func (d *DashboardResponse) AddLog(log LogEntry) *DashboardResponse {
 ```
 
 **Pattern 2: EchartConfig for Chart Specifications**
+
 ```go
 // EchartConfig holds ECharts-style chart configurations
 type EchartConfig struct {
@@ -184,6 +192,7 @@ type Grid struct {
 ```
 
 **Pattern 3: StatsData for Aggregate Statistics**
+
 ```go
 // StatsData holds all statistical calculations for dashboard views
 type StatsData struct {
@@ -220,6 +229,7 @@ func (s *StatsData) RoundToThreeDecimals() {
 ```
 
 **Pattern 4: LogEntry for Eager-Loaded Log Data**
+
 ```go
 // LogEntry represents a log entry with eager-loaded project data
 type LogEntry struct {
@@ -248,6 +258,7 @@ func NewLogEntry(id int64, data string, startPage, endPage int, note *string, pr
 ```
 
 **Pattern 5: Validation Methods**
+
 ```go
 // Validate validates the DashboardResponse structure
 func (d *DashboardResponse) Validate() error {
@@ -376,6 +387,7 @@ func (l *LogEntry) Validate() error {
 ```
 
 **Pattern 6: Project Reference in LogEntry**
+
 ```go
 // Project represents minimal project data for eager loading
 type Project struct {
@@ -417,6 +429,8 @@ func (p *Project) Validate() error {
     return nil
 }
 ```
+
+---
 
 ### 5. Testing Strategy
 
@@ -714,6 +728,8 @@ func TestIntegration_DashboardResponseWithRealData(t *testing.T) {
 | `test/unit/dashboard_response_test.go` | DTO creation, validation, JSON serialization | ~400-500 |
 | **Total** | All response structures and methods | ~400-500 |
 
+---
+
 ### 6. Risks and Considerations
 
 #### Known Risks:
@@ -764,6 +780,8 @@ func TestIntegration_DashboardResponseWithRealData(t *testing.T) {
 - Backward compatible (new response format extends existing structure)
 - Canary deployment safe (old endpoints return same format)
 
+---
+
 ### 7. Implementation Checklist
 
 **Phase 1: Core DTO Definitions**
@@ -805,6 +823,8 @@ func TestIntegration_DashboardResponseWithRealData(t *testing.T) {
 - [ ] Update QWEN.md with new DTO structure
 - [ ] Document JSON response format for each endpoint type
 
+---
+
 ### 8. Acceptance Criteria Mapping
 
 | AC Requirement | Implementation Approach |
@@ -813,6 +833,8 @@ func TestIntegration_DashboardResponseWithRealData(t *testing.T) {
 | EchartConfig supports ECharts-style configurations | Implement `EchartConfig`, `Series`, `Legend`, `Axis`, `Grid` types |
 | StatsData includes all required aggregate fields | Implement `StatsData` with all 12 statistical fields from PRD |
 | Validation methods implemented for each DTO | Add `Validate()` method to all public DTOs with comprehensive checks |
+
+---
 
 ### 9. Quality Gates
 
