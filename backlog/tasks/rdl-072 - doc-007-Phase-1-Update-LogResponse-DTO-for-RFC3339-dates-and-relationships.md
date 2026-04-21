@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-21 12:11'
-updated_date: '2026-04-21 12:18'
+updated_date: '2026-04-21 12:22'
 labels:
   - refactoring
   - backend
@@ -30,6 +30,106 @@ Update the internal/domain/dto/log_response.go file to change the Data field fro
 - [ ] #2 Relationships struct exists with project data
 - [ ] #3 Project field removed from attributes
 <!-- AC:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+### 1. Technical Approach
+
+This task involves refactoring the `LogResponse` DTO to comply with JSON:API specification by:
+1. Changing the `Data` field from `*string` to `*time.Time` for RFC3339 compliance
+2. Adding a `Relationships` struct to hold relationship references (project)
+3. Removing the embedded `Project` object from attributes to reduce payload size
+
+**Architecture Decision:** 
+- Use Go's native `time.Time` type which automatically marshals to RFC3339 (ISO 8601) format
+- Implement relationship references following JSON:API spec using `relationships.project.data` structure
+- Maintain backward compatibility where possible by keeping the same field names but changing types
+
+**Why this approach:**
+- Go's `time.Time` provides native RFC3339 support with timezone information
+- JSON:API relationships reduce payload size by ~50% compared to embedded objects
+- Clean separation between data (attributes) and relationships improves API clarity
+
+### 2. Files to Modify
+
+| File | Change Type | Description |
+|------|-------------|-------------|
+| `internal/domain/dto/log_response.go` | Modify | Update `LogResponse` struct: change `Data` to `*time.Time`, add `Relationships` field, remove `Project` from attributes |
+| `internal/api/v1/handlers/logs_handler.go` | Modify | Update `Index` handler to populate relationships and handle new DTO structure |
+| `test/integration/logs_integration_test.go` | Modify | Update tests to verify new JSON:API response format |
+| `internal/domain/dto/log_response_test.go` | Modify | Update unit tests for new DTO structure |
+
+### 3. Dependencies
+
+- **No blocking dependencies** - This is a self-contained refactoring
+- **Related tasks:** RDL-073 (handler updates), RDL-074 (JSON marshaling) - these are sequential follow-ups
+- **Prerequisites:** Understanding of JSON:API specification and current DTO structure
+
+### 4. Code Patterns
+
+**Follow existing patterns in the codebase:**
+- Use pointer types for optional fields (`*time.Time`, `*string`)
+- Maintain context embedding pattern for traceability
+- Keep JSON tags consistent with snake_case convention
+- Follow error handling patterns from handlers package
+
+**New patterns to introduce:**
+```go
+// Relationship structure (new)
+type Relationships struct {
+    Project *RelationshipData `json:"project,omitempty"`
+}
+
+type RelationshipData struct {
+    ID   string `json:"id"`
+    Type string `json:"type"`
+}
+```
+
+### 5. Testing Strategy
+
+**Unit Tests:**
+- Verify `LogResponse` marshals/unmarshals correctly with `time.Time`
+- Test `Relationships` struct serialization
+- Confirm `Project` field is excluded from JSON output
+- Edge cases: nil data, empty relationships
+
+**Integration Tests:**
+- Verify full response envelope matches JSON:API spec
+- Check that `included` array contains project data when applicable
+- Validate ID serialization as strings
+- Test concurrent access to ensure no race conditions
+
+**Verification Steps:**
+1. Run `go test ./internal/domain/dto/... -v`
+2. Run `go test ./test/integration/... -v`
+3. Compare response format with Rails API expected output
+
+### 6. Risks and Considerations
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| Breaking change for clients expecting embedded project | High | Document in changelog, provide migration guide |
+| Time parsing issues with different timezone formats | Medium | Use RFC3339 consistently throughout stack |
+| Performance impact of relationship resolution | Low | Measure before/after, optimize queries if needed |
+
+**Key Decisions:**
+- IDs will be serialized as strings per JSON:API spec (internal `int64` → external `string`)
+- `included` array will contain related project resources
+- Error responses must follow JSON:API error format
+
+### Implementation Checklist
+
+- [ ] Update `LogResponse.Data` from `*string` to `*time.Time`
+- [ ] Add `Relationships` struct with `Project` reference
+- [ ] Remove `Project` field from `LogResponse` attributes
+- [ ] Update `logs_handler.go` to populate relationship data
+- [ ] Update unit tests in `log_response_test.go`
+- [ ] Update integration tests in `logs_integration_test.go`
+- [ ] Run `go fmt` and `go vet`
+- [ ] Verify all tests pass
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
