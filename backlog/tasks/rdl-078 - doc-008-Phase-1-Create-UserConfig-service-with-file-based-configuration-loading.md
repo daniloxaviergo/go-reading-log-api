@@ -5,7 +5,7 @@ title: >-
   loading
 status: To Do
 assignee:
-  - workflow
+  - catarina
 created_date: '2026-04-21 15:49'
 updated_date: '2026-04-21 15:54'
 labels:
