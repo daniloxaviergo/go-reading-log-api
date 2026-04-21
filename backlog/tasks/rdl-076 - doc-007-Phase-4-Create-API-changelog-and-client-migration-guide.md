@@ -2,8 +2,10 @@
 id: RDL-076
 title: '[doc-007 Phase 4] Create API changelog and client migration guide'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-21 12:11'
+updated_date: '2026-04-21 13:57'
 labels:
   - documentation
   - api
