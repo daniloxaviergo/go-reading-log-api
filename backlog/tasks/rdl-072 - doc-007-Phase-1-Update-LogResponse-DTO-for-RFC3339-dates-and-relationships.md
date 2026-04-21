@@ -27,7 +27,7 @@ Update the internal/domain/dto/log_response.go file to change the Data field fro
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 Data field is time.Time type
-- [ ] #2 Relationships struct exists with project data
+- [x] #2 Relationships struct exists with project data
 - [ ] #3 Project field removed from attributes
 <!-- AC:END -->
 
