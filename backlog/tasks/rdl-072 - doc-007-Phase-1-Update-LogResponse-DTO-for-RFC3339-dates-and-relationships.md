@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-21 12:11'
-updated_date: '2026-04-21 12:22'
+updated_date: '2026-04-21 12:23'
 labels:
   - refactoring
   - backend
@@ -129,6 +129,22 @@ type RelationshipData struct {
 - [ ] Update integration tests in `logs_integration_test.go`
 - [ ] Run `go fmt` and `go vet`
 - [ ] Verify all tests pass
+
+---
+
+## PRD Document Updates Needed
+
+The PRD document (`backlog/docs/doc-007 - Logs-Endpoint-Alignment-PRD-RDL-071.md`) should be updated to reference this implementation plan:
+
+**Add to PRD Section 9 (Implementation Checklist) - Phase 1:**
+```
+- [ ] Update `LogResponse` DTO to use `time.Time` for `Data`.
+- [ ] Add `Relationships` struct to `LogResponse`.
+- [ ] Remove `Project` field from `LogAttributes`.
+- [ ] Update `GetProjectLogs` query logic to fetch project IDs.
+```
+
+**Reference:** Implementation details are tracked in task RDL-072 (`backlog/tasks/rdl-072 - doc-007-Phase-1-Update-LogResponse-DTO-for-RFC3339-dates-and-relationships.md`).
 <!-- SECTION:PLAN:END -->
 
 ## Definition of Done
