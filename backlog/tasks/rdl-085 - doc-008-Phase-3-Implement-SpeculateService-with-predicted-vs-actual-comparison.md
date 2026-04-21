@@ -3,11 +3,11 @@ id: RDL-085
 title: >-
   [doc-008 Phase 3] Implement SpeculateService with predicted vs actual
   comparison
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 23:37'
+updated_date: '2026-04-21 23:38'
 labels:
   - phase-3
   - service
