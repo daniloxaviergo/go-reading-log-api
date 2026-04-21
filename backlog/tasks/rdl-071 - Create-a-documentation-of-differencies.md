@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 10:35'
-updated_date: '2026-04-21 11:46'
+updated_date: '2026-04-21 11:47'
 labels: []
 dependencies: []
 ---
@@ -149,6 +149,89 @@ Highlight what clients need to change when migrating from Rails to Go API.
 - Consider removing embedded project object from logs (use relationship references)
 - Document field naming convention clearly for clients
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - RDL-071
+
+**Date:** 2026-04-21  
+**Task:** Create documentation of differences between Go API and Rails API logs endpoints
+
+---
+
+### Phase 1: Codebase Research (In Progress)
+
+I'm currently analyzing both implementations to identify all structural and data differences.
+
+#### Files Examined:
+1. **Go API Implementation**
+   - `internal/api/v1/handlers/logs_handler.go` - Handler logic
+   - `internal/domain/dto/log_response.go` - DTO definitions
+   - `internal/adapter/postgres/repository_logs.go` - Database queries
+
+2. **Rails API Implementation** (Reference)
+   - `rails-app/app/controllers/v1/logs_controller.rb`
+   - `rails-app/app/serializers/*`
+
+3. **Existing Documentation**
+   - `docs/diff_show_project.md` - Format reference for project comparison
+   - `docs/endpoint-comparison-report-v1-projects.md` - Previous endpoint comparison
+
+#### Key Findings So Far:
+
+**Difference 1: ID Type**
+- Go API: `9092` (integer)
+- Rails API: `"9092"` (string, per JSON:API spec)
+- Status: Documented ✅
+
+**Difference 2: Date Format**
+- Go logs: `2026-04-18 21:21:53` (custom format)
+- Rails logs: `2026-04-02T18:21:53.000-03:00` (ISO 8601/RFC3339)
+- Status: Documented ✅
+
+**Difference 3: Embedded Project Object**
+- Go: Includes full project object in each log response
+- Rails: No embedded project object (follows JSON:API relationships pattern)
+- Status: Documented ✅
+
+**Difference 4: Field Naming Convention**
+- Go: `start_page`, `end_page` (snake_case)
+- Rails: `start-page`, `end-page` (kebab-case per JSON:API)
+- Status: Documented ✅
+
+---
+
+### Phase 2: API Response Comparison
+
+Need to fetch actual responses from both endpoints to verify field values and structures.
+
+**Go API Endpoint:** `http://0.0.0.0:3000/v1/projects/450/logs.json`  
+**Rails API Endpoint:** `http://0.0.0.0:3001/v1/projects/450/logs.json`
+
+---
+
+### Phase 3: Documentation Writing
+
+Drafting the comparison documentation with:
+- Field-by-field comparison table
+- Side-by-side JSON examples
+- Migration guide for clients
+- Summary of critical differences
+
+---
+
+### Blockers/Issues:
+None currently. Proceeding with research and documentation generation.
+
+---
+
+### Next Steps:
+1. Fetch actual API responses from both endpoints
+2. Verify identified differences against real data
+3. Complete documentation draft in `docs/diff_show_logs.md`
+4. Review and finalize documentation
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
