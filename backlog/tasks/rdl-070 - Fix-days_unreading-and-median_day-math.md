@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-21 10:15'
-updated_date: '2026-04-21 10:19'
+updated_date: '2026-04-21 10:22'
 labels: []
 dependencies: []
 ---
@@ -32,70 +32,101 @@ Look the code rais-app to check the math and fix
 
 ## 1. Technical Approach
 
-### Analysis of Current State
+### Root Cause Analysis
 
-After thorough codebase review, I've identified that the **calculation logic is already correct** in the current implementation. The discrepancies are:
+After comparing Go implementation with Rails API code, I've identified the **actual bug**:
 
-| Field | Go Value | Rails Value | Status |
-|-------|----------|-------------|--------|
-| days_unreading | 58 | 16 | ⚠️ Expected values wrong |
-| median_day | 11.91 | 11.91 | ✅ Already matching |
-| finished_at | null | 2026-04-02 | ⚠️ Incomplete implementation |
+**Rails Code:**
+```ruby
+def days_unreading
+  base_data = last_read && last_read[:data].to_date || started_at
+  @days_unreading = (Date.today - base_data).to_i
+end
 
-### Root Cause
+def median_day
+  (page.to_f / days_reading.to_f).round(2)
+end
 
-The **expected values file** (`test/testdata/expected-values.go`) contains outdated values:
-- `DaysUnread: intPtr(58)` - This is incorrect, should be 16
-- The actual calculation logic correctly produces ~16 days for the test data
+def days_reading
+  (Date.today - started_at).to_i
+end
+```
 
-### Implementation Strategy
+**Key:** Rails `Date.today` returns the current date **in the application timezone** (America/Sao_Paulo/BRT).
 
-**Phase 1: Fix Expected Values**
-- Update `test/testdata/expected-values.go` to match Rails API values
-- Set `DaysUnread: intPtr(16)` to match Rails `days-unreading: 16`
+**Current Go Code (BUGGY):**
+```go
+now := time.Now()  // Gets current time in SYSTEM timezone (likely UTC)
+nowDate := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, tzLocation)
+```
 
-**Phase 2: Verify/Fix finished_at Calculation**
-- The `CalculateFinishedAt()` method exists but returns null for completed projects
-- Need to ensure it returns the last log date when project is finished (page >= total_page)
-- Current logic: "If no logs with data found, return nil" - this needs adjustment
+**The Problem:**
+- `time.Now()` returns time in system timezone (UTC)
+- Extracting year/month/day from UTC time
+- Then applying BRT timezone to those extracted values
 
-**Phase 3: Verify median_day Serialization**
-- Already implemented in RDL-063
-- Confirm field appears in all project responses
+**Example of the bug:**
+- Current UTC time: `2026-04-21 02:00:00`
+- Extracted date parts: Year=2026, Month=4, Day=21
+- After applying BRT (-3 hours): Date becomes `2026-04-20`!
+- This causes a **1-day discrepancy**
+
+**The Fix:**
+Convert to the target timezone FIRST, THEN extract date parts:
+```go
+now := time.Now().In(tzLocation)  // Convert to target timezone first
+nowDate := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, tzLocation)
+```
 
 ### Files to Modify
 
-| File | Action | Reason |
-|------|--------|--------|
-| `test/testdata/expected-values.go` | Modify | Fix DaysUnread from 58 to 16 |
-| `test/testdata/project-450-data.go` | Modify | Update Project450ExpectedValues.DaysUnread |
-| `internal/domain/models/project.go` | Verify | Ensure CalculateFinishedAt handles completed projects correctly |
-| `internal/adapter/postgres/project_repository.go` | Verify | Ensure MedianDay is populated in responses |
+| File | Changes |
+|------|---------|
+| `internal/domain/models/project.go` | Fix `CalculateDaysUnreading()` - use `.In(tzLocation)` before extracting date |
+| `internal/domain/models/project.go` | Fix `CalculateMedianDay()` - use `.In(tzLocation)` before extracting date |
+| `internal/domain/models/project.go` | Fix `CalculateFinishedAt()` - use `.In(tzLocation)` before extracting date |
 
 ### Code Changes
 
-**Change 1: Fix expected days_unreading value**
+**Before (buggy):**
 ```go
-// In test/testdata/expected-values.go
-DaysUnread: intPtr(16),  // Changed from 58 to 16
+func (p *Project) CalculateDaysUnreading(logs []*dto.LogResponse) *int {
+    // ...
+    now := time.Now()  // ❌ Gets UTC time
+    
+    ctx := p.GetContext()
+    tzLocation := getTimezoneFromContext(ctx)
+    
+    nowDate := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, tzLocation)
+    // ...
+}
 ```
 
-**Change 2: Verify CalculateFinishedAt for completed projects**
-- When `page >= total_page` and logs exist, return the most recent log's date
-- Current logic already does this - verify it works correctly
+**After (fixed):**
+```go
+func (p *Project) CalculateDaysUnreading(logs []*dto.LogResponse) *int {
+    // ...
+    ctx := p.GetContext()
+    tzLocation := getTimezoneFromContext(ctx)
+    
+    now := time.Now().In(tzLocation)  // ✅ Convert to target timezone first
+    nowDate := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, tzLocation)
+    // ...
+}
+```
 
 ### Testing Strategy
 
 **Unit Tests:**
 ```bash
+# Test days_unreading calculation with timezone
+go test -v ./internal/domain/models/... -run TestProject_CalculateDaysUnreading_Timezone
+
+# Test median_day calculation with timezone
+go test -v ./internal/domain/models/... -run TestProject_CalculateMedianDay_Timezone
+
 # Run all project model tests
 go test -v ./internal/domain/models/...
-
-# Specifically test days_unreading calculation
-go test -v ./internal/domain/models/... -run TestProject_CalculateDaysUnreading
-
-# Test median_day calculation  
-go test -v ./internal/domain/models/... -run TestProject_CalculateMedianDay
 ```
 
 **Integration Tests:**
@@ -107,26 +138,24 @@ go test -v ./test/integration/...
 go test -v ./internal/adapter/postgres/...
 ```
 
-**Verification Steps:**
-1. Confirm `days_unreading` returns 16 for project 450 (matching Rails)
-2. Confirm `median_day` is present in all project responses
-3. Confirm `finished_at` is calculated correctly for completed projects
-4. Run full test suite: `go test ./...`
-5. Run linters: `go fmt ./... && go vet ./...`
+**Manual Verification:**
+1. Start the server with BRT timezone configured
+2. Query `/v1/projects/450.json`
+3. Compare `days_unreading` value with Rails API
+4. Values should match (within 1 day tolerance)
+
+### Expected Results
+
+After fix:
+- `days_unreading`: Should match Rails API (15 days)
+- `median_day`: Should match Rails API (12.12)
+- `finished_at`: Should be calculated correctly
 
 ### Risks and Considerations
 
-**Risk 1: Test Data Dependencies**
-- The expected values are hardcoded and may need frequent updates
-- **Mitigation:** Create a script to regenerate expected values from Rails API
+**Risk:** Minimal - this is a straightforward timezone fix following established patterns.
 
-**Risk 2: Timezone Sensitivity**
-- Days calculation depends on current date
-- **Mitigation:** Tests should use fixed dates or tolerance ranges
-
-**Risk 3: Breaking Expected Value Tests**
-- Updating values will break existing tests
-- **Mitigation:** Update all related test assertions together
+**Consideration:** The fix ensures all date calculations use the application's configured timezone consistently, matching Rails `Date.today` behavior exactly.
 
 ### Acceptance Criteria Alignment
 
@@ -135,18 +164,12 @@ go test -v ./internal/adapter/postgres/...
 | All unit tests pass | To Do | Run `go test ./...` |
 | All integration tests pass | To Do | Run `go test -v ./test/integration/...` |
 | go fmt and go vet pass | To Do | Run linters |
-| days_unreading matches Rails | To Do | Verify value is 16 |
-| median_day calculation correct | To Do | Verify value is 11.91 |
+| days_unreading matches Rails | To Do | Verify value matches Rails API |
+| median_day calculation correct | To Do | Verify value matches Rails API |
 
 ### Summary
 
-This task is primarily about **fixing incorrect expected values** rather than fixing calculation logic. The current implementation already:
-- ✅ Supports multiple date formats
-- ✅ Uses timezone-aware comparison
-- ✅ Calculates days_unreading correctly (produces ~16 days)
-- ✅ Calculates median_day correctly (produces 11.91)
-
-The main fix is updating the expected values file to match the actual Rails API behavior.
+This task fixes a **timezone conversion bug** where Go was extracting date parts from UTC time before applying the target timezone, causing date shifts. The fix ensures `time.Now()` is converted to the target timezone FIRST, matching Rails `Date.today` behavior exactly.
 <!-- SECTION:PLAN:END -->
 
 ## Definition of Done
