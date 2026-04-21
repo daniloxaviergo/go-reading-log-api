@@ -2,7 +2,8 @@
 id: RDL-071
 title: Create a documentation of differencies
 status: To Do
-assignee: []
+assignee:
+  - workflow
 created_date: '2026-04-21 10:35'
 updated_date: '2026-04-21 10:46'
 labels: []
