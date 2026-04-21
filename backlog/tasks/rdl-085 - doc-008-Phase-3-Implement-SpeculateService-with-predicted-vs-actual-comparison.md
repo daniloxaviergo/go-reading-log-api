@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 22:35'
+updated_date: '2026-04-21 22:40'
 labels:
   - phase-3
   - service
@@ -269,6 +269,45 @@ speculative_mean = actual_mean × (1 + prediction_pct)
 - No modifications to existing files required
 - Backward compatible with existing API
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - RDL-085
+
+### Status: In Progress
+
+I'm researching the codebase to understand the patterns and structure before implementing the SpeculateService. Based on my analysis:
+
+**Key Findings:**
+
+1. **Service Patterns**: The codebase uses dependency injection with interfaces (UserConfigProvider) for testability
+   - `DayService` and `FaultsService` follow similar patterns
+   - Both use `DashboardRepository` and `UserConfigProvider`
+
+2. **Test Infrastructure**: 
+   - Unit tests in `test/unit/`
+   - Integration tests use `TestHelper` from `test/test_helper.go`
+   - Mock implementations available for repository
+
+3. **Configuration**:
+   - `UserConfigService` provides `GetPredictionPct()` method
+   - Default prediction_pct is 0.15 (15%)
+
+4. **Required Implementation**:
+   - Single file: `internal/service/dashboard/speculate_service.go`
+   - ~200-300 lines of code
+   - Calculate speculative mean: `actual_mean * (1 + prediction_pct)`
+   - Generate chart data for last 15 days
+   - Zero-fill missing days
+
+**Next Steps:**
+1. Create the SpeculateService with mean calculation
+2. Implement 15-day data retrieval and zero-filling
+3. Create chart configuration generation
+4. Write unit tests following existing patterns
+5. Run integration tests to verify database interactions
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
