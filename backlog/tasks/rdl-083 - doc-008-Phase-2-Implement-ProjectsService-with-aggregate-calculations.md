@@ -31,7 +31,7 @@ Implement internal/service/dashboard/projects_service.go querying all projects w
 - [x] #1 All projects retrieved with eager-loaded logs
 - [x] #2 Log ordering correct (first 4, date DESC)
 - [x] #3 Progress aggregate calculated correctly
-- [ ] #4 Total pages and pages aggregates accurate
+- [x] #4 Total pages and pages aggregates accurate
 - [ ] #5 Results ordered by progress descending
 <!-- AC:END -->
 
