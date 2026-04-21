@@ -32,7 +32,7 @@ Implement internal/service/user_config_service.go to load dashboard configuratio
 <!-- AC:BEGIN -->
 - [x] #1 Configuration loads from config/dashboard.yaml if present
 - [x] #2 Hardcoded defaults used when config file missing
-- [ ] #3 All three settings (max_faults, prediction_pct, pages_per_day) accessible with correct types
+- [x] #3 All three settings (max_faults, prediction_pct, pages_per_day) accessible with correct types
 - [ ] #4 Unit tests cover both file and default paths
 <!-- AC:END -->
 
