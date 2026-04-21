@@ -3,7 +3,7 @@ id: RDL-083
 title: '[doc-008 Phase 2] Implement ProjectsService with aggregate calculations'
 status: To Do
 assignee:
-  - workflow
+  - catarina
 created_date: '2026-04-21 15:50'
 updated_date: '2026-04-21 20:25'
 labels:
