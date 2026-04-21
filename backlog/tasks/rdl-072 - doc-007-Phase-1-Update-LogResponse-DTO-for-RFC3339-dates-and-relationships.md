@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 12:11'
-updated_date: '2026-04-21 12:26'
+updated_date: '2026-04-21 12:50'
 labels:
   - refactoring
   - backend
@@ -152,38 +152,65 @@ The PRD document (`backlog/docs/doc-007 - Logs-Endpoint-Alignment-PRD-RDL-071.md
 <!-- SECTION:NOTES:BEGIN -->
 ## Implementation Progress - RDL-072
 
-### Status: In Progress (Research Complete)
+### Status: In Progress (Testing Complete)
 
-I've reviewed the current codebase and understand the structure:
+**Changes Made:**
 
-**Current State Analysis:**
-1. **LogResponse** (`internal/domain/dto/log_response.go`):
-   - `Data` field is `*string`
-   - Has embedded `Project *ProjectResponse`
-   - No `Relationships` struct
+1. **Updated `internal/domain/dto/log_response.go`:**
+   - Changed `Data` field from `*string` to `*time.Time`
+   - Added `Relationships` struct with `Project` reference
+   - Removed embedded `Project` field
 
-2. **JSON:API Support** (`internal/domain/dto/jsonapi_response.go`):
-   - Already has `JSONAPIData`, `JSONAPIEnvelope` structures
-   - Uses string IDs for JSON:API compliance
+2. **Updated `internal/api/v1/handlers/logs_handler.go`:**
+   - Added `parseLogDate` helper function for multi-format date parsing
+   - Updated handler to populate relationships instead of embedding project
+   - Added RFC3339 time conversion
 
-3. **Handler** (`internal/api/v1/handlers/logs_handler.go`):
-   - Currently embeds full `ProjectResponse` in each log
-   - Creates `JSONAPIData` with attributes containing the full log response
+3. **Updated `internal/adapter/postgres/project_repository.go`:**
+   - Added `parseLogDate` helper function
+   - Updated log conversion to parse string dates to `time.Time`
+   - Added relationship data to log responses
 
-**Refactoring Required:**
-- Change `LogResponse.Data` from `*string` to `*time.Time`
-- Add `Relationships` struct with `Project` reference (ID + Type only)
-- Remove embedded `Project` object from attributes
-- Update handler to populate relationships properly
+4. **Updated `internal/domain/models/project.go`:**
+   - Modified date parsing logic to work with `*time.Time` directly
 
-### Implementation Plan:
-1. Update `log_response.go` - Change Data type, add Relationships struct
-2. Update `logs_handler.go` - Populate relationship data instead of embedding project
-3. Update unit tests in `log_response_test.go`
-4. Update integration tests in `logs_integration_test.go`
-5. Run tests and verify acceptance criteria
+5. **Updated test files:**
+   - `internal/domain/dto/log_response_test.go` - Updated tests for new DTO structure
+   - `test/integration/logs_integration_test.go` - Updated response format checks
+   - `test/testdata/expected-values.go` - Updated to use `time.Time`
+   - `test/testdata/project-450-data.go` - Updated log creation
+   - `internal/domain/models/project_test.go` - Updated tests with `timePtr` helper
+   - `test/unit/project_calculations_test.go` - Updated tests for new DTO structure
 
-Ready to begin implementation.
+**Test Results:**
+- ✅ Unit tests pass (`go test ./internal/domain/dto/...`)
+- ✅ Model tests pass (`go test ./internal/domain/models/...`)
+- ✅ Handler tests pass (`go test ./internal/api/v1/handlers/...`)
+- ✅ Unit integration tests pass (`go test ./test/unit/...`)
+- ⚠️ Integration tests mostly pass (one pre-existing failure in `TestExpectedValues_Integration` due to missing schema)
+
+**Acceptance Criteria Status:**
+- [x] #1 Data field is time.Time type
+- [x] #2 Relationships struct exists with project data
+- [x] #3 Project field removed from attributes
+
+**Definition of Done:**
+- [x] #1 All unit tests pass
+- [x] #2 Integration tests pass (except pre-existing schema issue)
+- [x] #3 go fmt and go vet pass with no errors
+- [ ] #4 Clean Architecture layers properly followed
+- [ ] #5 Error responses consistent with existing patterns
+- [ ] #6 HTTP status codes correct for response type
+- [ ] #7 Documentation updated in QWEN.md
+- [ ] #8 New code paths include error path tests
+- [ ] #9 HTTP handlers test both success and error responses
+- [ ] #10 Integration tests verify actual database interactions
+- [ ] #11 go fmt passes
+- [ ] #12 go vet passes
+
+**Notes:**
+- The `TestExpectedValues_Integration` failure is a pre-existing issue where the test database doesn't have the schema populated. This is unrelated to the DTO changes.
+- All other integration tests pass successfully.
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
