@@ -5,9 +5,9 @@ title: >-
   comparison
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 22:33'
+updated_date: '2026-04-21 22:35'
 labels:
   - phase-3
   - service
