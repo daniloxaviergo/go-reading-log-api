@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 21:36'
+updated_date: '2026-04-21 21:42'
 labels:
   - phase-2
   - service
@@ -427,6 +427,43 @@ Implementation steps:
 
 **Total Estimated Lines**: ~500 lines of new code + test infrastructure
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+# Implementation Progress for RDL-084
+
+## Status: In Progress
+
+### What has been done:
+
+1. **Analyzed the codebase** - Reviewed existing services (DayService, ProjectsService) and repository patterns to understand the implementation approach.
+
+2. **Identified key components**:
+   - `UserConfigProvider` interface already exists with `GetMaxFaults()` method
+   - `DashboardRepository` already has `GetFaultsByDateRange()` method implemented
+   - `dto.EchartConfig` and `Series` types are available in dashboard_response.go
+
+3. **Created implementation plan** based on the task description:
+   - Create `internal/service/dashboard/faults_service.go`
+   - Implement percentage calculation with zero-handling
+   - Follow Clean Architecture patterns
+   - Use 15-second context timeout (consistent with other services)
+
+### What's next:
+
+1. Create `internal/service/dashboard/faults_service.go` with:
+   - `NewFaultsService()` constructor
+   - `CalculatePercentage()` method with zero-fault handling
+   - `GetFaultsPercentage()` method for 30-day calculation
+   - `CreateGaugeChart()` method for ECharts configuration
+
+2. Create unit tests in `test/dashboard/faults_service_test.go`
+
+3. Update `dashboard_handler.go` to add `/v1/dashboard/echart/faults.json` endpoint using the new service
+
+4. Run tests and verify acceptance criteria
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
