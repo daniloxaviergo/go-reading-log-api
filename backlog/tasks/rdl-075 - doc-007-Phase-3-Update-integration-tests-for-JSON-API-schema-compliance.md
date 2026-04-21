@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 12:11'
-updated_date: '2026-04-21 13:35'
+updated_date: '2026-04-21 13:37'
 labels:
   - testing
   - backend
@@ -103,6 +103,38 @@ The goal is to update integration tests for the logs endpoint to validate JSON:A
 *   **Performance:** Adding relationship resolution in tests might slow down the suite slightly, but it's necessary for accuracy.
 *   **Documentation Sync:** Ensure `docs/api-changes/logs-endpoint-refinement.md` is updated to reflect the exact schema tested here.
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - RDL-075
+
+### Status: In Progress
+
+### Completed Analysis:
+1.  **Codebase Review**: Reviewed `logs_handler.go`, `log_response.go`, and `jsonapi_response.go`.
+2.  **Current State Identified**:
+    *   Backend logic is already implemented to output JSON:API format (envelope with `data` and `included`).
+    *   `LogResponse` DTO uses `time.Time` for `Data` field (RFC3339 compliant) and has `Relationships` struct.
+    *   Handler constructs JSON:API envelopes using `dto.JSONAPIData` and `NewJSONAPIEnvelopeWithIncluded`.
+    *   Existing test file (`logs_integration_test.go`) parses responses but lacks specific assertions for JSON:API schema elements like `relationships`, `included`, and strict RFC3339 format validation.
+
+### Implementation Plan (from PRD):
+1.  Enhance `test/integration/test_context.go` to include robust JSON:API parsing helpers.
+2.  Update `logs_integration_test.go` to add specific test cases for JSON:API schema compliance.
+3.  Ensure tests handle the new envelope structure correctly.
+
+### Next Steps:
+1.  Modify `test_context.go` to add helper methods specifically for JSON:API envelope validation.
+2.  Modify `logs_integration_test.go` to add tests for:
+    *   Schema structure validation (presence of `data`, `relationships`, `included`).
+    *   RFC3339 date format verification.
+    *   Payload size verification.
+    *   Relationship reference correctness.
+
+### Blockers/Decisions:
+*   None currently. Ready to write code.
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
