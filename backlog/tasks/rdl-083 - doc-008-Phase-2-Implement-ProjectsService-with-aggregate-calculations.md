@@ -1,7 +1,7 @@
 ---
 id: RDL-083
 title: '[doc-008 Phase 2] Implement ProjectsService with aggregate calculations'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-21 15:50'
