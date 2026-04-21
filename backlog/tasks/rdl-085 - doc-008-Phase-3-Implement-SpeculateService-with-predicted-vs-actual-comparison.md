@@ -33,7 +33,7 @@ Implement internal/service/dashboard/speculate_service.go comparing actual vs pr
 - [x] #1 Actual vs predicted comparison implemented
 - [x] #2 Speculative mean formula correct (actual * (1 + pct))
 - [x] #3 Last 15 days data coverage including today
-- [ ] #4 Missing days zero-filled not omitted
+- [x] #4 Missing days zero-filled not omitted
 <!-- AC:END -->
 
 ## Implementation Plan
