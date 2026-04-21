@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 12:11'
-updated_date: '2026-04-21 12:59'
+updated_date: '2026-04-21 13:02'
 labels:
   - refactoring
   - backend
@@ -171,6 +171,59 @@ We'll modify the `JSONAPIEnvelope` to support an optional `included` array and u
 - Notify frontend teams of breaking changes
 - Consider implementing a versioned endpoint (`/v2/`) if full backward compatibility is required
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - RDL-073
+
+### Status: In Progress
+
+**Date:** 2026-04-21
+
+### Understanding the Task
+
+The task requires updating the `GetProjectLogs` handler to produce a fully compliant JSON:API response structure. Key requirements:
+
+1. **Current State Analysis:**
+   - Handler uses `dto.LogResponse` which embeds project data (denormalized)
+   - Response lacks `included` array for related resources
+   - IDs are integers instead of strings (JSON:API requirement)
+   - Missing `type` field in response structure
+
+2. **Target State:**
+   - Use JSON:API standard format with `data` and `included` arrays
+   - Replace embedded project objects with relationship references (`relationships.project.data`)
+   - Serialize all IDs as strings per JSON:API specification
+   - Include proper `type` field for each resource
+
+### Files to Modify (from Implementation Plan)
+
+| File | Action | Reason |
+|------|--------|--------|
+| `internal/domain/dto/jsonapi_response.go` | **Modify** | Add `Included` field to `JSONAPIEnvelope` struct |
+| `internal/domain/dto/log_response.go` | **Modify** | Update `LogResponse` to use `time.Time` for `Data` field |
+| `internal/api/v1/handlers/logs_handler.go` | **Modify** | Rewrite `Index` method to populate `relationships` and `included` arrays |
+| `test/integration/logs_integration_test.go` | **Modify** | Update assertions to validate new JSON:API structure |
+
+### Initial Analysis
+
+Looking at the current implementation in `logs_handler.go`:
+- The handler already uses `dto.JSONAPIData` with `Type: "logs"`
+- IDs are already being converted to strings with `strconv.FormatInt()`
+- Relationships are partially implemented with `Relationships` struct
+- Missing: `included` array in JSON:API envelope
+
+### Next Steps
+
+1. Add `Included` field to `JSONAPIEnvelope` in `jsonapi_response.go`
+2. Update `LogResponse` DTO to ensure proper serialization
+3. Modify `logs_handler.go` Index method to build and include project data
+4. Update integration tests to validate new structure
+
+### Blockers
+- None currently identified
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
