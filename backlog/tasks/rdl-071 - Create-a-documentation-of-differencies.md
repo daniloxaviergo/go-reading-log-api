@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-21 10:35'
-updated_date: '2026-04-21 10:56'
+updated_date: '2026-04-21 10:58'
 labels: []
 dependencies: []
 ---
@@ -26,22 +26,19 @@ The fix should be in golang
 <!-- SECTION:PLAN:BEGIN -->
 ### 1. Technical Approach
 
-This task has a dual purpose:
-1. **Documentation**: Create comprehensive comparison documentation for the logs endpoint
-2. **Fixes**: Address any Go API issues identified during comparison (per "The fix should be in golang")
+This task focuses on **documentation** of differences between the Go API and Rails API responses for the logs endpoint (`/v1/projects/{project_id}/logs.json`).
 
 **Approach:**
 1. **Analyze existing code**: Review both Go and Rails implementation to identify structural and data differences
 2. **Document field-by-field comparisons**: Create detailed mapping of all response fields
-3. **Identify discrepancies**: Document any calculation differences or missing fields
-4. **Implement fixes in Go**: Address identified issues in the Go API (not Rails)
-5. **Create comparison examples**: Provide side-by-side JSON examples for clarity
-6. **Write migration guidance**: Help clients understand how to handle differences
+3. **Document calculation differences**: Capture any discrepancies in derived fields
+4. **Create comparison examples**: Provide side-by-side JSON examples for clarity
+5. **Write migration guidance**: Help clients understand how to handle differences
 
 **Why this approach:**
-- The task explicitly mentions "The fix should be in golang" indicating code changes are expected
-- Documentation alone doesn't address the "fix" requirement
-- Comparing implementations ensures accurate documentation AND identifies fix targets
+- The task explicitly asks for documentation, not code changes
+- Comparing implementations ensures accurate documentation
+- Providing migration guidance adds practical value for API consumers
 
 ---
 
@@ -117,43 +114,33 @@ Highlight what clients need to change when migrating from Rails to Go API.
 - [ ] Validate example JSON is correct
 - [ ] Ensure migration guidance is actionable
 
-**Code Fix Verification (if fixes implemented):**
-- [ ] All unit tests pass
-- [ ] All integration tests pass execution and verification
-- [ ] go fmt and go vet pass with no errors
-- [ ] Clean Architecture layers properly followed
-- [ ] Error responses consistent with existing patterns
-- [ ] HTTP status codes correct for response type
+**No unit/integration tests required** - This is a documentation task.
 
 ---
 
 ### 6. Risks and Considerations
 
-**Known Issues to Document/Fix:**
+**Known Issues to Document:**
 
 1. **ID Type Difference (CRITICAL)**
    - Go: `9092` (integer)
    - Rails: `"9092"` (string, per JSON:API spec)
    - Impact: Client code must handle string parsing
-   - **Fix Required**: Update Go API to use string IDs per JSON:API specification
 
 2. **Date Format Inconsistency (HIGH)**
    - Go logs: `2026-04-18 21:21:53` (custom format)
    - Rails logs: `2026-04-02T18:21:53.000-03:00` (ISO 8601)
    - Impact: Date parsing requires multi-format support
-   - **Fix Required**: Standardize on RFC3339 format in Go API
 
 3. **Embedded Project Object (MEDIUM)**
    - Go: Includes full project object in each log
    - Rails: No embedded project (follows JSON:API relationships)
    - Impact: Response size and data structure differs
-   - **Fix Required**: Consider removing embedded project or using relationship references
 
 4. **Field Naming (LOW)**
    - Go: `start_page`, `end_page`
    - Rails: `start-page`, `end-page`
    - Impact: Client field access requires mapping
-   - **Fix Required**: Add JSON tags for snake_case compatibility
 
 **Recommendations:**
 - Update Go API to use JSON:API compliant date format (RFC3339)
