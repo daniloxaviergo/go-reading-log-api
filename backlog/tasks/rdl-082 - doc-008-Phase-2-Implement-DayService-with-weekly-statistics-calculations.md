@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 19:40'
+updated_date: '2026-04-21 19:42'
 labels:
   - phase-2
   - service
@@ -213,6 +213,62 @@ Before coding, verify:
 
 Ready to implement when approved.
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - DayService with Weekly Statistics Calculations
+
+### Date: 2026-04-21
+
+### Status: In Progress
+
+### What I've Discovered:
+
+1. **Existing Infrastructure**:
+   - `internal/service/user_config_service.go` - Already exists with config loading
+   - `internal/repository/dashboard_repository.go` - Interface defined but needs implementation
+   - `internal/domain/dto/dashboard_response.go` - Contains `StatsData` struct with all required fields
+   - No existing `DayService` - This is what we're implementing
+
+2. **Required Fields in StatsData** (from AC-DASH-001):
+   - `previous_week_pages` - Sum of pages from 14-7 days ago (previous week)
+   - `last_week_pages` - Sum of pages from 7 days ago to today (current week so far)
+   - `per_pages` - Ratio: last_week_pages / previous_week_pages * 100 (3 decimals)
+   - `mean_day` - Average pages per day for current weekday across all weeks
+   - `spec_mean_day` - mean_day * (1 + prediction_pct from config)
+
+3. **Missing Component**: Need to create `GetToday()` helper function for consistent date references
+
+### Implementation Plan:
+
+**Step 1**: Create `internal/service/dashboard/day_service.go`
+- Implement `DayService` struct with repository and config dependencies
+- Implement `CalculateWeeklyStats()` method with all required calculations
+- Use `GetToday()` for consistent date references
+- Round all float values to 3 decimal places
+
+**Step 2**: Create helper function `GetToday()`
+- Located in `internal/service/dashboard/day_service.go` or shared utility
+- Returns current date truncated to midnight for consistency
+
+**Step 3**: Update dashboard handler to use DayService
+- Modify existing handlers to delegate calculations to DayService
+- Ensure proper error handling and response formatting
+
+**Step 4**: Write comprehensive tests
+- Unit tests for calculation logic
+- Edge case testing (zero division, empty data)
+- Integration tests with database
+
+### Next Steps:
+1. Create the DayService implementation
+2. Add GetToday() helper function
+3. Implement CalculateWeeklyStats() method
+4. Update dashboard handlers to use the service
+5. Write unit and integration tests
+6. Verify all acceptance criteria are met
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
