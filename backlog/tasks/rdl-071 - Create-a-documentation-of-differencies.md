@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-21 10:35'
-updated_date: '2026-04-21 10:58'
+updated_date: '2026-04-21 11:00'
 labels: []
 dependencies: []
 ---
@@ -26,7 +26,7 @@ The fix should be in golang
 <!-- SECTION:PLAN:BEGIN -->
 ### 1. Technical Approach
 
-This task focuses on **documentation** of differences between the Go API and Rails API responses for the logs endpoint (`/v1/projects/{project_id}/logs.json`).
+This task is a **documentation-only** effort to compare and document differences between the Go API and Rails API responses for the logs endpoint (`/v1/projects/{project_id}/logs.json`).
 
 **Approach:**
 1. **Analyze existing code**: Review both Go and Rails implementation to identify structural and data differences
@@ -39,6 +39,8 @@ This task focuses on **documentation** of differences between the Go API and Rai
 - The task explicitly asks for documentation, not code changes
 - Comparing implementations ensures accurate documentation
 - Providing migration guidance adds practical value for API consumers
+
+**IMPORTANT NOTE:** Despite the task description mentioning "The fix should be in golang", this implementation plan focuses on **documentation only** as per explicit instructions. Any code fixes would require a separate task.
 
 ---
 
