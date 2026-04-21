@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:49'
-updated_date: '2026-04-21 16:49'
+updated_date: '2026-04-21 16:50'
 labels:
   - phase-1
   - repository
@@ -30,7 +30,7 @@ Define internal/repository/dashboard_repository.go with all dashboard query meth
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Interface defines all required dashboard query methods
+- [x] #1 Interface defines all required dashboard query methods
 - [ ] #2 PostgreSQL implementation uses pgx for efficient queries
 - [ ] #3 Connection pooling configured correctly
 - [ ] #4 Unit tests verify each repository method independently
