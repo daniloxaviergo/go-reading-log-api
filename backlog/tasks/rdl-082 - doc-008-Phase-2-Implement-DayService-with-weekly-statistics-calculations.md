@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 20:18'
+updated_date: '2026-04-21 20:19'
 labels:
   - phase-2
   - service
@@ -31,7 +31,7 @@ Implement internal/service/dashboard/day_service.go calculating previous_week_pa
 - [x] #1 Previous week page total calculated correctly
 - [x] #2 Last week page total calculated correctly
 - [x] #3 Per pages ratio computed with 3 decimal precision
-- [ ] #4 Mean day by weekday calculated accurately
+- [x] #4 Mean day by weekday calculated accurately
 - [ ] #5 Speculative mean derived from actual mean
 <!-- AC:END -->
 
