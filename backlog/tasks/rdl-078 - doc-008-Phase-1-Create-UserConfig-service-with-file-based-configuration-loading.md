@@ -5,7 +5,7 @@ title: >-
   loading
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-21 15:49'
 updated_date: '2026-04-21 16:22'
 labels:
