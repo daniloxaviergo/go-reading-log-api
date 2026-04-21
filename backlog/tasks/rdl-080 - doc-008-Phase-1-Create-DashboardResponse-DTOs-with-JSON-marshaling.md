@@ -3,9 +3,9 @@ id: RDL-080
 title: '[doc-008 Phase 1] Create DashboardResponse DTOs with JSON marshaling'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-21 15:49'
-updated_date: '2026-04-21 17:57'
+updated_date: '2026-04-21 17:59'
 labels:
   - phase-1
   - dto
