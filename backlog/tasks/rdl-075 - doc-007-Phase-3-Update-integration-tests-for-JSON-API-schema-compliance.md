@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 12:11'
-updated_date: '2026-04-21 13:38'
+updated_date: '2026-04-21 13:52'
 labels:
   - testing
   - backend
@@ -26,7 +26,7 @@ Update the test/integration/logs_endpoint_test.go file to validate the new JSON:
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Tests validate JSON:API schema
+- [x] #1 Tests validate JSON:API schema
 - [ ] #2 Date format checked for RFC3339
 - [ ] #3 Payload size verified
 <!-- AC:END -->
