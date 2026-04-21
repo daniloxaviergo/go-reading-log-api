@@ -1,7 +1,7 @@
 ---
 id: RDL-070
 title: Fix days_unreading and median_day math
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-21 10:15'
