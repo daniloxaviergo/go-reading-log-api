@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 12:11'
-updated_date: '2026-04-21 12:24'
+updated_date: '2026-04-21 12:25'
 labels:
   - refactoring
   - backend
@@ -146,6 +146,33 @@ The PRD document (`backlog/docs/doc-007 - Logs-Endpoint-Alignment-PRD-RDL-071.md
 
 **Reference:** Implementation details are tracked in task RDL-072 (`backlog/tasks/rdl-072 - doc-007-Phase-1-Update-LogResponse-DTO-for-RFC3339-dates-and-relationships.md`).
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - RDL-072
+
+### Status: In Progress
+
+I've reviewed the task and implementation plan. This is a refactoring task to update the `LogResponse` DTO for JSON:API compliance.
+
+### Initial Research Phase
+
+**What I need to understand before implementing:**
+1. Current state of `internal/domain/dto/log_response.go`
+2. How relationships are structured in other parts of the codebase
+3. Current handler implementation in `logs_handler.go`
+4. Existing test patterns for this DTO
+
+**Planned approach:**
+- Change `Data` field from `*string` to `*time.Time`
+- Add `Relationships` struct with project reference
+- Remove embedded `Project` object from attributes
+- Update handlers and tests accordingly
+
+### Next Steps
+I will now examine the current codebase structure to understand the existing implementation before making changes.
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
