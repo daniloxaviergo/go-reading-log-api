@@ -4,8 +4,10 @@ title: >-
   [doc-008 Phase 1] Create UserConfig service with file-based configuration
   loading
 status: To Do
-assignee: []
+assignee:
+  - workflow
 created_date: '2026-04-21 15:49'
+updated_date: '2026-04-21 15:54'
 labels:
   - phase-1
   - infrastructure
