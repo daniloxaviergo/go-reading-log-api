@@ -1,11 +1,11 @@
 ---
 id: RDL-075
 title: '[doc-007 Phase 3] Update integration tests for JSON:API schema compliance'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-21 12:11'
-updated_date: '2026-04-21 13:54'
+updated_date: '2026-04-21 13:55'
 labels:
   - testing
   - backend
@@ -28,7 +28,7 @@ Update the test/integration/logs_endpoint_test.go file to validate the new JSON:
 <!-- AC:BEGIN -->
 - [x] #1 Tests validate JSON:API schema
 - [x] #2 Date format checked for RFC3339
-- [ ] #3 Payload size verified
+- [x] #3 Payload size verified
 <!-- AC:END -->
 
 ## Implementation Plan
