@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 22:18'
+updated_date: '2026-04-21 22:19'
 labels:
   - phase-2
   - service
@@ -30,7 +30,7 @@ Implement internal/service/dashboard/faults_service.go counting ALL faults (rega
 <!-- AC:BEGIN -->
 - [x] #1 Counts all faults regardless of status (matches Rails)
 - [x] #2 Percentage calculation correct with 2 decimal precision
-- [ ] #3 Zero faults returns 0% not NaN/error
+- [x] #3 Zero faults returns 0% not NaN/error
 - [ ] #4 Max faults from config with default fallback
 <!-- AC:END -->
 
