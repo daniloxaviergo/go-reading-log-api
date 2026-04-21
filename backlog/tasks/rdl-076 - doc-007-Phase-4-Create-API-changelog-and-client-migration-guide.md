@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 12:11'
-updated_date: '2026-04-21 14:06'
+updated_date: '2026-04-21 14:12'
 labels:
   - documentation
   - api
@@ -26,7 +26,7 @@ Create the docs/api-changes/logs-endpoint-refinement.md file detailing the break
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Changelog exists at correct path
+- [x] #1 Changelog exists at correct path
 - [ ] #2 Before/after examples included
 - [ ] #3 Client migration steps provided
 <!-- AC:END -->
