@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 21:24'
+updated_date: '2026-04-21 21:25'
 labels:
   - phase-2
   - service
@@ -234,6 +234,79 @@ projects, err := projectService.GetAll(r.Context())
 - ✅ New service follows Clean Architecture patterns
 - ✅ Error handling consistent with existing patterns
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+# RDL-083: Implement ProjectsService with Aggregate Calculations
+
+## Summary
+Successfully implemented `ProjectsService` in `internal/service/dashboard/` that queries all projects with eager-loaded logs (first 4, ordered by date DESC), calculates progress_geral, total_pages, and pages aggregates, and orders results by progress descending.
+
+## Changes Made
+
+### New Files Created
+- `internal/service/dashboard/projects_service.go` - Main service implementation with:
+  - `ProjectsService` struct with repository and database pool dependencies
+  - `GetAll()` method for retrieving projects with eager-loaded logs
+  - `calculateTotalPages()` and `calculatePages()` for aggregate calculations
+  - `calculateProgress()` for progress percentage calculation
+  - Results sorted by progress descending
+
+- `internal/service/dashboard/projects_service_test.go` - Unit tests covering:
+  - Progress calculation with various scenarios
+  - Empty database handling
+  - Sorting by progress
+  - Log limit verification (first 4 logs)
+  - Error handling
+  - Multiple logs per project
+
+### Modified Files
+- `internal/repository/dashboard_repository.go`:
+  - Added `GetProjectsWithLogs()` method
+  - Added `GetProjectLogs()` method  
+  - Added `PoolInterface` for dependency injection
+  - Added `pgxPoolInterface` type definition
+
+- `internal/adapter/postgres/dashboard_repository.go`:
+  - Implemented `GetProjectsWithLogs()` using CTE pattern
+  - Implemented `GetProjectLogs()` with LIMIT and ORDER BY
+  - Added `GetPool()` method to return database pool
+
+- `internal/api/v1/handlers/dashboard_handler.go`:
+  - Added `ProjectsWithLogs()` endpoint handler
+  - Integrated service into handler
+  - Added helper methods for calculations
+
+- `internal/api/v1/routes.go`:
+  - Registered `/v1/dashboard/projects_with_logs.json` endpoint
+
+- `internal/domain/dto/dashboard_response.go`:
+  - Added `ProjectWithLogs` struct with all required fields
+
+### Test Updates
+- Updated `MockDashboardRepository` in multiple test files to implement new interface
+- Added missing methods to support the new repository interface
+
+## Verification
+- ✅ Build succeeds without errors
+- ✅ Go vet passes with no warnings  
+- ✅ All existing tests pass
+- ✅ New service follows Clean Architecture patterns
+- ✅ Error handling consistent with existing patterns
+- ✅ All acceptance criteria checked
+- ✅ All Definition of Done items satisfied
+
+## API Endpoint
+```
+GET /v1/dashboard/projects_with_logs.json
+```
+
+Returns all projects with:
+- Eager-loaded logs (first 4 per project, ordered by date DESC)
+- Calculated aggregates: progress_geral, total_pages, pages
+- Results sorted by progress descending
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
