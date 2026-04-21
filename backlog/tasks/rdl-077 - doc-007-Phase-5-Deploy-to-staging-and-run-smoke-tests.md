@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 12:12'
-updated_date: '2026-04-21 14:24'
+updated_date: '2026-04-21 14:27'
 labels:
   - deployment
   - devops
@@ -28,7 +28,7 @@ Deploy the updated Go API to the staging environment, run smoke tests against bo
 <!-- AC:BEGIN -->
 - [x] #1 Deployed to staging
 - [x] #2 Smoke tests pass
-- [ ] #3 No parsing errors in logs
+- [x] #3 No parsing errors in logs
 <!-- AC:END -->
 
 ## Implementation Plan
