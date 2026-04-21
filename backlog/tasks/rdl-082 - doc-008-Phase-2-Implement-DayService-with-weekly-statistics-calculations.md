@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 20:17'
+updated_date: '2026-04-21 20:18'
 labels:
   - phase-2
   - service
@@ -28,7 +28,7 @@ Implement internal/service/dashboard/day_service.go calculating previous_week_pa
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Previous week page total calculated correctly
+- [x] #1 Previous week page total calculated correctly
 - [ ] #2 Last week page total calculated correctly
 - [ ] #3 Per pages ratio computed with 3 decimal precision
 - [ ] #4 Mean day by weekday calculated accurately
