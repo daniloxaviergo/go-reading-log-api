@@ -5,9 +5,9 @@ title: >-
   loading
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-21 15:49'
-updated_date: '2026-04-21 16:21'
+updated_date: '2026-04-21 16:22'
 labels:
   - phase-1
   - infrastructure
