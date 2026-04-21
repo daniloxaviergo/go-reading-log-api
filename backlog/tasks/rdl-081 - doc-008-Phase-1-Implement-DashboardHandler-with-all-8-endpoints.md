@@ -3,7 +3,7 @@ id: RDL-081
 title: '[doc-008 Phase 1] Implement DashboardHandler with all 8 endpoints'
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-21 15:49'
 updated_date: '2026-04-21 19:29'
 labels:
