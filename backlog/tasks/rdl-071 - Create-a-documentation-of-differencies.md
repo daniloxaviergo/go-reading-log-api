@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 10:35'
-updated_date: '2026-04-21 11:47'
+updated_date: '2026-04-21 11:49'
 labels: []
 dependencies: []
 ---
@@ -203,6 +203,53 @@ None currently. Proceeding with research and documentation generation.
 3. Complete documentation draft in `docs/diff_show_logs.md`
 4. Review and finalize documentation
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Task RDL-071 Completion Summary
+
+### What Was Accomplished
+Created comprehensive documentation comparing Go API vs Rails API responses for the logs endpoint (`/v1/projects/{project_id}/logs.json`).
+
+### Key Changes Made
+**New File Created:** `docs/diff_show_logs.md` (~9.4KB)
+
+The documentation includes:
+1. **Executive Summary** - Overview of discrepancies found
+2. **Detailed Field Analysis** - Complete field-by-field comparison table
+3. **Critical Issues Identified:**
+   - Date format inconsistency (custom vs ISO 8601/RFC3339)
+   - Project object embedding vs relationship references
+   - ID type differences (integer vs string)
+4. **Response Size Comparison** - ~50% size reduction with relationship references
+5. **Field Naming Convention Mapping** - snake_case vs kebab-case
+6. **Recommendations by Priority** - Immediate, short-term, and medium-term actions
+7. **Migration Guide** - Practical code examples for API consumers
+
+### Verification Completed
+- ✅ Fetched actual responses from both endpoints (Go: port 3000, Rails: port 3001)
+- ✅ Verified all identified differences against real data
+- ✅ Created side-by-side JSON examples for clarity
+- ✅ Documented migration guidance with code samples
+
+### Acceptance Criteria Status
+| Criterion | Status |
+|-----------|--------|
+| Documentation created at docs/diff_show_logs.md | ✅ Complete |
+| Field comparisons accurate | ✅ Verified with live API data |
+| Migration guide included | ✅ Complete |
+
+### Risks & Follow-ups
+1. **Date format standardization** - Go API should use RFC3339 instead of custom format
+2. **Relationship references** - Consider replacing embedded project objects to reduce response size
+3. **ID type alignment** - Document integer vs string ID handling for clients
+
+### Notes
+- Task was documentation-only (no code changes required)
+- All findings verified against actual running API endpoints
+- Documentation follows existing comparison patterns from RDL-059
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
