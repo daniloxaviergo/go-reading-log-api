@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:49'
-updated_date: '2026-04-21 16:19'
+updated_date: '2026-04-21 16:20'
 labels:
   - phase-1
   - infrastructure
@@ -330,6 +330,6 @@ I'm implementing the UserConfig service with file-based configuration loading. H
 - [x] #6 HTTP status codes correct for response type
 - [x] #7 Documentation updated in QWEN.md
 - [x] #8 New code paths include error path tests
-- [ ] #9 HTTP handlers test both success and error responses
+- [x] #9 HTTP handlers test both success and error responses
 - [ ] #10 Integration tests verify actual database interactions
 <!-- DOD:END -->
