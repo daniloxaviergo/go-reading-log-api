@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 12:11'
-updated_date: '2026-04-21 12:50'
+updated_date: '2026-04-21 12:51'
 labels:
   - refactoring
   - backend
@@ -28,7 +28,7 @@ Update the internal/domain/dto/log_response.go file to change the Data field fro
 <!-- AC:BEGIN -->
 - [x] #1 Data field is time.Time type
 - [x] #2 Relationships struct exists with project data
-- [ ] #3 Project field removed from attributes
+- [x] #3 Project field removed from attributes
 <!-- AC:END -->
 
 ## Implementation Plan
