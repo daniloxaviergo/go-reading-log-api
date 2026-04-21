@@ -5,7 +5,7 @@ title: >-
   comparison
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-21 15:50'
 updated_date: '2026-04-21 23:40'
 labels:
