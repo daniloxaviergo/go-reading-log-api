@@ -38,16 +38,16 @@ func TestProject_CalculateDaysUnreading(t *testing.T) {
 		{
 			name: "single_log_with_date",
 			logs: []*dto.LogResponse{
-				{Data: stringPtr(today.AddDate(0, 0, -3).Format("2006-01-02"))},
+				{Data: timePtr(today.AddDate(0, 0, -3))},
 			},
 			expected: intPtr(3),
 		},
 		{
 			name: "multiple_logs_returns_most_recent",
 			logs: []*dto.LogResponse{
-				{Data: stringPtr(today.AddDate(0, 0, -8).Format("2006-01-02"))},
-				{Data: stringPtr(today.AddDate(0, 0, -6).Format("2006-01-02"))},
-				{Data: stringPtr(today.AddDate(0, 0, -4).Format("2006-01-02"))},
+				{Data: timePtr(today.AddDate(0, 0, -8))},
+				{Data: timePtr(today.AddDate(0, 0, -6))},
+				{Data: timePtr(today.AddDate(0, 0, -4))},
 			},
 			expected: intPtr(4),
 		},
@@ -122,7 +122,7 @@ func TestProject_CalculateDaysUnreading_EdgeCases(t *testing.T) {
 				StartedAt: func() *time.Time { t := time.Now().AddDate(0, 0, -5); return &t }(),
 			},
 			logs: []*dto.LogResponse{
-				{Data: stringPtr(time.Now().Format("2006-01-02"))}, // Today
+				{Data: timePtr(time.Now())}, // Today
 			},
 			expected: intPtr(0),
 		},
@@ -172,27 +172,27 @@ func TestProject_CalculateDaysUnreading_MultiFormat(t *testing.T) {
 		{
 			name: "YYYY-MM-DD format",
 			logs: []*dto.LogResponse{
-				{Data: stringPtr(today.AddDate(0, 0, -3).Format("2006-01-02"))},
+				{Data: timePtr(today.AddDate(0, 0, -3))},
 			},
 		},
 		{
 			name: "RFC3339 format",
 			logs: []*dto.LogResponse{
-				{Data: stringPtr(today.AddDate(0, 0, -3).Format("2006-01-02T15:04:05Z"))},
+				{Data: timePtr(today.AddDate(0, 0, -3).Add(time.Hour * 15 / time.Microsecond * 1000))}, // Approximate
 			},
 		},
 		{
 			name: "Standard datetime format",
 			logs: []*dto.LogResponse{
-				{Data: stringPtr(today.AddDate(0, 0, -3).Format("2006-01-02 15:04:05"))},
+				{Data: timePtr(today.AddDate(0, 0, -3).Add(time.Hour * 15 / time.Microsecond * 1000))}, // Approximate
 			},
 		},
 		{
 			name: "Mixed formats",
 			logs: []*dto.LogResponse{
-				{Data: stringPtr(today.AddDate(0, 0, -8).Format("2006-01-02T15:04:05Z"))},
-				{Data: stringPtr(today.AddDate(0, 0, -6).Format("2006-01-02 15:04:05"))},
-				{Data: stringPtr(today.AddDate(0, 0, -4).Format("2006-01-02"))},
+				{Data: timePtr(today.AddDate(0, 0, -8).Add(time.Hour * 15 / time.Microsecond * 1000))},
+				{Data: timePtr(today.AddDate(0, 0, -6).Add(time.Hour * 15 / time.Microsecond * 1000))},
+				{Data: timePtr(today.AddDate(0, 0, -4))},
 			},
 		},
 	}
@@ -262,7 +262,7 @@ func TestProject_CalculateFinishedAt(t *testing.T) {
 		{
 			name: "with_logs_estimates_completion",
 			logs: []*dto.LogResponse{
-				{Data: stringPtr(today.AddDate(0, 0, -2).Format("2006-01-02"))},
+				{Data: timePtr(today.AddDate(0, 0, -2))},
 			},
 			expected: func(finished *time.Time) bool {
 				return finished != nil && finished.After(today)
@@ -336,7 +336,7 @@ func TestProject_CalculateFinishedAt_EdgeCases(t *testing.T) {
 				StartedAt: func() *time.Time { t := time.Now(); return &t }(),
 			},
 			logs: []*dto.LogResponse{
-				{Data: stringPtr(today.AddDate(0, 0, -2).Format("2006-01-02"))},
+				{Data: timePtr(today.AddDate(0, 0, -2))},
 			},
 			// When page >= total_page with logs, returns the most recent log's date
 			expected: func() *time.Time {
@@ -620,7 +620,7 @@ func TestProject_CalculateStatus(t *testing.T) {
 	}
 
 	logs := []*dto.LogResponse{
-		{Data: stringPtr(today.AddDate(0, 0, -2).Format("2006-01-02"))}, // 2 days ago
+		{Data: timePtr(today.AddDate(0, 0, -2))}, // 2 days ago
 	}
 
 	status := project.CalculateStatus(logs, cfg)
@@ -708,6 +708,10 @@ func TestProject_CalculateStatus_EdgeCases(t *testing.T) {
 // Helper functions
 func stringPtr(s string) *string {
 	return &s
+}
+
+func timePtr(t time.Time) *time.Time {
+	return &t
 }
 
 func intPtr(i int) *int {

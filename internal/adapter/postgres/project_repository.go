@@ -14,6 +14,27 @@ import (
 	"go-reading-log-api-next/internal/repository"
 )
 
+// parseLogDate attempts to parse a date string using multiple formats.
+// Supported formats:
+//   - RFC3339 (e.g., "2024-01-15T10:30:00Z")
+//   - Date only (e.g., "2024-01-15")
+//   - Standard datetime (e.g., "2024-01-15 10:30:00")
+func parseLogDate(dateStr string) (*time.Time, bool) {
+	formats := []string{
+		time.RFC3339,          // 2006-01-02T15:04:05Z
+		"2006-01-02",          // YYYY-MM-DD
+		"2006-01-02 15:04:05", // Standard datetime
+	}
+
+	for _, format := range formats {
+		if t, err := time.Parse(format, dateStr); err == nil {
+			return &t, true
+		}
+	}
+
+	return nil, false
+}
+
 const defaultContextTimeout = 15 * time.Second
 
 // ProjectRepositoryImpl implements ProjectRepository interface using PostgreSQL
@@ -183,9 +204,14 @@ func (r *ProjectRepositoryImpl) GetWithLogs(ctx context.Context, id int64) (*rep
 	// Convert logs to DTOs
 	logResponses := make([]*dto.LogResponse, len(logs))
 	for i, log := range logs {
+		// Parse the data string to time.Time for RFC3339 compliance
+		var dataTime *time.Time
+		if log.Data != nil && *log.Data != "" {
+			dataTime, _ = parseLogDate(*log.Data)
+		}
 		logResponses[i] = &dto.LogResponse{
 			ID:        log.ID,
-			Data:      log.Data,
+			Data:      dataTime,
 			StartPage: log.StartPage,
 			EndPage:   log.EndPage,
 			Note:      log.Note,
@@ -358,14 +384,14 @@ func (r *ProjectRepositoryImpl) GetAllWithLogs(ctx context.Context) ([]*reposito
 
 		// If log_id is not NULL, we have a log entry to process
 		if logID != nil && *logID != 0 {
-			// Convert timestamp to formatted string for JSON compatibility
-			var data *string
+			// Parse the data string to time.Time for RFC3339 compliance
+			var dataTime *time.Time
 			if dataStr != nil && *dataStr != "" {
-				data = dataStr
+				dataTime, _ = parseLogDate(*dataStr)
 			}
 			logResponse := &dto.LogResponse{
 				ID:   *logID,
-				Data: data,
+				Data: dataTime,
 				StartPage: func() int {
 					if startPage == nil {
 						return 0

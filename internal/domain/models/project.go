@@ -71,13 +71,12 @@ func (p *Project) CalculateDaysUnreading(logs []*dto.LogResponse) *int {
 
 	for _, log := range logs {
 		if log.Data != nil {
-			// Parse the log data field with multiple format support
-			if t, ok := parseLogDate(*log.Data); ok {
-				// Update if this is the first found date or more recent than current
-				if !found || t.After(lastReadDate) {
-					lastReadDate = t
-					found = true
-				}
+			// Parse the log data field (now time.Time) using RFC3339 format
+			t := *log.Data
+			// Update if this is the first found date or more recent than current
+			if !found || t.After(lastReadDate) {
+				lastReadDate = t
+				found = true
 			}
 		}
 	}
@@ -344,12 +343,11 @@ func (p *Project) CalculateFinishedAt(logs []*dto.LogResponse) *time.Time {
 		found := false
 		for _, log := range logs {
 			if log.Data != nil {
-				// Parse the log data field with multi-format support
-				if t, ok := parseLogDate(*log.Data); ok {
-					if !found || t.After(latestDate) {
-						latestDate = t
-						found = true
-					}
+				// Use the time.Time value directly (already parsed)
+				t := *log.Data
+				if !found || t.After(latestDate) {
+					latestDate = t
+					found = true
 				}
 			}
 		}

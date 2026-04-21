@@ -208,7 +208,7 @@ func TestProject_CalculateFinishedAt_100PercentProgress(t *testing.T) {
 		today := time.Now()
 		logs := []*dto.LogResponse{
 			{
-				Data: stringPtr(today.Format("2006-01-02")),
+				Data: &today,
 			},
 		}
 		project := &Project{
@@ -440,30 +440,30 @@ func TestProject_CalculateDaysUnreading_MultiFormat(t *testing.T) {
 		{
 			name: "YYYY-MM-DD format in log",
 			logs: []*dto.LogResponse{
-				{Data: stringPtr("2024-01-15")},
+				{Data: timePtr(time.Date(2024, 1, 15, 0, 0, 0, 0, time.UTC))},
 			},
 			expected: intPtr(3), // 3 days since last read (assuming today is 2024-01-18)
 		},
 		{
 			name: "RFC3339 format in log",
 			logs: []*dto.LogResponse{
-				{Data: stringPtr("2024-01-15T10:30:00Z")},
+				{Data: timePtr(time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC))},
 			},
 			expected: intPtr(3),
 		},
 		{
 			name: "Standard datetime format in log",
 			logs: []*dto.LogResponse{
-				{Data: stringPtr("2024-01-15 10:30:00")},
+				{Data: timePtr(time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC))},
 			},
 			expected: intPtr(3),
 		},
 		{
 			name: "Multiple logs with different formats",
 			logs: []*dto.LogResponse{
-				{Data: stringPtr("2024-01-10T10:30:00Z")},
-				{Data: stringPtr("2024-01-12 15:00:00")},
-				{Data: stringPtr("2024-01-14")},
+				{Data: timePtr(time.Date(2024, 1, 10, 10, 30, 0, 0, time.UTC))},
+				{Data: timePtr(time.Date(2024, 1, 12, 15, 0, 0, 0, time.UTC))},
+				{Data: timePtr(time.Date(2024, 1, 14, 0, 0, 0, 0, time.UTC))},
 			},
 			expected: intPtr(4), // Most recent is 2024-01-14
 		},
@@ -580,19 +580,19 @@ func TestProject_CalculateFinishedAt_MultiFormat(t *testing.T) {
 		{
 			name: "YYYY-MM-DD format in log",
 			logs: []*dto.LogResponse{
-				{Data: stringPtr("2024-01-15")},
+				{Data: timePtr(time.Date(2024, 1, 15, 0, 0, 0, 0, time.UTC))},
 			},
 		},
 		{
 			name: "RFC3339 format in log",
 			logs: []*dto.LogResponse{
-				{Data: stringPtr("2024-01-15T10:30:00Z")},
+				{Data: timePtr(time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC))},
 			},
 		},
 		{
 			name: "Standard datetime format in log",
 			logs: []*dto.LogResponse{
-				{Data: stringPtr("2024-01-15 10:30:00")},
+				{Data: timePtr(time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC))},
 			},
 		},
 	}
@@ -617,4 +617,9 @@ func TestProject_CalculateFinishedAt_MultiFormat(t *testing.T) {
 // intPtr returns a pointer to an int value
 func intPtr(i int) *int {
 	return &i
+}
+
+// timePtr returns a pointer to a time.Time value
+func timePtr(t time.Time) *time.Time {
+	return &t
 }

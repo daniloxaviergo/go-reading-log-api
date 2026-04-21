@@ -13,6 +13,27 @@ import (
 	"go-reading-log-api-next/internal/repository"
 )
 
+// parseLogDate attempts to parse a date string using multiple formats.
+// Supported formats:
+//   - RFC3339 (e.g., "2024-01-15T10:30:00Z")
+//   - Date only (e.g., "2024-01-15")
+//   - Standard datetime (e.g., "2024-01-15 10:30:00")
+func parseLogDate(dateStr string) (*time.Time, bool) {
+	formats := []string{
+		time.RFC3339,          // 2006-01-02T15:04:05Z
+		"2006-01-02",          // YYYY-MM-DD
+		"2006-01-02 15:04:05", // Standard datetime
+	}
+
+	for _, format := range formats {
+		if t, err := time.Parse(format, dateStr); err == nil {
+			return &t, true
+		}
+	}
+
+	return nil, false
+}
+
 // LogsHandler handles HTTP requests for logs endpoints
 type LogsHandler struct {
 	repo        repository.LogRepository
@@ -74,42 +95,67 @@ func (h *LogsHandler) Index(w http.ResponseWriter, r *http.Request) {
 		limit = len(logs)
 	}
 
-	// Convert to JSON:API data objects
+	// Build data objects for JSON:API response
 	dataObjects := make([]dto.JSONAPIData, limit)
+
 	for i := 0; i < limit; i++ {
-		// Format StartedAt as string
-		var startedAtStr *string
-		if project.StartedAt != nil {
-			formatted := project.StartedAt.Format(time.RFC3339)
-			startedAtStr = &formatted
+		// Parse the data string to time.Time for RFC3339 compliance
+		var dataTime *time.Time
+		if logs[i].Data != nil && *logs[i].Data != "" {
+			dataTime, _ = parseLogDate(*logs[i].Data)
 		}
 
 		logResponse := &dto.LogResponse{
 			ID:        logs[i].ID,
-			Data:      logs[i].Data,
+			Data:      dataTime,
 			StartPage: logs[i].StartPage,
 			EndPage:   logs[i].EndPage,
 			Note:      logs[i].Note,
-			Project: &dto.ProjectResponse{
-				ID:        project.ID,
-				Name:      project.Name,
-				TotalPage: project.TotalPage,
-				Page:      project.Page,
-				StartedAt: startedAtStr,
-				Status:    project.Status,
-				Progress:  project.Progress,
-			},
 		}
 
+		// Build JSONAPIData with relationships at the resource level (not in attributes)
 		dataObjects[i] = dto.JSONAPIData{
 			Type:       "logs",
 			ID:         strconv.FormatInt(logs[i].ID, 10), // ID as string per JSON:API spec
 			Attributes: logResponse,
+			Relationships: map[string]interface{}{
+				"project": map[string]string{
+					"id":   strconv.FormatInt(project.ID, 10),
+					"type": "projects",
+				},
+			},
 		}
 	}
 
-	// Wrap collection in envelope
-	envelope := dto.NewJSONAPIEnvelopeWithArray(dataObjects)
+	// Build included array with project data
+	included := []interface{}{}
+
+	if limit > 0 {
+		// Create project response for inclusion
+		// Convert time.Time pointers to string pointers for JSON serialization
+		startedAtStr := formatTimePtr(project.StartedAt)
+		finishedAtStr := formatTimePtr(project.FinishedAt)
+
+		projectResponse := &dto.ProjectResponse{
+			ID:         project.ID,
+			Name:       project.Name,
+			TotalPage:  project.TotalPage,
+			Page:       project.Page,
+			StartedAt:  startedAtStr,
+			Progress:   project.Progress,
+			Status:     project.Status,
+			LogsCount:  project.LogsCount,
+			DaysUnread: project.DaysUnread,
+			MedianDay:  project.MedianDay,
+			FinishedAt: finishedAtStr,
+		}
+
+		// Add project to included array
+		included = append(included, dto.NewIncludedProject(projectResponse))
+	}
+
+	// Wrap collection in envelope with included resources
+	envelope := dto.NewJSONAPIEnvelopeWithIncluded(dataObjects, included)
 
 	w.Header().Set("Content-Type", "application/vnd.api+json")
 	json.NewEncoder(w).Encode(envelope)

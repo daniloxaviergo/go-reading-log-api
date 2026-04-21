@@ -416,6 +416,120 @@ func contains(s, substr string) bool {
 	return strings.Contains(s, substr)
 }
 
+// ValidateJSONAPIStructure verifies the JSON:API response structure
+// Checks for required fields: data, relationships
+// Note: 'included' is optional in JSON:API spec, so we don't strictly require it
+func (ctx *IntegrationTestContext) ValidateJSONAPIStructure(t *testing.T, body string) {
+	t.Helper()
+
+	var envelope dto.JSONAPIEnvelope
+	if err := json.Unmarshal([]byte(body), &envelope); err != nil {
+		t.Fatalf("Failed to parse JSON:API envelope: %v", err)
+	}
+
+	// Check for 'data' field
+	if envelope.Data == nil {
+		t.Error("Response missing required field: data")
+	}
+
+	// If data is an array, check individual items for relationships
+	if dataArray, ok := envelope.Data.([]interface{}); ok && len(dataArray) > 0 {
+		for i, item := range dataArray {
+			if dataObj, ok := item.(map[string]interface{}); ok {
+				if rel, exists := dataObj["relationships"]; !exists || rel == nil {
+					t.Errorf("Item %d missing required field: relationships", i)
+				}
+			}
+		}
+	}
+}
+
+// VerifyRFC3339Date verifies that a date string is in RFC3339 format
+func (ctx *IntegrationTestContext) VerifyRFC3339Date(t *testing.T, dateStr string) {
+	t.Helper()
+
+	if dateStr == "" {
+		t.Error("Date string is empty")
+		return
+	}
+
+	// Try to parse using RFC3339 format
+	_, err := time.Parse(time.RFC3339, dateStr)
+	if err != nil {
+		t.Errorf("Date '%s' is not in RFC3339 format: %v", dateStr, err)
+	}
+}
+
+// VerifyRFC3339TimePtr verifies that a time.Time pointer is valid
+func (ctx *IntegrationTestContext) VerifyRFC3339TimePtr(t *testing.T, tPtr *time.Time) {
+	t.Helper()
+
+	if tPtr == nil {
+		t.Error("Time pointer is nil")
+		return
+	}
+
+	// Verify the time is not zero
+	if (*tPtr).IsZero() {
+		t.Error("Time is zero")
+		return
+	}
+
+	// Format back to string and verify it's valid RFC3339
+	formatted := (*tPtr).Format(time.RFC3339)
+	ctx.VerifyRFC3339Date(t, formatted)
+}
+
+// CalculatePayloadSize returns the byte size of a response body
+func (ctx *IntegrationTestContext) CalculatePayloadSize(t *testing.T, body string) int {
+	t.Helper()
+	return len(body)
+}
+
+// VerifyPayloadSizeLimit checks if payload size is within acceptable limits
+func (ctx *IntegrationTestContext) VerifyPayloadSizeLimit(t *testing.T, body string, maxSizeBytes int) {
+	t.Helper()
+
+	size := ctx.CalculatePayloadSize(t, body)
+	if size > maxSizeBytes {
+		t.Errorf("Payload size (%d bytes) exceeds limit (%d bytes)", size, maxSizeBytes)
+	}
+}
+
+// ExtractRelationships extracts relationship data from a JSON:API response
+func (ctx *IntegrationTestContext) ExtractRelationships(t *testing.T, body string) map[string]interface{} {
+	t.Helper()
+
+	var envelope dto.JSONAPIEnvelope
+	if err := json.Unmarshal([]byte(body), &envelope); err != nil {
+		t.Fatalf("Failed to parse JSON:API envelope: %v", err)
+	}
+
+	relationships := make(map[string]interface{})
+
+	if dataArray, ok := envelope.Data.([]interface{}); ok && len(dataArray) > 0 {
+		if dataObj, ok := dataArray[0].(map[string]interface{}); ok {
+			if rel, exists := dataObj["relationships"]; exists && rel != nil {
+				relationships = rel.(map[string]interface{})
+			}
+		}
+	}
+
+	return relationships
+}
+
+// ExtractIncludedResources extracts included resources from a JSON:API response
+func (ctx *IntegrationTestContext) ExtractIncludedResources(t *testing.T, body string) []interface{} {
+	t.Helper()
+
+	var envelope dto.JSONAPIEnvelope
+	if err := json.Unmarshal([]byte(body), &envelope); err != nil {
+		t.Fatalf("Failed to parse JSON:API envelope: %v", err)
+	}
+
+	return envelope.Included
+}
+
 // Helper to check if we're running against a test database
 func IsTestDatabase() bool {
 	return test.IsTestDatabase()

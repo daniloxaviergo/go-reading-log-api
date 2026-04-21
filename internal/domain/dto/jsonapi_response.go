@@ -6,17 +6,28 @@ import (
 )
 
 // JSONAPIEnvelope represents the JSON:API response envelope
-// Format: { "data": { "type": "...", "attributes": {...} } }
+// Format: { "data": { "type": "...", "attributes": {...} }, "included": [...] }
 // The data field can contain either a single JSONAPIData object or an array of them
 type JSONAPIEnvelope struct {
-	Data interface{} `json:"data"`
+	Data     interface{}   `json:"data"`
+	Included []interface{} `json:"included,omitempty"`
+}
+
+// JSONAPISingleResource represents a single JSON:API resource with included relationships
+type JSONAPISingleResource struct {
+	Type       string        `json:"type"`
+	Attributes interface{}   `json:"attributes"`
+	ID         interface{}   `json:"id,omitempty"`
+	Included   []interface{} `json:"included,omitempty"`
 }
 
 // JSONAPIData represents the data object within JSON:API envelope
+// Supports relationships at the resource level (sibling to attributes)
 type JSONAPIData struct {
-	Type       string      `json:"type"`
-	Attributes interface{} `json:"attributes"`
-	ID         interface{} `json:"id,omitempty"`
+	Type          string      `json:"type"`
+	Attributes    interface{} `json:"attributes"`
+	ID            interface{} `json:"id,omitempty"`
+	Relationships interface{} `json:"relationships,omitempty"`
 }
 
 // NewJSONAPIEnvelope creates a new JSON:API envelope with the given data
@@ -32,7 +43,12 @@ func NewJSONAPIEnvelopeWithArray(data []JSONAPIData) *JSONAPIEnvelope {
 	if data == nil {
 		data = []JSONAPIData{}
 	}
-	return &JSONAPIEnvelope{Data: data}
+	return &JSONAPIEnvelope{Data: data, Included: []interface{}{}}
+}
+
+// NewJSONAPIEnvelopeWithIncluded creates a new JSON:API envelope with included resources
+func NewJSONAPIEnvelopeWithIncluded(data interface{}, included []interface{}) *JSONAPIEnvelope {
+	return &JSONAPIEnvelope{Data: data, Included: included}
 }
 
 // ProjectJSONAPIResponse represents a JSON:API formatted project response
@@ -51,6 +67,15 @@ func NewProjectJSONAPIResponse(project *ProjectResponse) *ProjectJSONAPIResponse
 		ID:         strconv.FormatInt(project.ID, 10), // ID as string per JSON:API spec
 		Type:       "projects",
 		Attributes: project,
+	}
+}
+
+// NewIncludedProject creates an included project resource for JSON:API response
+func NewIncludedProject(project *ProjectResponse) map[string]interface{} {
+	return map[string]interface{}{
+		"type":       "projects",
+		"id":         strconv.FormatInt(project.ID, 10),
+		"attributes": project,
 	}
 }
 

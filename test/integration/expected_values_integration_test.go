@@ -32,6 +32,11 @@ func TestExpectedValues_Integration(t *testing.T) {
 	}
 	defer helper.Close()
 
+	// Setup test schema (create tables)
+	if err := helper.SetupTestSchema(); err != nil {
+		t.Fatalf("Failed to setup test schema: %v", err)
+	}
+
 	// Create a test project
 	ctx := context.Background()
 

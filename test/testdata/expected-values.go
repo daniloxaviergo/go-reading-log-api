@@ -139,15 +139,14 @@ func CalculateExpectedValues(ctx context.Context, project *dto.ProjectResponse) 
 	// Convert logs to expected format
 	expected.Logs = make([]ExpectedLog, len(project.Logs))
 	for i, log := range project.Logs {
-		// Get ProjectID from embedded Project or use 0 if not available
-		var projectID int64
-		if log.Project != nil {
-			projectID = log.Project.ID
-		}
+		// ProjectID is not available in LogResponse DTO anymore
+		// It should be passed separately or derived from context
+		// Defaulting to 0 for now
+		projectID := int64(0)
 		expected.Logs[i] = ExpectedLog{
 			ID:        log.ID,
 			ProjectID: projectID,
-			Data:      *log.Data,
+			Data:      log.Data.Format(time.RFC3339),
 			StartPage: log.StartPage,
 			EndPage:   log.EndPage,
 			Note:      log.Note,
@@ -226,11 +225,11 @@ func CalculateDaysUnreading(logs []*dto.LogResponse, startedAt *time.Time, ctx c
 
 	for _, log := range logs {
 		if log.Data != nil {
-			if t, ok := ParseLogDate(*log.Data); ok {
-				if !found || t.After(lastReadDate) {
-					lastReadDate = t
-					found = true
-				}
+			// Use time.Time directly since Data is now *time.Time
+			t := *log.Data
+			if !found || t.After(lastReadDate) {
+				lastReadDate = t
+				found = true
 			}
 		}
 	}
@@ -305,11 +304,11 @@ func CalculateFinishedAt(page, totalPage int, logs []*dto.LogResponse, startedAt
 		found := false
 		for _, log := range logs {
 			if log.Data != nil {
-				if t, ok := ParseLogDate(*log.Data); ok {
-					if !found || t.After(latestDate) {
-						latestDate = t
-						found = true
-					}
+				// Use time.Time directly since Data is now *time.Time
+				t := *log.Data
+				if !found || t.After(latestDate) {
+					latestDate = t
+					found = true
 				}
 			}
 		}

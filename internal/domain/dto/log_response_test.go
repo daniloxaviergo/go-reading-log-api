@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"testing"
+	"time"
 )
 
 // TestLogResponse tests the LogResponse DTO
 func TestLogResponse(t *testing.T) {
-	data := "2024-01-01T00:00:00Z"
+	data := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 	response := NewLogResponse(1, &data, 10, 20)
 
 	if response == nil {
@@ -19,8 +20,8 @@ func TestLogResponse(t *testing.T) {
 		t.Errorf("Expected ID 1, got %d", response.ID)
 	}
 
-	if *response.Data != "2024-01-01T00:00:00Z" {
-		t.Errorf("Expected data '2024-01-01T00:00:00Z', got '%s'", *response.Data)
+	if *response.Data != data {
+		t.Errorf("Expected data to match input time")
 	}
 
 	if response.StartPage != 10 {
@@ -48,7 +49,7 @@ func TestLogResponse(t *testing.T) {
 
 // TestLogResponse_JSON tests JSON serialization
 func TestLogResponse_JSON(t *testing.T) {
-	data := "2024-01-01T00:00:00Z"
+	data := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 	response := NewLogResponse(1, &data, 10, 20)
 	response.SetContext(context.Background())
 
@@ -56,6 +57,12 @@ func TestLogResponse_JSON(t *testing.T) {
 	jsonData, err := json.Marshal(response)
 	if err != nil {
 		t.Fatalf("Failed to marshal JSON: %v", err)
+	}
+
+	// Verify RFC3339 format in JSON
+	expectedDataStr := data.Format(time.RFC3339)
+	if !contains(string(jsonData), expectedDataStr) {
+		t.Errorf("Expected RFC3339 data '%s' in JSON: %s", expectedDataStr, string(jsonData))
 	}
 
 	// Test JSON unmarshaling
@@ -69,14 +76,16 @@ func TestLogResponse_JSON(t *testing.T) {
 		t.Errorf("Expected ID 1, got %d", decoded.ID)
 	}
 
-	if *decoded.Data != "2024-01-01T00:00:00Z" {
-		t.Errorf("Expected data '2024-01-01T00:00:00Z', got '%s'", *decoded.Data)
+	if decoded.Data == nil {
+		t.Error("Expected non-nil Data after unmarshaling")
+	} else if decoded.Data.Format(time.RFC3339) != expectedDataStr {
+		t.Errorf("Expected data '%s', got '%s'", expectedDataStr, decoded.Data.Format(time.RFC3339))
 	}
 }
 
 // TestLogResponse_WithNote tests the response with optional note
 func TestLogResponse_WithNote(t *testing.T) {
-	data := "2024-01-01T00:00:00Z"
+	data := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 	note := "This is a note"
 	response := &LogResponse{
 		ID:        1,
@@ -106,12 +115,46 @@ func TestLogResponse_EmptyContext(t *testing.T) {
 	}
 }
 
-// contains checks if s contains substr
-func contains(s, substr string) bool {
-	for i := 0; i <= len(s)-len(substr); i++ {
-		if s[i:i+len(substr)] == substr {
-			return true
+// TestLogResponse_AtributesStructure tests that attributes contain expected fields only
+func TestLogResponse_AtributesStructure(t *testing.T) {
+	data := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+	response := &LogResponse{
+		ID:        1,
+		Data:      &data,
+		StartPage: 10,
+		EndPage:   20,
+	}
+
+	jsonData, err := json.Marshal(response)
+	if err != nil {
+		t.Fatalf("Failed to marshal JSON: %v", err)
+	}
+
+	// Verify attributes contain expected fields
+	expectedFields := []string{"id", "data", "start_page", "end_page"}
+	for _, field := range expectedFields {
+		if !contains(string(jsonData), `"`+field+`"`) {
+			t.Errorf("Expected field '%s' in JSON attributes: %s", field, string(jsonData))
 		}
 	}
-	return false
+
+	// Verify relationships are NOT in attributes (they're at envelope level now)
+	if contains(string(jsonData), `"relationships"`) {
+		t.Errorf("Relationships should not be in attributes (should be at envelope level): %s", string(jsonData))
+	}
+}
+
+// indexof returns the index of substr in s, or -1 if not found
+func indexof(s, substr string) int {
+	for i := 0; i <= len(s)-len(substr); i++ {
+		if s[i:i+len(substr)] == substr {
+			return i
+		}
+	}
+	return -1
+}
+
+// contains checks if s contains substr
+func contains(s, substr string) bool {
+	return indexof(s, substr) >= 0
 }

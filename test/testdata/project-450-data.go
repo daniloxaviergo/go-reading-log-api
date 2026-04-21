@@ -87,14 +87,13 @@ var Project450ExpectedValues = ExpectedProject{
 func GetProject450Logs() []*dto.LogResponse {
 	logs := make([]*dto.LogResponse, len(Project450ExpectedLogs))
 	for i, el := range Project450ExpectedLogs {
+		dataTime, _ := time.Parse(time.RFC3339, el.Data)
 		logs[i] = &dto.LogResponse{
 			ID:        el.ID,
-			Data:      &el.Data,
+			Data:      &dataTime,
 			StartPage: el.StartPage,
 			EndPage:   el.EndPage,
 			Note:      el.Note,
-			// ProjectID is not directly accessible in dto.LogResponse
-			// It's accessed via the embedded Project field
 		}
 	}
 	return logs
