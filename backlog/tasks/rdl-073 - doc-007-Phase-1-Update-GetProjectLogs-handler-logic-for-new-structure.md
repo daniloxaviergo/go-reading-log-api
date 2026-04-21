@@ -28,7 +28,7 @@ Modify the internal/api/v1/handlers/logs_handler.go file to update the GetProjec
 <!-- AC:BEGIN -->
 - [x] #1 Handler returns valid JSON:API structure
 - [x] #2 Relationships populated correctly
-- [ ] #3 Included array contains project data
+- [x] #3 Included array contains project data
 <!-- AC:END -->
 
 ## Implementation Plan
