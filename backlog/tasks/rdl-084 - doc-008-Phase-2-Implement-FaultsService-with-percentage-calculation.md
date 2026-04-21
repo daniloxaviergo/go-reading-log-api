@@ -1,11 +1,11 @@
 ---
 id: RDL-084
 title: '[doc-008 Phase 2] Implement FaultsService with percentage calculation'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 22:21'
+updated_date: '2026-04-21 22:22'
 labels:
   - phase-2
   - service
