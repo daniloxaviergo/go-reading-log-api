@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 12:11'
-updated_date: '2026-04-21 13:05'
+updated_date: '2026-04-21 13:06'
 labels:
   - refactoring
   - backend
@@ -27,7 +27,7 @@ Modify the internal/api/v1/handlers/logs_handler.go file to update the GetProjec
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 Handler returns valid JSON:API structure
-- [ ] #2 Relationships populated correctly
+- [x] #2 Relationships populated correctly
 - [ ] #3 Included array contains project data
 <!-- AC:END -->
 
