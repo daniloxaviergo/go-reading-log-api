@@ -3,7 +3,7 @@ id: RDL-074
 title: '[doc-007 Phase 2] Implement JSON marshaling for relationships and string IDs'
 status: To Do
 assignee:
-  - workflow
+  - catarina
 created_date: '2026-04-21 12:11'
 updated_date: '2026-04-21 13:12'
 labels:
