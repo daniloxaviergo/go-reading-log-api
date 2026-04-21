@@ -3,7 +3,7 @@ id: RDL-075
 title: '[doc-007 Phase 3] Update integration tests for JSON:API schema compliance'
 status: To Do
 assignee:
-  - workflow
+  - catarina
 created_date: '2026-04-21 12:11'
 updated_date: '2026-04-21 13:31'
 labels:
