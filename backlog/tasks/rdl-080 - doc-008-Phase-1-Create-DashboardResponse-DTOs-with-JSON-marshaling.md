@@ -5,7 +5,7 @@ status: Done
 assignee:
   - thomas
 created_date: '2026-04-21 15:49'
-updated_date: '2026-04-21 17:50'
+updated_date: '2026-04-21 17:51'
 labels:
   - phase-1
   - dto
@@ -29,7 +29,7 @@ Implement internal/domain/dto/dashboard_response.go defining all response struct
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 All response DTOs defined with correct JSON tags
-- [ ] #2 EchartConfig supports ECharts-style configurations
+- [x] #2 EchartConfig supports ECharts-style configurations
 - [ ] #3 StatsData includes all required aggregate fields
 - [ ] #4 Validation methods implemented for each DTO
 <!-- AC:END -->
