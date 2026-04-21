@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-21 10:35'
-updated_date: '2026-04-21 11:43'
+updated_date: '2026-04-21 11:45'
 labels: []
 dependencies: []
 ---
@@ -57,7 +57,7 @@ This task is a **documentation-only** effort to compare and document differences
 | `internal/api/v1/handlers/logs_handler.go` | Go API logs implementation |
 | `rails-app/app/controllers/v1/logs_controller.rb` | Rails API logs implementation |
 | `docs/diff_show_project.md` | Existing project comparison (format reference) |
-| `docs/api-response-alignment.md` | General API alignment documentation |
+| `docs/endpoint-comparison-report-v1-projects.md` | Previous endpoint comparison (reference) |
 
 #### Files to Check for Context:
 | File | Purpose |
