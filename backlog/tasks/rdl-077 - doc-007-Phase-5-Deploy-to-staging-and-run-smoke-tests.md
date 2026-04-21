@@ -1,11 +1,11 @@
 ---
 id: RDL-077
 title: '[doc-007 Phase 5] Deploy to staging and run smoke tests'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-21 12:12'
-updated_date: '2026-04-21 14:31'
+updated_date: '2026-04-21 14:32'
 labels:
   - deployment
   - devops
