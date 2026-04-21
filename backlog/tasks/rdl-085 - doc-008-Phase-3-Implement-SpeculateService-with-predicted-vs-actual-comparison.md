@@ -5,9 +5,9 @@ title: >-
   comparison
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 23:39'
+updated_date: '2026-04-21 23:40'
 labels:
   - phase-3
   - service
