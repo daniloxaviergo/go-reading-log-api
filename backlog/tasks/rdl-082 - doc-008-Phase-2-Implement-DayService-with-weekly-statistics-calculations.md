@@ -32,7 +32,7 @@ Implement internal/service/dashboard/day_service.go calculating previous_week_pa
 - [x] #2 Last week page total calculated correctly
 - [x] #3 Per pages ratio computed with 3 decimal precision
 - [x] #4 Mean day by weekday calculated accurately
-- [ ] #5 Speculative mean derived from actual mean
+- [x] #5 Speculative mean derived from actual mean
 <!-- AC:END -->
 
 ## Implementation Plan
