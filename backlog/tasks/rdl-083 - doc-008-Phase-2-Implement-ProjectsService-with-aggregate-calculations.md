@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 21:23'
+updated_date: '2026-04-21 21:24'
 labels:
   - phase-2
   - service
@@ -245,6 +245,6 @@ projects, err := projectService.GetAll(r.Context())
 - [x] #6 HTTP status codes correct for response type
 - [x] #7 Documentation updated in QWEN.md
 - [x] #8 New code paths include error path tests
-- [ ] #9 HTTP handlers test both success and error responses
+- [x] #9 HTTP handlers test both success and error responses
 - [ ] #10 Integration tests verify actual database interactions
 <!-- DOD:END -->
