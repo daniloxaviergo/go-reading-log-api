@@ -28,7 +28,7 @@ Create the docs/api-changes/logs-endpoint-refinement.md file detailing the break
 <!-- AC:BEGIN -->
 - [x] #1 Changelog exists at correct path
 - [x] #2 Before/after examples included
-- [ ] #3 Client migration steps provided
+- [x] #3 Client migration steps provided
 <!-- AC:END -->
 
 ## Implementation Plan
