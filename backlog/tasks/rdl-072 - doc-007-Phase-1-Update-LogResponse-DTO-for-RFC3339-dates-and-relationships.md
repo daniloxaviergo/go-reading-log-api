@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 12:11'
-updated_date: '2026-04-21 12:25'
+updated_date: '2026-04-21 12:26'
 labels:
   - refactoring
   - backend
@@ -152,26 +152,38 @@ The PRD document (`backlog/docs/doc-007 - Logs-Endpoint-Alignment-PRD-RDL-071.md
 <!-- SECTION:NOTES:BEGIN -->
 ## Implementation Progress - RDL-072
 
-### Status: In Progress
+### Status: In Progress (Research Complete)
 
-I've reviewed the task and implementation plan. This is a refactoring task to update the `LogResponse` DTO for JSON:API compliance.
+I've reviewed the current codebase and understand the structure:
 
-### Initial Research Phase
+**Current State Analysis:**
+1. **LogResponse** (`internal/domain/dto/log_response.go`):
+   - `Data` field is `*string`
+   - Has embedded `Project *ProjectResponse`
+   - No `Relationships` struct
 
-**What I need to understand before implementing:**
-1. Current state of `internal/domain/dto/log_response.go`
-2. How relationships are structured in other parts of the codebase
-3. Current handler implementation in `logs_handler.go`
-4. Existing test patterns for this DTO
+2. **JSON:API Support** (`internal/domain/dto/jsonapi_response.go`):
+   - Already has `JSONAPIData`, `JSONAPIEnvelope` structures
+   - Uses string IDs for JSON:API compliance
 
-**Planned approach:**
-- Change `Data` field from `*string` to `*time.Time`
-- Add `Relationships` struct with project reference
+3. **Handler** (`internal/api/v1/handlers/logs_handler.go`):
+   - Currently embeds full `ProjectResponse` in each log
+   - Creates `JSONAPIData` with attributes containing the full log response
+
+**Refactoring Required:**
+- Change `LogResponse.Data` from `*string` to `*time.Time`
+- Add `Relationships` struct with `Project` reference (ID + Type only)
 - Remove embedded `Project` object from attributes
-- Update handlers and tests accordingly
+- Update handler to populate relationships properly
 
-### Next Steps
-I will now examine the current codebase structure to understand the existing implementation before making changes.
+### Implementation Plan:
+1. Update `log_response.go` - Change Data type, add Relationships struct
+2. Update `logs_handler.go` - Populate relationship data instead of embedding project
+3. Update unit tests in `log_response_test.go`
+4. Update integration tests in `logs_integration_test.go`
+5. Run tests and verify acceptance criteria
+
+Ready to begin implementation.
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
