@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 23:35'
+updated_date: '2026-04-21 23:36'
 labels:
   - phase-3
   - service
@@ -30,7 +30,7 @@ Implement internal/service/dashboard/speculate_service.go comparing actual vs pr
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Actual vs predicted comparison implemented
+- [x] #1 Actual vs predicted comparison implemented
 - [ ] #2 Speculative mean formula correct (actual * (1 + pct))
 - [ ] #3 Last 15 days data coverage including today
 - [ ] #4 Missing days zero-filled not omitted
