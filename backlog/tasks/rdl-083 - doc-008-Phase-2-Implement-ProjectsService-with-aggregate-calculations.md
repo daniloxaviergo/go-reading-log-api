@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 21:19'
+updated_date: '2026-04-21 21:20'
 labels:
   - phase-2
   - service
@@ -30,7 +30,7 @@ Implement internal/service/dashboard/projects_service.go querying all projects w
 <!-- AC:BEGIN -->
 - [x] #1 All projects retrieved with eager-loaded logs
 - [x] #2 Log ordering correct (first 4, date DESC)
-- [ ] #3 Progress aggregate calculated correctly
+- [x] #3 Progress aggregate calculated correctly
 - [ ] #4 Total pages and pages aggregates accurate
 - [ ] #5 Results ordered by progress descending
 <!-- AC:END -->
