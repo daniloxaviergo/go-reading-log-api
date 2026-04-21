@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 10:15'
-updated_date: '2026-04-21 10:22'
+updated_date: '2026-04-21 10:24'
 labels: []
 dependencies: []
 ---
@@ -171,6 +171,39 @@ After fix:
 
 This task fixes a **timezone conversion bug** where Go was extracting date parts from UTC time before applying the target timezone, causing date shifts. The fix ensures `time.Now()` is converted to the target timezone FIRST, matching Rails `Date.today` behavior exactly.
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - RDL-070
+
+### Analysis Complete
+Identified the root cause: timezone conversion bug in `project.go` where date calculations use UTC time instead of the application's configured timezone (BRT).
+
+**The Bug:**
+```go
+now := time.Now()  // Gets UTC time
+nowDate := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, tzLocation)
+```
+
+When UTC is `2026-04-21 02:00:00`, extracting date parts gives Year=2026, Month=4, Day=21. Then applying BRT (-3 hours) shifts the date to `2026-04-20`.
+
+**The Fix:**
+```go
+now := time.Now().In(tzLocation)  // Convert to target timezone first
+nowDate := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, tzLocation)
+```
+
+### Files to Modify
+1. `internal/domain/models/project.go` - Fix all three methods using `.In(tzLocation)`
+2. Add timezone middleware to set context timezone
+
+### Next Steps
+1. Create a timezone middleware to populate context with configured timezone
+2. Update project.go methods to use `.In(tzLocation)` before extracting date parts
+3. Write tests for timezone-aware calculations
+4. Run all tests to verify fix
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
