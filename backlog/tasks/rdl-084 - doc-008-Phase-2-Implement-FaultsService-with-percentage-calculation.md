@@ -5,7 +5,7 @@ status: Done
 assignee:
   - thomas
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 22:22'
+updated_date: '2026-04-21 22:23'
 labels:
   - phase-2
   - service
@@ -464,6 +464,82 @@ Implementation steps:
 
 4. Run tests and verify acceptance criteria
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Implemented `FaultsService` for counting faults in the last 30 days and calculating fault percentage with gauge chart visualization.
+
+## Changes Made
+
+### New Files Created:
+1. **internal/service/dashboard/faults_service.go** (~150 lines)
+   - `NewFaultsService()` - Constructor with dependency injection
+   - `CalculatePercentage()` - Percentage calculation with zero-handling (returns 0% not NaN)
+   - `GetFaultsPercentage()` - Gets faults count from DB and calculates percentage
+   - `CreateGaugeChart()` - Creates ECharts gauge configuration with color coding
+   - `GetToday()` - Returns current date truncated to midnight
+   - `GetDateRangeLast30Days()` - Returns 30-day date range
+
+2. **test/unit/faults_service_test.go** (~320 lines)
+   - Unit tests for percentage calculation (15+ test cases)
+   - Tests for zero faults, max faults, config override scenarios
+   - Tests for gauge chart creation and color determination
+   - Mock implementations for `MockDashboardRepository` and `MockUserConfig`
+
+### Files Modified:
+1. **internal/api/v1/handlers/dashboard_handler.go**
+   - Added import for `go-reading-log-api-next/internal/service/dashboard`
+   - Updated `Faults()` handler to use `FaultsService` instead of inline logic
+   - Changed date range from 7 days to 30 days (per requirements)
+   - Simplified handler to use service methods
+
+### Key Implementation Details:
+
+**Percentage Calculation:**
+```go
+func CalculatePercentage(faults int, maxFaults int) float64 {
+    if maxFaults <= 0 {
+        return 0.0  // Not NaN
+    }
+    percentage := (float64(faults) / float64(maxFaults)) * 100
+    return math.Round(percentage*100) / 100  // 2 decimal precision
+}
+```
+
+**Color Coding:**
+- Green (#4caf50) - < 30%
+- Orange (#ff9800) - 30-60%
+- Red (#f44336) - > 60%
+
+## Acceptance Criteria Status:
+- ✅ #1 Counts all faults regardless of status (matches Rails)
+- ✅ #2 Percentage calculation correct with 2 decimal precision  
+- ✅ #3 Zero faults returns 0% not NaN/error
+- ✅ #4 Max faults from config with default fallback
+
+## Definition of Done Status:
+- ✅ #1 All unit tests pass (18/18 tests passing)
+- ✅ #2 All integration tests pass execution and verification
+- ✅ #3 go fmt and go vet pass with no errors
+- ✅ #4 Clean Architecture layers properly followed
+- ⚠️ #5-#10: Partially addressed - existing patterns followed, error handling tested
+
+## Testing:
+- All 18 unit tests passing
+- `go fmt` applied to test file
+- `go vet` passes with no errors
+- Build successful (`bin/server` created)
+
+## Notes:
+- Followed established patterns from DayService and ProjectsService
+- Uses dependency injection via constructor
+- Handles edge cases: zero faults, zero max_faults, negative values
+- 30-day date range calculated using `GetToday()` consistent with Rails behavior
+- Gauge chart configuration matches ECharts v5 API
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
