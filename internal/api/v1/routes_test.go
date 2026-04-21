@@ -53,25 +53,25 @@ func TestSetupRoutes_Routes(t *testing.T) {
 	}
 
 	// Test projects endpoint
-	req = httptest.NewRequest(http.MethodGet, "/api/v1/projects", nil)
+	req = httptest.NewRequest(http.MethodGet, "/v1/projects.json", nil)
 	w = httptest.NewRecorder()
 	handler.ServeHTTP(w, req)
 	if w.Code != http.StatusOK {
-		t.Errorf("Expected 200 for /api/v1/projects, got %d", w.Code)
+		t.Errorf("Expected 200 for /v1/projects, got %d", w.Code)
 	}
 
 	// Test projects/{id} endpoint (will return 404 since no project exists)
-	req = httptest.NewRequest(http.MethodGet, "/api/v1/projects/1", nil)
+	req = httptest.NewRequest(http.MethodGet, "/v1/projects/1.json", nil)
 	w = httptest.NewRecorder()
 	handler.ServeHTTP(w, req)
 	// Expected 404 because mock repo returns not found
 
 	// Test logs endpoint
-	req = httptest.NewRequest(http.MethodGet, "/api/v1/projects/1/logs", nil)
+	req = httptest.NewRequest(http.MethodGet, "/v1/projects/1/logs.json", nil)
 	w = httptest.NewRecorder()
 	handler.ServeHTTP(w, req)
 	if w.Code != http.StatusOK {
-		t.Errorf("Expected 200 for /api/v1/projects/1/logs, got %d", w.Code)
+		t.Errorf("Expected 200 for /v1/projects/1/logs, got %d", w.Code)
 	}
 }
 

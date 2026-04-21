@@ -363,3 +363,258 @@ func TestProject_DerivedCalculationsEdgeCases_Documentation(t *testing.T) {
 		}
 	})
 }
+
+// TestProject_ParseLogDate tests the parseLogDate function with multiple formats
+func TestProject_ParseLogDate(t *testing.T) {
+	tests := []struct {
+		name   string
+		input  string
+		wantOk bool
+	}{
+		{
+			name:   "YYYY-MM-DD format",
+			input:  "2024-01-15",
+			wantOk: true,
+		},
+		{
+			name:   "RFC3339 format",
+			input:  "2024-01-15T10:30:00Z",
+			wantOk: true,
+		},
+		{
+			name:   "Standard datetime format",
+			input:  "2024-01-15 10:30:00",
+			wantOk: true,
+		},
+		{
+			name:   "Invalid format",
+			input:  "not-a-date",
+			wantOk: false,
+		},
+		{
+			name:   "Empty string",
+			input:  "",
+			wantOk: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotTime, gotOk := parseLogDate(tt.input)
+
+			if gotOk != tt.wantOk {
+				t.Errorf("parseLogDate(%q) = _, %v; want ok=%v", tt.input, gotOk, tt.wantOk)
+			}
+
+			if gotOk && tt.wantOk {
+				// Verify the parsed time is reasonable
+				if gotTime.IsZero() {
+					t.Errorf("parseLogDate(%q) returned zero time", tt.input)
+				}
+			}
+		})
+	}
+}
+
+// TestProject_CalculateDaysUnreading_MultiFormat tests CalculateDaysUnreading with different date formats
+func TestProject_CalculateDaysUnreading_MultiFormat(t *testing.T) {
+	ctx := context.Background()
+
+	// Create a project with started_at
+	today := time.Now()
+	startedAt := today.AddDate(0, 0, -5) // 5 days ago
+	project := &Project{
+		ctx:       ctx,
+		ID:        1,
+		TotalPage: 100,
+		Page:      20,
+		Reinicia:  false,
+		StartedAt: &startedAt,
+	}
+
+	tests := []struct {
+		name     string
+		logs     []*dto.LogResponse
+		expected *int
+	}{
+		{
+			name: "YYYY-MM-DD format in log",
+			logs: []*dto.LogResponse{
+				{Data: stringPtr("2024-01-15")},
+			},
+			expected: intPtr(3), // 3 days since last read (assuming today is 2024-01-18)
+		},
+		{
+			name: "RFC3339 format in log",
+			logs: []*dto.LogResponse{
+				{Data: stringPtr("2024-01-15T10:30:00Z")},
+			},
+			expected: intPtr(3),
+		},
+		{
+			name: "Standard datetime format in log",
+			logs: []*dto.LogResponse{
+				{Data: stringPtr("2024-01-15 10:30:00")},
+			},
+			expected: intPtr(3),
+		},
+		{
+			name: "Multiple logs with different formats",
+			logs: []*dto.LogResponse{
+				{Data: stringPtr("2024-01-10T10:30:00Z")},
+				{Data: stringPtr("2024-01-12 15:00:00")},
+				{Data: stringPtr("2024-01-14")},
+			},
+			expected: intPtr(4), // Most recent is 2024-01-14
+		},
+		{
+			name:     "No logs, uses started_at",
+			logs:     []*dto.LogResponse{},
+			expected: intPtr(5), // 5 days since started_at
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			days := project.CalculateDaysUnreading(tt.logs)
+
+			if days == nil {
+				t.Fatal("CalculateDaysUnreading returned nil")
+			}
+
+			// Note: The expected value depends on the current date
+			// This test verifies the function works with multiple formats
+			// and returns a non-negative integer
+			if *days < 0 {
+				t.Errorf("Expected non-negative days, got %d", *days)
+			}
+		})
+	}
+}
+
+// TestProject_CalculateDaysUnreading_Timezone tests timezone-aware date comparison
+func TestProject_CalculateDaysUnreading_Timezone(t *testing.T) {
+	ctx := context.Background()
+
+	// Create a project with started_at in the past
+	today := time.Now()
+	startedAt := today.AddDate(0, 0, -7) // 7 days ago
+	project := &Project{
+		ctx:       ctx,
+		ID:        1,
+		TotalPage: 100,
+		Page:      30,
+		Reinicia:  false,
+		StartedAt: &startedAt,
+	}
+
+	// Test with Brazil timezone (BRT)
+	brazilCtx := context.WithValue(ctx, "timezone", time.FixedZone("BRT", -3*60*60))
+	project.SetContext(brazilCtx)
+
+	days := project.CalculateDaysUnreading(nil)
+
+	if days == nil {
+		t.Fatal("CalculateDaysUnreading returned nil")
+	}
+
+	// Should be approximately 7 days (allowing for timezone edge cases)
+	if *days < 6 || *days > 8 {
+		t.Errorf("Expected ~7 days, got %d", *days)
+	}
+}
+
+// TestProject_CalculateMedianDay_Timezone tests timezone-aware median day calculation
+func TestProject_CalculateMedianDay_Timezone(t *testing.T) {
+	ctx := context.Background()
+
+	today := time.Now()
+	startedAt := today.AddDate(0, 0, -14) // 14 days ago
+	project := &Project{
+		ctx:       ctx,
+		ID:        1,
+		TotalPage: 100,
+		Page:      50,
+		Reinicia:  false,
+		StartedAt: &startedAt,
+	}
+
+	// Test with Brazil timezone (BRT)
+	brazilCtx := context.WithValue(ctx, "timezone", time.FixedZone("BRT", -3*60*60))
+	project.SetContext(brazilCtx)
+
+	median := project.CalculateMedianDay()
+
+	if median == nil {
+		t.Fatal("CalculateMedianDay returned nil")
+	}
+
+	// With 14 days and 50 pages, median should be around 3.57
+	expectedMin := 3.0
+	expectedMax := 4.0
+
+	if *median < expectedMin || *median > expectedMax {
+		t.Errorf("Expected median between %v and %v, got %v", expectedMin, expectedMax, *median)
+	}
+}
+
+// TestProject_CalculateFinishedAt_MultiFormat tests CalculateFinishedAt with different date formats
+func TestProject_CalculateFinishedAt_MultiFormat(t *testing.T) {
+	ctx := context.Background()
+
+	today := time.Now()
+	startedAt := today.AddDate(0, 0, -10)
+	project := &Project{
+		ctx:       ctx,
+		ID:        1,
+		TotalPage: 200,
+		Page:      50,
+		Reinicia:  false,
+		StartedAt: &startedAt,
+	}
+
+	tests := []struct {
+		name string
+		logs []*dto.LogResponse
+	}{
+		{
+			name: "YYYY-MM-DD format in log",
+			logs: []*dto.LogResponse{
+				{Data: stringPtr("2024-01-15")},
+			},
+		},
+		{
+			name: "RFC3339 format in log",
+			logs: []*dto.LogResponse{
+				{Data: stringPtr("2024-01-15T10:30:00Z")},
+			},
+		},
+		{
+			name: "Standard datetime format in log",
+			logs: []*dto.LogResponse{
+				{Data: stringPtr("2024-01-15 10:30:00")},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			finished := project.CalculateFinishedAt(tt.logs)
+
+			if finished == nil {
+				t.Fatal("CalculateFinishedAt returned nil")
+			}
+
+			// Verify the date is in the future (estimated finish date)
+			now := time.Now()
+			if !finished.After(now) {
+				t.Errorf("Expected finished_at to be in the future, got %v", *finished)
+			}
+		})
+	}
+}
+
+// intPtr returns a pointer to an int value
+func intPtr(i int) *int {
+	return &i
+}

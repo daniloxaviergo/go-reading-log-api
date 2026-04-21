@@ -162,24 +162,373 @@ make docker-stop-pg
 
 ## API Endpoints
 
-The API is versioned under `/api/v1/`:
+The API uses version `/v1/` prefix (not `/api/v1/`). All endpoints return JSON responses.
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/healthz` | GET | Health check endpoint |
-| `/api/v1/projects` | GET | List all projects with calculated fields |
-| `/api/v1/projects/:id` | GET | Get project by ID with calculated fields |
-| `/api/v1/projects/:project_id/logs` | GET | Get logs for a project |
+### Base URL
+```
+http://localhost:3000
+```
 
-**Calculated Fields:** The API includes several derived calculations that are computed in real-time:
-- `progress`: Percentage of book completed (page / total_page * 100)
-- `status`: Project status (unstarted, finished, running, sleeping, stopped)
-- `days_unread`: Number of days since last reading activity
-- `logs_count`: Number of log entries (len(logs))
-- `median_day`: Pages per day calculation (page / days_reading.round(2))
-- `finished_at`: Estimated completion date (computed from median_day)
+### Route Prefix
+All API routes use `/v1/` prefix (note: not `/api/v1/`).
 
-**Note:** Phase 1 only implements read-only endpoints (GET). POST/PUT/DELETE operations for logs will be added in Phase 2.
+---
+
+## Endpoints
+
+### Health Check
+
+| Property | Value |
+|----------|-------|
+| **Method** | GET |
+| **Path** | `/healthz` |
+| **Description** | Returns health status of the API service |
+| **Authentication** | None |
+| **Response Code** | 200 OK |
+
+**Request:**
+```bash
+curl http://localhost:3000/healthz
+```
+
+**Response (200 OK):**
+```json
+{
+  "status": "healthy",
+  "message": "API is running"
+}
+```
+
+---
+
+### Projects Endpoints
+
+#### List All Projects
+
+| Property | Value |
+|----------|-------|
+| **Method** | GET |
+| **Path** | `/v1/projects.json` |
+| **Description** | Returns all projects with eager-loaded logs (first 4) and calculated fields |
+| **Authentication** | None |
+| **Response Code** | 200 OK |
+
+**Request:**
+```bash
+curl http://localhost:3000/v1/projects.json
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "name": "Project Name",
+    "total_page": 200,
+    "page": 50,
+    "started_at": "2024-01-15T10:30:00Z",
+    "progress": 25.0,
+    "status": "running",
+    "logs_count": 4,
+    "days_unreading": 5,
+    "median_day": 10.0,
+    "finished_at": "2024-02-15T00:00:00Z",
+    "logs": [
+      {
+        "id": 1,
+        "data": "2024-01-15T10:30:00",
+        "start_page": 0,
+        "end_page": 25,
+        "note": "Morning reading",
+        "project": {
+          "id": 1,
+          "name": "Project Name",
+          "total_page": 200,
+          "page": 50
+        }
+      }
+    ]
+  }
+]
+```
+
+#### Get Project by ID
+
+| Property | Value |
+|----------|-------|
+| **Method** | GET |
+| **Path** | `/v1/projects/{id}.json` |
+| **Description** | Returns a single project by ID with eager-loaded logs and calculated fields |
+| **Authentication** | None |
+| **Response Code** | 200 OK, 404 Not Found |
+
+**Request:**
+```bash
+curl http://localhost:3000/v1/projects/1.json
+```
+
+**Response (200 OK):**
+```json
+{
+  "id": 1,
+  "name": "Project Name",
+  "total_page": 200,
+  "page": 50,
+  "started_at": "2024-01-15T10:30:00Z",
+  "progress": 25.0,
+  "status": "running",
+  "logs_count": 4,
+  "days_unreading": 5,
+  "median_day": 10.0,
+  "finished_at": "2024-02-15T00:00:00Z",
+  "logs": [
+    {
+      "id": 1,
+      "data": "2024-01-15T10:30:00",
+      "start_page": 0,
+      "end_page": 25,
+      "note": "Morning reading"
+    }
+  ]
+}
+```
+
+**Error Response (404 Not Found):**
+```json
+{
+  "error": "project not found"
+}
+```
+
+#### Create Project
+
+| Property | Value |
+|----------|-------|
+| **Method** | POST |
+| **Path** | `/v1/projects.json` |
+| **Description** | Creates a new reading project |
+| **Authentication** | None |
+| **Response Code** | 201 Created, 400 Bad Request |
+
+**Request:**
+```bash
+curl -X POST http://localhost:3000/v1/projects.json \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "My Reading Project",
+    "total_page": 200,
+    "page": 0,
+    "started_at": "2024-01-15T10:30:00Z",
+    "reinicia": false
+  }'
+```
+
+**Request Body Schema:**
+```json
+{
+  "name": "string (required, max 255)",
+  "total_page": "integer (required, must be > 0)",
+  "page": "integer (required, must be <= total_page)",
+  "started_at": "string (optional, RFC3339 format)",
+  "reinicia": "boolean (optional, default: false)"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": 1,
+  "name": "My Reading Project",
+  "total_page": 200,
+  "page": 0,
+  "started_at": "2024-01-15T10:30:00Z"
+}
+```
+
+**Error Response (400 Bad Request) - Validation Failed:**
+```json
+{
+  "error": "validation failed",
+  "details": {
+    "page": "page (100) cannot exceed total_page (50)",
+    "total_page": "total_page (0) must be greater than 0"
+  }
+}
+```
+
+**Error Response (400 Bad Request) - Invalid Date:**
+```json
+{
+  "error": "invalid date format",
+  "details": {
+    "started_at": "must be in RFC3339 format"
+  }
+}
+```
+
+---
+
+### Logs Endpoints
+
+#### List Logs for Project
+
+| Property | Value |
+|----------|-------|
+| **Method** | GET |
+| **Path** | `/v1/projects/{project_id}/logs.json` |
+| **Description** | Returns first 4 logs for a project, ordered by date DESC |
+| **Authentication** | None |
+| **Response Code** | 200 OK, 404 Not Found |
+
+**Request:**
+```bash
+curl http://localhost:3000/v1/projects/1/logs.json
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "data": "2024-01-15T10:30:00",
+    "start_page": 0,
+    "end_page": 25,
+    "note": "Morning reading",
+    "project": {
+      "id": 1,
+      "name": "Project Name",
+      "total_page": 200,
+      "page": 50,
+      "started_at": "2024-01-15T10:30:00Z",
+      "status": "running",
+      "progress": 25.0
+    }
+  },
+  {
+    "id": 2,
+    "data": "2024-01-14T09:00:00",
+    "start_page": 25,
+    "end_page": 50,
+    "note": "Evening reading",
+    "project": {
+      "id": 1,
+      "name": "Project Name",
+      "total_page": 200,
+      "page": 50,
+      "started_at": "2024-01-15T10:30:00Z",
+      "status": "running",
+      "progress": 25.0
+    }
+  }
+]
+```
+
+**Error Response (404 Not Found):**
+```json
+{
+  "error": "project not found"
+}
+```
+
+---
+
+## Calculated Fields
+
+The API computes several derived fields for each project:
+
+| Field | Type | Description | Formula |
+|-------|------|-------------|---------|
+| `progress` | float | Percentage of book completed | `(page / total_page) * 100` |
+| `status` | string | Project status | Determined by page/total_page and started_at |
+| `logs_count` | int | Number of log entries | `len(logs)` |
+| `days_unreading` | int | Days since last reading activity | Calculated from logs data |
+| `median_day` | float | Pages per day (rounded to 2 decimals) | `round(page / days_reading, 2)` |
+| `finished_at` | datetime | Estimated completion date | Based on median_day calculation |
+
+### Status Values
+
+The `status` field can have one of these values:
+- `unstarted` - Project not yet started
+- `running` - Currently reading
+- `sleeping` - Paused reading
+- `stopped` - Stopped reading
+- `finished` - Completed the book
+
+---
+
+## Error Handling
+
+All error responses follow this format:
+
+```json
+{
+  "error": "error_type_or_message",
+  "details": {
+    "field_name": "human-readable error description"
+  }
+}
+```
+
+### HTTP Status Codes
+
+| Code | Description |
+|------|-------------|
+| 200 | Success |
+| 201 | Created (POST) |
+| 400 | Bad Request - validation errors or invalid data |
+| 404 | Not Found - resource doesn't exist |
+| 500 | Internal Server Error |
+
+### Validation Error Types
+
+| Code | Field | Description |
+|------|-------|-------------|
+| `page_invalid` | page | Page number is negative |
+| `page_exceeds_total` | page | Page exceeds total_page |
+| `total_page_invalid` | total_page | Total page is zero or negative |
+| `invalid_status` | status | Status is not one of the valid values |
+| `start_page_exceeds_end` | start_page | Start page exceeds end page |
+
+---
+
+## Phase 1 Limitations
+
+The current implementation (Phase 1) provides **read-only** access to logs:
+
+- ✅ GET `/v1/projects.json` - List projects
+- ✅ GET `/v1/projects/{id}.json` - Get project details
+- ✅ POST `/v1/projects.json` - Create projects
+- ✅ GET `/v1/projects/{project_id}/logs.json` - List logs
+
+**Not implemented (Phase 2):**
+- ❌ POST `/v1/projects/{project_id}/logs.json` - Create log
+- ❌ PUT `/v1/logs/{id}.json` - Update log
+- ❌ DELETE `/v1/logs/{id}.json` - Delete log
+
+---
+
+## Quick Reference
+
+### Complete curl Examples
+
+```bash
+# Health check
+curl http://localhost:3000/healthz
+
+# List all projects
+curl http://localhost:3000/v1/projects.json
+
+# Get project by ID
+curl http://localhost:3000/v1/projects/1.json
+
+# Create a new project
+curl -X POST http://localhost:3000/v1/projects.json \
+  -H "Content-Type: application/json" \
+  -d '{"name":"My Book","total_page":300,"page":0}'
+
+# Get logs for a project
+curl http://localhost:3000/v1/projects/1/logs.json
+```
 
 ## Environment Variables
 
@@ -462,6 +811,83 @@ Context is embedded in domain models for timeout and cancellation propagation.
 
 1. Create middleware function in `internal/api/v1/middleware/`
 2. Add to middleware chain in `cmd/server.go`
+
+### Cleanup Procedures
+
+#### Auto-cleanup mechanism
+The integration test helper automatically cleans up test databases after each test run using `TestHelper.Close()`. This ensures no leftover data affects subsequent tests. The cleanup process includes:
+- Dropping the current test database (e.g., `reading_log_test_12345_67890_123456789`)
+- Cleaning up orphaned test databases from previous test runs by dropping all databases matching the pattern `reading_log_test_%`
+
+Example usage in integration tests:
+```go
+helper, err := test.SetupTestDB()
+if err != nil {
+    t.Fatal(err)
+}
+defer helper.Close()
+
+// Test cases here
+```
+
+#### Server Log Management
+
+When using `make run`, server output is written to `server.log`. To prevent excessive log growth:
+- Run `rm server.log` to manually clear the log
+- Add a `clean-log` target to your Makefile for convenience:
+  ```makefile
+clean-log:
+	rm -f server.log
+  ```
+
+#### Database naming conventions
+All test databases follow a unique naming convention to ensure parallel test safety:
+
+- Format: `reading_log_test_<pid>_<goroutine_id>_<timestamp>`
+- Example: `reading_log_test_12345_67890_1620000000`
+- The name includes:
+  - Process ID (`os.Getpid()`)
+  - Goroutine ID (extracted from stack trace)
+  - Current timestamp in UnixNano format
+
+This ensures each test runs in its own isolated database, preventing conflicts during parallel execution.
+
+#### SQL cleanup patterns
+The following SQL commands are used for database cleanup:
+
+1. **Drop orphaned test databases**:
+   ```sql
+   SELECT datname FROM pg_database WHERE datname LIKE 'reading_log_test_%' AND datname != 'current_test_db';
+   DROP DATABASE IF EXISTS <database_name>;
+   ```
+
+2. **Reset entire test database** (used in `make test-clean`):
+   ```sql
+   DROP DATABASE IF EXISTS reading_log_test;
+   CREATE DATABASE reading_log_test;
+   ```
+
+3. **Clean specific tables within a database**:
+   ```sql
+   TRUNCATE TABLE logs CASCADE;
+   TRUNCATE TABLE projects CASCADE;
+   ```
+
+⚠️ **WARNING:** Never run manual cleanup commands on production databases (`reading_log`). Always verify you're using the `reading_log_test` database.
+
+#### Rationale for per-test database strategy
+- **Isolation**: Each test runs in its own database, preventing side effects between tests.
+- **Parallel execution**: Unique database names allow multiple tests to run simultaneously without interference.
+- **Simplicity**: Dropping entire databases is safer than schema resets which could accidentally affect other environments.
+- **Consistency**: Ensures a clean state for every test run, regardless of previous failures.
+
+#### Troubleshooting steps
+- **Test database conflicts**: If tests fail due to existing databases, manually drop all `reading_log_test_%` databases:
+  ```bash
+  psql -c "SELECT datname FROM pg_database WHERE datname LIKE 'reading_log_test_%';" | grep reading_log_test | xargs -I {} psql -c "DROP DATABASE IF EXISTS {};"
+  ```
+- **Slow cleanup**: If cleanup takes too long, ensure no other processes are using the test databases. Use `pg_terminate_backend` to kill lingering connections.
+- **Permission issues**: Verify the database user has sufficient privileges to drop databases.
 
 ## Troubleshooting
 

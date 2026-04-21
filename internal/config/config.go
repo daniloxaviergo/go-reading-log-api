@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -29,6 +30,11 @@ type Config struct {
 	// Note: Rails uses 8 and 16 days respectively, task specification requires 7 and 14
 	EmAndamentoRange int
 	DormindoRange    int
+
+	// Timezone Configuration
+	// TZLocation holds the parsed time.Location for date calculations
+	// Defaults to Brazil timezone (BRT) if not configured
+	TZLocation *time.Location
 }
 
 // LoadConfig loads configuration from .env file and environment variables.
@@ -38,6 +44,9 @@ type Config struct {
 func LoadConfig() *Config {
 	// Load .env file if it exists (non-blocking)
 	_ = godotenv.Load()
+
+	// Parse timezone configuration
+	tzLocation := parseTZLocation(getEnv("TZ_LOCATION", ""))
 
 	return &Config{
 		// Database Configuration with defaults
@@ -60,7 +69,28 @@ func LoadConfig() *Config {
 		// dormindo_range = 14 days (Rails uses 16)
 		EmAndamentoRange: getEnvAsInt("EM_ANDAMENTO_RANGE", 7),
 		DormindoRange:    getEnvAsInt("DORMINDO_RANGE", 14),
+
+		// Timezone Configuration
+		TZLocation: tzLocation,
 	}
+}
+
+// parseTZLocation parses timezone string and returns time.Location.
+// Falls back to Brazil timezone (BRT) if parsing fails.
+func parseTZLocation(tzStr string) *time.Location {
+	if tzStr == "" {
+		// Default to Brazil timezone (BRT) matching Rails behavior
+		return time.FixedZone("BRT", -3*60*60)
+	}
+
+	loc, err := time.LoadLocation(tzStr)
+	if err != nil {
+		// Fallback to BRT on error
+		fmt.Fprintf(os.Stderr, "Warning: Failed to load timezone '%s', using BRT fallback: %v\n", tzStr, err)
+		return time.FixedZone("BRT", -3*60*60)
+	}
+
+	return loc
 }
 
 // getEnv retrieves an environment variable or returns the default value.

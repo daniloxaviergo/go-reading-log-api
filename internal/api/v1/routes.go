@@ -21,12 +21,12 @@ func SetupRoutes(repo repository.ProjectRepository, logRepo repository.LogReposi
 	r.HandleFunc("/healthz", healthHandler.Healthz).Methods("GET")
 
 	// Projects endpoints
-	r.HandleFunc("/api/v1/projects", projectsHandler.Index).Methods("GET")
-	r.HandleFunc("/api/v1/projects", projectsHandler.Create).Methods("POST")
-	r.HandleFunc("/api/v1/projects/{id}", projectsHandler.Show).Methods("GET")
+	r.HandleFunc("/v1/projects.json", projectsHandler.Index).Methods("GET")
+	r.HandleFunc("/v1/projects.json", projectsHandler.Create).Methods("POST")
+	r.HandleFunc("/v1/projects/{id}.json", projectsHandler.Show).Methods("GET")
 
 	// Logs endpoints
-	r.HandleFunc("/api/v1/projects/{project_id}/logs", logsHandler.Index).Methods("GET")
+	r.HandleFunc("/v1/projects/{project_id}/logs.json", logsHandler.Index).Methods("GET")
 	// Phase 1: Read-only - logs creation will be added in Phase 2
 
 	return r

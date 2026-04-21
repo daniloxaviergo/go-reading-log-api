@@ -65,11 +65,12 @@ func main() {
 	// Setup routes with repositories
 	router := api.SetupRoutes(projectRepo, logRepo)
 
-	// Create middleware chain: Recovery -> CORS -> RequestID -> Logging -> Handler
+	// Create middleware chain: Recovery -> CORS -> RequestID -> Timezone -> Logging -> Handler
 	middlewareChain := middleware.Chain(router,
 		middleware.RecoveryMiddleware,
 		middleware.CORSMiddleware,
 		middleware.RequestIDMiddleware,
+		middleware.TimezoneMiddleware(cfg),
 		middleware.LoggingMiddleware,
 	)
 

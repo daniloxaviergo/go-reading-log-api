@@ -6,11 +6,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"go-reading-log-api-next/internal/domain/dto"
 )
 
-// TestProjectsCreateIntegration tests the POST /api/v1/projects endpoint
+// TestProjectsCreateIntegration tests the POST /v1/projects endpoint
 func TestProjectsCreateIntegration(t *testing.T) {
 	if !IsTestDatabase() {
 		t.Skip("Test database not configured - skipping integration test")
@@ -31,7 +29,7 @@ func TestProjectsCreateIntegration(t *testing.T) {
 		t.Fatalf("Failed to marshal request body: %v", err)
 	}
 
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+	req := httptest.NewRequest(http.MethodPost, "/v1/projects.json", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 	recorder := ctx.MakeRequest(t, req)
 
@@ -42,10 +40,7 @@ func TestProjectsCreateIntegration(t *testing.T) {
 	}
 
 	// Parse and verify response
-	var response dto.ProjectResponse
-	if err := json.Unmarshal(recorder.Body.Bytes(), &response); err != nil {
-		t.Fatalf("Failed to parse response: %v", err)
-	}
+	response := ctx.ParseProjectResponse(t, recorder.Body.String())
 
 	// Verify response fields
 	if response.Name != "Integration Test Project" {
@@ -128,7 +123,7 @@ func TestProjectsCreateValidationErrors(t *testing.T) {
 				t.Fatalf("Failed to marshal request body: %v", err)
 			}
 
-			req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+			req := httptest.NewRequest(http.MethodPost, "/v1/projects.json", bytes.NewBuffer(body))
 			req.Header.Set("Content-Type", "application/json")
 			recorder := ctx.MakeRequest(t, req)
 
@@ -189,7 +184,7 @@ func TestProjectsCreateWithStartedAt(t *testing.T) {
 		t.Fatalf("Failed to marshal request body: %v", err)
 	}
 
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+	req := httptest.NewRequest(http.MethodPost, "/v1/projects.json", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 	recorder := ctx.MakeRequest(t, req)
 
@@ -198,10 +193,7 @@ func TestProjectsCreateWithStartedAt(t *testing.T) {
 		t.Errorf("Response body: %s", recorder.Body.String())
 	}
 
-	var response dto.ProjectResponse
-	if err := json.Unmarshal(recorder.Body.Bytes(), &response); err != nil {
-		t.Fatalf("Failed to parse response: %v", err)
-	}
+	response := ctx.ParseProjectResponse(t, recorder.Body.String())
 
 	if response.Name != "Project with Date" {
 		t.Errorf("Expected name 'Project with Date', got '%s'", response.Name)
@@ -235,7 +227,7 @@ func TestProjectsCreateInvalidDate(t *testing.T) {
 		t.Fatalf("Failed to marshal request body: %v", err)
 	}
 
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+	req := httptest.NewRequest(http.MethodPost, "/v1/projects.json", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 	recorder := ctx.MakeRequest(t, req)
 
@@ -274,7 +266,7 @@ func TestProjectsCreateWithReinicia(t *testing.T) {
 		t.Fatalf("Failed to marshal request body: %v", err)
 	}
 
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+	req := httptest.NewRequest(http.MethodPost, "/v1/projects.json", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 	recorder := ctx.MakeRequest(t, req)
 
@@ -283,10 +275,7 @@ func TestProjectsCreateWithReinicia(t *testing.T) {
 		t.Errorf("Response body: %s", recorder.Body.String())
 	}
 
-	var response dto.ProjectResponse
-	if err := json.Unmarshal(recorder.Body.Bytes(), &response); err != nil {
-		t.Fatalf("Failed to parse response: %v", err)
-	}
+	response := ctx.ParseProjectResponse(t, recorder.Body.String())
 
 	// Reinicia is not included in ProjectResponse - just verify other fields
 	if response.Name != "Project with Reinicia" {
@@ -305,7 +294,7 @@ func TestProjectsCreateInvalidJSON(t *testing.T) {
 
 	invalidBody := []byte(`{invalid json`)
 
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(invalidBody))
+	req := httptest.NewRequest(http.MethodPost, "/v1/projects.json", bytes.NewBuffer(invalidBody))
 	req.Header.Set("Content-Type", "application/json")
 	recorder := ctx.MakeRequest(t, req)
 
@@ -333,7 +322,7 @@ func TestProjectsCreateEmptyBody(t *testing.T) {
 	ctx := Setup(t)
 	defer ctx.Teardown(t)
 
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", nil)
+	req := httptest.NewRequest(http.MethodPost, "/v1/projects.json", nil)
 	req.Header.Set("Content-Type", "application/json")
 	recorder := ctx.MakeRequest(t, req)
 
@@ -372,7 +361,7 @@ func TestProjectsCreateRetrieve(t *testing.T) {
 		t.Fatalf("Failed to marshal request body: %v", err)
 	}
 
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+	req := httptest.NewRequest(http.MethodPost, "/v1/projects.json", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 	recorder := ctx.MakeRequest(t, req)
 
@@ -381,13 +370,10 @@ func TestProjectsCreateRetrieve(t *testing.T) {
 		t.Errorf("Response body: %s", recorder.Body.String())
 	}
 
-	var created dto.ProjectResponse
-	if err := json.Unmarshal(recorder.Body.Bytes(), &created); err != nil {
-		t.Fatalf("Failed to parse creation response: %v", err)
-	}
+	created := ctx.ParseProjectResponse(t, recorder.Body.String())
 
 	// Retrieve the created project
-	getReq := httptest.NewRequest(http.MethodGet, "/api/v1/projects/"+string(rune('0'+created.ID)), nil)
+	getReq := httptest.NewRequest(http.MethodGet, "/v1/projects/"+string(rune('0'+created.ID))+".json", nil)
 	getRecorder := ctx.MakeRequest(t, getReq)
 
 	if getRecorder.Code != http.StatusOK {
@@ -395,10 +381,7 @@ func TestProjectsCreateRetrieve(t *testing.T) {
 		t.Errorf("Response body: %s", getRecorder.Body.String())
 	}
 
-	var retrieved dto.ProjectResponse
-	if err := json.Unmarshal(getRecorder.Body.Bytes(), &retrieved); err != nil {
-		t.Fatalf("Failed to parse GET response: %v", err)
-	}
+	retrieved := ctx.ParseProjectResponse(t, getRecorder.Body.String())
 
 	if retrieved.ID != created.ID {
 		t.Errorf("Expected retrieved project ID %d, got %d", created.ID, retrieved.ID)
@@ -438,7 +421,7 @@ func TestProjectsCreateMultiple(t *testing.T) {
 			t.Fatalf("Failed to marshal request body: %v", err)
 		}
 
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+		req := httptest.NewRequest(http.MethodPost, "/v1/projects.json", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		recorder := ctx.MakeRequest(t, req)
 
@@ -447,10 +430,7 @@ func TestProjectsCreateMultiple(t *testing.T) {
 			t.Errorf("Response body: %s", recorder.Body.String())
 		}
 
-		var response dto.ProjectResponse
-		if err := json.Unmarshal(recorder.Body.Bytes(), &response); err != nil {
-			t.Fatalf("Failed to parse response %d: %v", i, err)
-		}
+		response := ctx.ParseProjectResponse(t, recorder.Body.String())
 
 		if response.ID == 0 {
 			t.Errorf("Expected non-zero project ID for project %d", i)
@@ -460,7 +440,7 @@ func TestProjectsCreateMultiple(t *testing.T) {
 	}
 
 	// Verify all projects can be listed
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/projects", nil)
+	req := httptest.NewRequest(http.MethodGet, "/v1/projects.json", nil)
 	recorder := ctx.MakeRequest(t, req)
 
 	if recorder.Code != http.StatusOK {
@@ -468,10 +448,7 @@ func TestProjectsCreateMultiple(t *testing.T) {
 		t.Errorf("Response body: %s", recorder.Body.String())
 	}
 
-	var response []*dto.ProjectResponse
-	if err := json.Unmarshal(recorder.Body.Bytes(), &response); err != nil {
-		t.Fatalf("Failed to parse response: %v", err)
-	}
+	response := ctx.ParseProjectResponseArray(t, recorder.Body.String())
 
 	if len(response) != 3 {
 		t.Errorf("Expected 3 projects, got %d", len(response))
@@ -516,7 +493,7 @@ func TestProjectsCreateConcurrent(t *testing.T) {
 				return
 			}
 
-			req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+			req := httptest.NewRequest(http.MethodPost, "/v1/projects.json", bytes.NewBuffer(body))
 			req.Header.Set("Content-Type", "application/json")
 			recorder := ctx.MakeRequest(t, req)
 
@@ -560,7 +537,7 @@ func TestProjectsCreateValidationErrorFormat(t *testing.T) {
 		t.Fatalf("Failed to marshal request body: %v", err)
 	}
 
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+	req := httptest.NewRequest(http.MethodPost, "/v1/projects.json", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 	recorder := ctx.MakeRequest(t, req)
 
@@ -625,7 +602,7 @@ func TestProjectsCreateWithNullStartedAt(t *testing.T) {
 		t.Fatalf("Failed to marshal request body: %v", err)
 	}
 
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+	req := httptest.NewRequest(http.MethodPost, "/v1/projects.json", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 	recorder := ctx.MakeRequest(t, req)
 
@@ -634,10 +611,7 @@ func TestProjectsCreateWithNullStartedAt(t *testing.T) {
 		t.Errorf("Response body: %s", recorder.Body.String())
 	}
 
-	var response dto.ProjectResponse
-	if err := json.Unmarshal(recorder.Body.Bytes(), &response); err != nil {
-		t.Fatalf("Failed to parse response: %v", err)
-	}
+	response := ctx.ParseProjectResponse(t, recorder.Body.String())
 
 	if response.Name != "Project with Null StartedAt" {
 		t.Errorf("Expected name 'Project with Null StartedAt', got '%s'", response.Name)
@@ -669,7 +643,7 @@ func TestProjectsCreateStatusCodeHeaders(t *testing.T) {
 		t.Fatalf("Failed to marshal request body: %v", err)
 	}
 
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+	req := httptest.NewRequest(http.MethodPost, "/v1/projects.json", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 	recorder := ctx.MakeRequest(t, req)
 
@@ -678,10 +652,10 @@ func TestProjectsCreateStatusCodeHeaders(t *testing.T) {
 		t.Errorf("Expected status %d, got %d", http.StatusCreated, recorder.Code)
 	}
 
-	// Verify Content-Type header
+	// Verify Content-Type header (should be JSON:API format now)
 	contentType := recorder.Header().Get("Content-Type")
-	if !contains(contentType, "application/json") {
-		t.Errorf("Expected Content-Type to contain 'application/json', got '%s'", contentType)
+	if !contains(contentType, "application/vnd.api+json") {
+		t.Errorf("Expected Content-Type to contain 'application/vnd.api+json', got '%s'", contentType)
 	}
 }
 
@@ -705,7 +679,7 @@ func TestProjectsCreateBadRequestHeaders(t *testing.T) {
 		t.Fatalf("Failed to marshal request body: %v", err)
 	}
 
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+	req := httptest.NewRequest(http.MethodPost, "/v1/projects.json", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 	recorder := ctx.MakeRequest(t, req)
 

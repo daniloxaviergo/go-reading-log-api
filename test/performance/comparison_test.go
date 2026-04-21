@@ -239,7 +239,7 @@ func BenchmarkHTTPHandlerIndex(b *testing.B) {
 	handler := handlers.NewProjectsHandler(repo)
 
 	// Add warm-up request
-	req := newMockRequest("GET", "/api/v1/projects", nil)
+	req := newMockRequest("GET", "/v1/projects", nil)
 	w := newMockResponseWriter()
 	handler.Index(w, req.Request)
 
@@ -251,7 +251,7 @@ func BenchmarkHTTPHandlerIndex(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		start := time.Now()
-		req := newMockRequest("GET", "/api/v1/projects", nil)
+		req := newMockRequest("GET", "/v1/projects", nil)
 		w := newMockResponseWriter()
 
 		handler.Index(w, req.Request)
@@ -293,7 +293,7 @@ func BenchmarkHTTPHandlerShow(b *testing.B) {
 	projectIDStr := fmt.Sprintf("%d", projectID)
 
 	// Add warm-up request
-	req := newMockRequest("GET", "/api/v1/projects/"+projectIDStr, nil)
+	req := newMockRequest("GET", "/v1/projects/"+projectIDStr, nil)
 	w := newMockResponseWriter()
 	handler := handlers.NewProjectsHandler(repo)
 	handler.Show(w, req.Request)
@@ -305,7 +305,7 @@ func BenchmarkHTTPHandlerShow(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		start := time.Now()
-		req := newMockRequest("GET", "/api/v1/projects/"+projectIDStr, nil)
+		req := newMockRequest("GET", "/v1/projects/"+projectIDStr, nil)
 		w := newMockResponseWriter()
 
 		handler := handlers.NewProjectsHandler(repo)

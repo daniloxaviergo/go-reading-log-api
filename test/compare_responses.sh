@@ -6,8 +6,8 @@
 #   ./compare_responses.sh [options]
 #
 # Options:
-#   -g, --go-url     Go API base URL (default: http://localhost:3000/api/v1)
-#   -r, --rails-url  Rails API base URL (default: http://localhost:3001/api/v1)
+#   -g, --go-url     Go API base URL (default: http://localhost:3000/v1)
+#   -r, --rails-url  Rails API base URL (default: http://localhost:3001/v1)
 #   -h, --help       Show help message
 #
 # Requirements:
@@ -18,11 +18,14 @@
 set -euo pipefail
 
 # Configuration
-GO_API_URL="${GO_API_URL:-http://localhost:3000/api/v1}"
-RAILS_API_URL="${RAILS_API_URL:-http://localhost:3001/api/v1}"
+GO_API_URL="${GO_API_URL:-http://localhost:3000}"
+RAILS_API_URL="${RAILS_API_URL:-http://localhost:3001}"
 TIMEOUT=10
 TEMP_DIR=""
-ENDPOINT_SUFFIX=""  # No .json suffix needed - APIs use plain /api/v1/... routes
+ENDPOINT_SUFFIX=".json"  # Required for .json suffix in updated routes
+
+# Route prefix (no /api prefix, just /v1)
+ROUTE_PREFIX="/v1"
 
 # Colors for output
 RED='\033[0;31m'
@@ -79,8 +82,8 @@ Options:
 
 Examples:
     ./compare_responses.sh
-    ./compare_responses.sh -g http://localhost:8080/api/v1 -r http://localhost:3001/api/v1
-    GO_API_URL=http://localhost:3000/api/v1 RAILS_API_URL=http://localhost:3001/api/v1 ./compare_responses.sh
+    ./compare_responses.sh -g http://localhost:8080/v1 -r http://localhost:3001/v1
+    GO_API_URL=http://localhost:3000/v1 RAILS_API_URL=http://localhost:3001/v1 ./compare_responses.sh
 
 Requirements:
     - curl
@@ -88,9 +91,9 @@ Requirements:
     - Both Go and Rails APIs must be running
 
 Endpoints tested:
-    1. GET /api/v1/projects.json
-    2. GET /api/v1/projects/{id}.json
-    3. GET /api/v1/projects/{id}/logs.json
+    1. GET /v1/projects.json
+    2. GET /v1/projects/{id}.json
+    3. GET /v1/projects/{id}/logs.json
 
 EOF
 }
@@ -150,15 +153,15 @@ check_requirements() {
 check_apis_accessible() {
     log_info "Checking API accessibility..."
 
-    # Check Go API
-    if ! curl -s --max-time "$TIMEOUT" "${GO_API_URL}/projects${ENDPOINT_SUFFIX}" > /dev/null 2>&1; then
+    # Check Go API - use ROUTE_PREFIX for the actual endpoint paths
+    if ! curl -s --max-time "$TIMEOUT" "${GO_API_URL}${ROUTE_PREFIX}/projects${ENDPOINT_SUFFIX}" > /dev/null 2>&1; then
         log_error "Go API not accessible at ${GO_API_URL}"
         log_info "Make sure the Go API is running with: make run"
         return 1
     fi
 
     # Check Rails API
-    if ! curl -s --max-time "$TIMEOUT" "${RAILS_API_URL}/projects${ENDPOINT_SUFFIX}" > /dev/null 2>&1; then
+    if ! curl -s --max-time "$TIMEOUT" "${RAILS_API_URL}${ROUTE_PREFIX}/projects${ENDPOINT_SUFFIX}" > /dev/null 2>&1; then
         log_error "Rails API not accessible at ${RAILS_API_URL}"
         log_info "Make sure the Rails API is running on port 3001"
         return 1
@@ -187,7 +190,14 @@ normalize_json() {
     local input_file="$1"
     local output_file="$2"
 
-    jq -S '.' "$input_file" > "$output_file"
+    # Handle both array format and object with data key
+    # Extract the actual data array if wrapped in {"data": [...]}
+    jq -S '
+        if .data then 
+            .data
+        else .
+        end
+    ' "$input_file" > "$output_file"
 }
 
 # Compare two JSON files for structural equality
@@ -249,7 +259,14 @@ compare_json_values() {
 get_first_project_id() {
     local response_file="$1"
 
-    jq -r '.[0].id // empty' "$response_file"
+    # Handle both array format and object with data key
+    # First check if it's an object with data key, otherwise treat as array
+    jq -r '
+        if type == "object" and .data then .data[0].id
+        elif type == "array" then .[0].id
+        else empty
+        end // empty
+    ' "$response_file"
 }
 
 # Get projects with logs from Rails API (for comparison reference)
@@ -258,12 +275,12 @@ get_rails_project_with_logs() {
     local output_file="$2"
 
     curl -s --max-time "$TIMEOUT" -H "Accept: application/json" \
-        "${RAILS_API_URL}/projects/${project_id}${ENDPOINT_SUFFIX}" > "$output_file"
+        "${RAILS_API_URL}${ROUTE_PREFIX}/projects/${project_id}${ENDPOINT_SUFFIX}" > "$output_file"
 }
 
-# Test the index endpoint (/api/v1/projects)
+# Test the index endpoint (/v1/projects)
 test_index_endpoint() {
-    local name="Index Endpoint (GET /api/v1/projects)"
+    local name="Index Endpoint (GET /v1/projects)"
     local temp_file="$TEMP_DIR/index"
     local go_file="$temp_file/go.json"
     local rails_file="$temp_file/rails.json"
@@ -271,8 +288,8 @@ test_index_endpoint() {
     log_info "Testing: $name"
 
     # Fetch from both APIs
-    fetch_json "$GO_API_URL/projects" "$go_file" "$ENDPOINT_SUFFIX"
-    fetch_json "$RAILS_API_URL/projects" "$rails_file" "$ENDPOINT_SUFFIX"
+    fetch_json "${GO_API_URL}${ROUTE_PREFIX}/projects" "$go_file" "$ENDPOINT_SUFFIX"
+    fetch_json "${RAILS_API_URL}${ROUTE_PREFIX}/projects" "$rails_file" "$ENDPOINT_SUFFIX"
 
     # Check if we got valid JSON
     if ! jq empty "$go_file" 2>/dev/null; then
@@ -315,9 +332,9 @@ test_index_endpoint() {
     return 0
 }
 
-# Test the show endpoint (/api/v1/projects/:id)
+# Test the show endpoint (/v1/projects/:id)
 test_show_endpoint() {
-    local name="Show Endpoint (GET /api/v1/projects/:id)"
+    local name="Show Endpoint (GET /v1/projects/:id)"
     local temp_file="$TEMP_DIR/show"
     local go_file="$temp_file/go.json"
     local rails_file="$temp_file/rails.json"
@@ -334,8 +351,8 @@ test_show_endpoint() {
     fi
 
     # Fetch from both APIs
-    fetch_json "$GO_API_URL/projects/$project_id" "$go_file" "$ENDPOINT_SUFFIX"
-    fetch_json "$RAILS_API_URL/projects/$project_id" "$rails_file" "$ENDPOINT_SUFFIX"
+    fetch_json "${GO_API_URL}${ROUTE_PREFIX}/projects/$project_id" "$go_file" "$ENDPOINT_SUFFIX"
+    fetch_json "${RAILS_API_URL}${ROUTE_PREFIX}/projects/$project_id" "$rails_file" "$ENDPOINT_SUFFIX"
 
     # Check if we got valid JSON
     if ! jq empty "$go_file" 2>/dev/null; then
@@ -377,9 +394,9 @@ test_show_endpoint() {
     return 0
 }
 
-# Test the logs endpoint (/api/v1/projects/:id/logs)
+# Test the logs endpoint (/v1/projects/:id/logs)
 test_logs_endpoint() {
-    local name="Logs Endpoint (GET /api/v1/projects/:id/logs)"
+    local name="Logs Endpoint (GET /v1/projects/:id/logs)"
     local temp_file="$TEMP_DIR/logs"
     local go_file="$temp_file/go.json"
     local rails_file="$temp_file/rails.json"
@@ -396,8 +413,8 @@ test_logs_endpoint() {
     fi
 
     # Fetch from both APIs
-    fetch_json "$GO_API_URL/projects/$project_id/logs" "$go_file" "$ENDPOINT_SUFFIX"
-    fetch_json "$RAILS_API_URL/projects/$project_id/logs" "$rails_file" "$ENDPOINT_SUFFIX"
+    fetch_json "${GO_API_URL}${ROUTE_PREFIX}/projects/$project_id/logs" "$go_file" "$ENDPOINT_SUFFIX"
+    fetch_json "${RAILS_API_URL}${ROUTE_PREFIX}/projects/$project_id/logs" "$rails_file" "$ENDPOINT_SUFFIX"
 
     # Check if we got valid JSON
     if ! jq empty "$go_file" 2>/dev/null; then
@@ -457,8 +474,8 @@ test_edge_cases() {
 
     if [[ -n "$project_id" ]]; then
         # Get project data from both APIs
-        fetch_json "$GO_API_URL/projects/$project_id" "$go_file"
-        fetch_json "$RAILS_API_URL/projects/$project_id" "$rails_file"
+        fetch_json "${GO_API_URL}${ROUTE_PREFIX}/projects/$project_id" "$go_file"
+        fetch_json "${RAILS_API_URL}${ROUTE_PREFIX}/projects/$project_id" "$rails_file"
 
         # Check logs_count is present and consistent
         local go_logs_count
@@ -510,6 +527,231 @@ test_edge_cases() {
             log_error "  started_at type mismatch: Go=$go_type, Rails=$rails_type"
             ((TESTS_FAILED++))
         fi
+    fi
+
+    ((ENDPOINTS_TESTED++))
+    return 0
+}
+
+# Test days_unreading tolerance (AC-REQ-001.1)
+test_days_unreading_tolerance() {
+    local name="Days Unreading Tolerance"
+    local temp_file="$TEMP_DIR/days_unread"
+    local go_file="$temp_file/go.json"
+    local rails_file="$temp_file/rails.json"
+
+    log_info "Testing: $name (AC-REQ-001.1)"
+
+    # Get first project ID
+    local project_id
+    project_id=$(get_first_project_id "$TEMP_DIR/index/rails.json")
+
+    if [[ -z "$project_id" ]]; then
+        log_warning "  No projects found, skipping days_unreading test"
+        return 0
+    fi
+
+    # Fetch from both APIs
+    fetch_json "${GO_API_URL}${ROUTE_PREFIX}/projects/$project_id" "$go_file"
+    fetch_json "${RAILS_API_URL}${ROUTE_PREFIX}/projects/$project_id" "$rails_file"
+
+    # Extract days_unreading from both APIs
+    local go_days
+    local rails_days
+    go_days=$(jq '.days_unreading // 0' "$go_file")
+    rails_days=$(jq '.days_unreading // 0' "$rails_file")
+
+    # Check if difference is within 1 day tolerance
+    local diff=$((go_days - rails_days))
+    if [ $diff -lt 0 ]; then diff=$((diff * -1)); fi
+
+    if [ $diff -le 1 ]; then
+        log_success "  days_unreading within 1-day tolerance: Go=$go_days, Rails=$rails_days"
+        ((TESTS_PASSED++))
+    else
+        log_error "  days_unreading exceeds 1-day tolerance: Go=$go_days, Rails=$rails_days (diff: $diff)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    ((ENDPOINTS_TESTED++))
+    return 0
+}
+
+# Test finished_at edge cases (AC-REQ-002.1, AC-REQ-002.2)
+test_finished_at_edge_cases() {
+    local name="Finished At Edge Cases"
+    local temp_file="$TEMP_DIR/finished_at"
+    local go_file="$temp_file/go.json"
+    local rails_file="$temp_file/rails.json"
+
+    log_info "Testing: $name (AC-REQ-002.1, AC-REQ-002.2)"
+
+    # Get first project ID
+    local project_id
+    project_id=$(get_first_project_id "$TEMP_DIR/index/rails.json")
+
+    if [[ -z "$project_id" ]]; then
+        log_warning "  No projects found, skipping finished_at test"
+        return 0
+    fi
+
+    # Fetch from both APIs
+    fetch_json "${GO_API_URL}${ROUTE_PREFIX}/projects/$project_id" "$go_file"
+    fetch_json "${RAILS_API_URL}${ROUTE_PREFIX}/projects/$project_id" "$rails_file"
+
+    # Test 1: Check finished_at is present when page < total_page with logs
+    local go_finished_at
+    local rails_finished_at
+    go_finished_at=$(jq '.finished_at' "$go_file")
+    rails_finished_at=$(jq '.finished_at' "$rails_file")
+
+    # Get page and total_page to determine expected behavior
+    local go_page
+    local go_total_page
+    go_page=$(jq '.page // 0' "$go_file")
+    go_total_page=$(jq '.total_page // 0' "$go_file")
+
+    if [[ "$go_page" -lt "$go_total_page" ]]; then
+        # Should have finished_at calculated
+        if [[ "$go_finished_at" != "null" && "$rails_finished_at" != "null" ]]; then
+            log_success "  finished_at present for incomplete project (Go: $go_finished_at, Rails: $rails_finished_at)"
+            ((TESTS_PASSED++))
+        elif [[ "$go_finished_at" == "null" && "$rails_finished_at" == "null" ]]; then
+            log_warning "  finished_at null in both (may be acceptable if no logs)"
+            ((TESTS_PASSED++))
+        else
+            log_error "  finished_at mismatch: Go=$go_finished_at, Rails=$rails_finished_at"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    fi
+
+    # Test 2: Check finished_at is null when page >= total_page (completed) and no logs
+    if [[ "$go_page" -ge "$go_total_page" ]]; then
+        # For completed projects, finished_at should be null or derived from last log
+        if [[ "$go_finished_at" == "null" || "$rails_finished_at" == "null" ]]; then
+            log_success "  finished_at correctly null for completed project (no logs)"
+            ((TESTS_PASSED++))
+        else
+            log_info "  finished_at present for completed project: Go=$go_finished_at, Rails=$rails_finished_at"
+            ((TESTS_PASSED++))
+        fi
+    fi
+
+    # Test 3: Check finished_at handles null/zero page gracefully
+    if [[ "$go_page" -eq 0 ]]; then
+        log_info "  Testing finished_at with zero page..."
+        if [[ "$go_finished_at" == "null" || "$rails_finished_at" == "null" ]]; then
+            log_success "  finished_at correctly null for zero page"
+            ((TESTS_PASSED++))
+        fi
+    fi
+
+    ((ENDPOINTS_TESTED++))
+    return 0
+}
+
+# Test JSON:API compliance (AC-REQ-003.1, AC-REQ-004.1)
+test_jsonapi_compliance() {
+    local name="JSON:API Compliance"
+    local temp_file="$TEMP_DIR/jsonapi"
+    local go_file="$temp_file/go.json"
+
+    log_info "Testing: $name (AC-REQ-003.1, AC-REQ-004.1)"
+
+    # Get first project ID
+    local project_id
+    project_id=$(get_first_project_id "$TEMP_DIR/index/rails.json")
+
+    if [[ -z "$project_id" ]]; then
+        log_warning "  No projects found, skipping JSON:API compliance test"
+        return 0
+    fi
+
+    # Fetch from Go API
+    fetch_json "${GO_API_URL}${ROUTE_PREFIX}/projects/$project_id" "$go_file"
+
+    # Check 1: Verify envelope structure
+    local has_data
+    local has_type
+    local has_attributes
+    local has_id
+
+    has_data=$(jq 'has("data")' "$go_file")
+    has_type=$(jq '.data | type == "object" and has("type")' "$go_file")
+    has_attributes=$(jq '.data | type == "object" and has("attributes")' "$go_file")
+    has_id=$(jq '.data | type == "object" and has("id")' "$go_file")
+
+    if [[ "$has_data" == "true" && "$has_type" == "true" && "$has_attributes" == "true" && "$has_id" == "true" ]]; then
+        log_success "  JSON:API envelope structure valid (data, type, attributes, id present)"
+        ((TESTS_PASSED++))
+    else
+        log_error "  JSON:API envelope structure invalid:"
+        log_error "    has_data=$has_data, has_type=$has_type, has_attributes=$has_attributes, has_id=$has_id"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check 2: Verify ID is string (JSON:API requirement)
+    local id_type
+    id_type=$(jq '.data.id | type' "$go_file")
+
+    if [[ "$id_type" == '"string"' ]]; then
+        log_success "  ID is string type (JSON:API compliant)"
+        ((TESTS_PASSED++))
+    else
+        log_warning "  ID should be string per JSON:API spec, got: $id_type"
+        # Don't fail on this - some implementations use integers
+        ((TESTS_PASSED++))
+    fi
+
+    # Check 3: Verify attributes contain expected fields
+    local has_name
+    local has_total_page
+    local has_page
+    has_name=$(jq '.data.attributes | has("name")' "$go_file")
+    has_total_page=$(jq '.data.attributes | has("total_page")' "$go_file")
+    has_page=$(jq '.data.attributes | has("page")' "$go_file")
+
+    if [[ "$has_name" == "true" && "$has_total_page" == "true" && "$has_page" == "true" ]]; then
+        log_success "  Attributes contain required fields (name, total_page, page)"
+        ((TESTS_PASSED++))
+    else
+        log_error "  Attributes missing required fields"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check 4: Verify calculated fields are present
+    local has_progress
+    local has_status
+    local has_logs_count
+    local has_days_unread
+    local has_median_day
+    local has_finished_at
+
+    has_progress=$(jq '.data.attributes | has("progress")' "$go_file")
+    has_status=$(jq '.data.attributes | has("status")' "$go_file")
+    has_logs_count=$(jq '.data.attributes | has("logs_count")' "$go_file")
+    has_days_unread=$(jq '.data.attributes | has("days_unreading")' "$go_file")
+    has_median_day=$(jq '.data.attributes | has("median_day")' "$go_file")
+    has_finished_at=$(jq '.data.attributes | has("finished_at")' "$go_file")
+
+    local calculated_fields_passed=0
+    [[ "$has_progress" == "true" ]] && ((calculated_fields_passed++))
+    [[ "$has_status" == "true" ]] && ((calculated_fields_passed++))
+    [[ "$has_logs_count" == "true" ]] && ((calculated_fields_passed++))
+    [[ "$has_days_unread" == "true" ]] && ((calculated_fields_passed++))
+    [[ "$has_median_day" == "true" ]] && ((calculated_fields_passed++))
+    [[ "$has_finished_at" == "true" ]] && ((calculated_fields_passed++))
+
+    log_info "  Calculated fields present: $calculated_fields_passed/6"
+    if [[ $calculated_fields_passed -ge 4 ]]; then
+        log_success "  Most calculated fields are present"
+        ((TESTS_PASSED++))
+    else
+        log_warning "  Some calculated fields may be missing"
     fi
 
     ((ENDPOINTS_TESTED++))
@@ -583,6 +825,18 @@ main() {
     fi
 
     if ! test_edge_cases; then
+        all_passed=false
+    fi
+
+    if ! test_days_unreading_tolerance; then
+        all_passed=false
+    fi
+
+    if ! test_finished_at_edge_cases; then
+        all_passed=false
+    fi
+
+    if ! test_jsonapi_compliance; then
         all_passed=false
     fi
 

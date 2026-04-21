@@ -39,7 +39,7 @@ func TestProjectsHandler_Create(t *testing.T) {
 		}
 		body, _ := json.Marshal(reqBody)
 
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+		req := httptest.NewRequest(http.MethodPost, "/v1/projects", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 
 		w := httptest.NewRecorder()
@@ -50,21 +50,56 @@ func TestProjectsHandler_Create(t *testing.T) {
 			t.Errorf("Expected status code %d, got %d", http.StatusCreated, w.Code)
 		}
 
-		var response dto.ProjectResponse
-		if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		// Verify Content-Type header
+		contentType := w.Header().Get("Content-Type")
+		if contentType != "application/vnd.api+json" {
+			t.Errorf("Expected Content-Type 'application/vnd.api+json', got '%s'", contentType)
+		}
+
+		// Decode JSON:API envelope
+		var envelope dto.JSONAPIEnvelope
+		if err := json.NewDecoder(w.Body).Decode(&envelope); err != nil {
 			t.Fatalf("Failed to decode response: %v", err)
 		}
 
-		if response.Name != "New Project" {
-			t.Errorf("Expected name 'New Project', got '%s'", response.Name)
+		// Verify data structure - after json.Unmarshal, single objects become map[string]interface{}
+		dataMap, ok := envelope.Data.(map[string]interface{})
+		if !ok {
+			t.Fatalf("Expected Data to be a JSON object, got %T", envelope.Data)
 		}
 
-		if response.TotalPage != 200 {
-			t.Errorf("Expected total_page 200, got %d", response.TotalPage)
+		// Verify required fields exist
+		if _, ok := dataMap["type"]; !ok {
+			t.Error("Missing 'type' field in data object")
+		}
+		if _, ok := dataMap["attributes"]; !ok {
+			t.Error("Missing 'attributes' field in data object")
 		}
 
-		if response.Page != 100 {
-			t.Errorf("Expected page 100, got %d", response.Page)
+		// Verify ID is string
+		idVal, ok := dataMap["id"]
+		if !ok {
+			t.Error("Missing 'id' field in data object")
+		} else if _, ok := idVal.(string); !ok {
+			t.Errorf("Expected ID to be string type, got %T", idVal)
+		}
+
+		// Verify attributes structure
+		attrsMap, ok := dataMap["attributes"].(map[string]interface{})
+		if !ok {
+			t.Fatal("Expected Attributes to be an object")
+		}
+
+		if nameStr, ok := attrsMap["name"].(string); !ok || nameStr != "New Project" {
+			t.Errorf("Expected name 'New Project', got '%v'", attrsMap["name"])
+		}
+
+		if totalPage, ok := attrsMap["total_page"].(float64); !ok || int(totalPage) != 200 {
+			t.Errorf("Expected total_page 200, got %v", attrsMap["total_page"])
+		}
+
+		if pageVal, ok := attrsMap["page"].(float64); !ok || int(pageVal) != 100 {
+			t.Errorf("Expected page 100, got %v", attrsMap["page"])
 		}
 	})
 
@@ -82,7 +117,7 @@ func TestProjectsHandler_Create(t *testing.T) {
 		}
 		body, _ := json.Marshal(reqBody)
 
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+		req := httptest.NewRequest(http.MethodPost, "/v1/projects", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 
 		w := httptest.NewRecorder()
@@ -108,7 +143,7 @@ func TestProjectsHandler_Create(t *testing.T) {
 		}
 		body, _ := json.Marshal(reqBody)
 
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+		req := httptest.NewRequest(http.MethodPost, "/v1/projects", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 
 		w := httptest.NewRecorder()
@@ -137,7 +172,7 @@ func TestProjectsHandler_CreateValidationErrors(t *testing.T) {
 		}
 		body, _ := json.Marshal(reqBody)
 
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+		req := httptest.NewRequest(http.MethodPost, "/v1/projects", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 
 		w := httptest.NewRecorder()
@@ -182,7 +217,7 @@ func TestProjectsHandler_CreateValidationErrors(t *testing.T) {
 		}
 		body, _ := json.Marshal(reqBody)
 
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+		req := httptest.NewRequest(http.MethodPost, "/v1/projects", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 
 		w := httptest.NewRecorder()
@@ -208,7 +243,7 @@ func TestProjectsHandler_CreateValidationErrors(t *testing.T) {
 		}
 		body, _ := json.Marshal(reqBody)
 
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+		req := httptest.NewRequest(http.MethodPost, "/v1/projects", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 
 		w := httptest.NewRecorder()
@@ -229,7 +264,7 @@ func TestProjectsHandler_CreateInvalidJSON(t *testing.T) {
 
 	invalidBody := []byte(`{invalid json`)
 
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(invalidBody))
+	req := httptest.NewRequest(http.MethodPost, "/v1/projects", bytes.NewBuffer(invalidBody))
 	req.Header.Set("Content-Type", "application/json")
 
 	w := httptest.NewRecorder()
@@ -265,7 +300,7 @@ func TestProjectsHandler_CreateRepositoryError(t *testing.T) {
 	}
 	body, _ := json.Marshal(reqBody)
 
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+	req := httptest.NewRequest(http.MethodPost, "/v1/projects", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 
 	w := httptest.NewRecorder()
@@ -291,7 +326,7 @@ func TestProjectsHandler_CreateEmptyBody(t *testing.T) {
 
 	handler := NewProjectsHandler(mockRepo)
 
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", nil)
+	req := httptest.NewRequest(http.MethodPost, "/v1/projects", nil)
 	req.Header.Set("Content-Type", "application/json")
 
 	w := httptest.NewRecorder()
@@ -319,7 +354,7 @@ func TestProjectsHandler_CreateValidationIntegration(t *testing.T) {
 	}
 	body, _ := json.Marshal(reqBody)
 
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+	req := httptest.NewRequest(http.MethodPost, "/v1/projects", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 
 	w := httptest.NewRecorder()
@@ -389,7 +424,7 @@ func TestProjectsHandler_CreateWithStartedAt(t *testing.T) {
 	}
 	body, _ := json.Marshal(reqBody)
 
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+	req := httptest.NewRequest(http.MethodPost, "/v1/projects", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 
 	w := httptest.NewRecorder()
@@ -400,13 +435,32 @@ func TestProjectsHandler_CreateWithStartedAt(t *testing.T) {
 		t.Errorf("Expected status code %d, got %d", http.StatusCreated, w.Code)
 	}
 
-	var response dto.ProjectResponse
-	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+	// Verify Content-Type header
+	contentType := w.Header().Get("Content-Type")
+	if contentType != "application/vnd.api+json" {
+		t.Errorf("Expected Content-Type 'application/vnd.api+json', got '%s'", contentType)
+	}
+
+	// Decode JSON:API envelope
+	var envelope dto.JSONAPIEnvelope
+	if err := json.NewDecoder(w.Body).Decode(&envelope); err != nil {
 		t.Fatalf("Failed to decode response: %v", err)
 	}
 
-	if response.Name != "Project with Date" {
-		t.Errorf("Expected name 'Project with Date', got '%s'", response.Name)
+	// Verify data structure - after json.Unmarshal, single objects become map[string]interface{}
+	dataMap, ok := envelope.Data.(map[string]interface{})
+	if !ok {
+		t.Fatalf("Expected Data to be a JSON object, got %T", envelope.Data)
+	}
+
+	// Verify attributes structure
+	attrsMap, ok := dataMap["attributes"].(map[string]interface{})
+	if !ok {
+		t.Fatal("Expected Attributes to be an object")
+	}
+
+	if nameStr, ok := attrsMap["name"].(string); !ok || nameStr != "Project with Date" {
+		t.Errorf("Expected name 'Project with Date', got '%v'", attrsMap["name"])
 	}
 }
 
@@ -426,7 +480,7 @@ func TestProjectsHandler_CreateWithInvalidDate(t *testing.T) {
 	}
 	body, _ := json.Marshal(reqBody)
 
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+	req := httptest.NewRequest(http.MethodPost, "/v1/projects", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 
 	w := httptest.NewRecorder()
@@ -461,7 +515,7 @@ func TestProjectsHandler_CreateReiniciaField(t *testing.T) {
 	}
 	body, _ := json.Marshal(reqBody)
 
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+	req := httptest.NewRequest(http.MethodPost, "/v1/projects", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 
 	w := httptest.NewRecorder()
@@ -472,14 +526,33 @@ func TestProjectsHandler_CreateReiniciaField(t *testing.T) {
 		t.Errorf("Expected status code %d, got %d", http.StatusCreated, w.Code)
 	}
 
-	var response dto.ProjectResponse
-	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+	// Verify Content-Type header
+	contentType := w.Header().Get("Content-Type")
+	if contentType != "application/vnd.api+json" {
+		t.Errorf("Expected Content-Type 'application/vnd.api+json', got '%s'", contentType)
+	}
+
+	// Decode JSON:API envelope
+	var envelope dto.JSONAPIEnvelope
+	if err := json.NewDecoder(w.Body).Decode(&envelope); err != nil {
 		t.Fatalf("Failed to decode response: %v", err)
 	}
 
+	// Verify data structure - after json.Unmarshal, single objects become map[string]interface{}
+	dataMap, ok := envelope.Data.(map[string]interface{})
+	if !ok {
+		t.Fatalf("Expected Data to be a JSON object, got %T", envelope.Data)
+	}
+
+	// Verify attributes structure
+	attrsMap, ok := dataMap["attributes"].(map[string]interface{})
+	if !ok {
+		t.Fatal("Expected Attributes to be an object")
+	}
+
 	// Reinicia is not included in ProjectResponse - just verify other fields
-	if response.Name != "Project with Reinicia" {
-		t.Errorf("Expected name 'Project with Reinicia', got '%s'", response.Name)
+	if nameStr, ok := attrsMap["name"].(string); !ok || nameStr != "Project with Reinicia" {
+		t.Errorf("Expected name 'Project with Reinicia', got '%v'", attrsMap["name"])
 	}
 }
 
@@ -500,7 +573,7 @@ func TestProjectsHandler_CreateWithoutRequiredFields(t *testing.T) {
 		}
 		body, _ := json.Marshal(reqBody)
 
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+		req := httptest.NewRequest(http.MethodPost, "/v1/projects", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 
 		w := httptest.NewRecorder()
@@ -527,7 +600,7 @@ func TestProjectsHandler_CreateWithoutRequiredFields(t *testing.T) {
 		}
 		body, _ := json.Marshal(reqBody)
 
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/projects", bytes.NewBuffer(body))
+		req := httptest.NewRequest(http.MethodPost, "/v1/projects", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 
 		w := httptest.NewRecorder()

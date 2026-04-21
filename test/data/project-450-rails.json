@@ -1,0 +1,28 @@
+# Test Data Artifact - Project 450 (Rails API)
+# Captured: 2026-04-18T16:05:30Z
+# API Version: v1
+# Endpoint: GET /v1/projects/450.json
+#
+# This file contains the recorded response from the Rails API for project ID 450.
+# Use this as a baseline for regression testing with test/compare_responses.sh
+#
+# Note: The Rails API uses JSON:API format with snake_case attributes (e.g., "started-at", "total-page")
+
+{
+  "data": {
+    "id": "450",
+    "type": "projects",
+    "attributes": {
+      "name": "História da Igreja VIII.1",
+      "started-at": "2026-02-19",
+      "progress": 100.0,
+      "total-page": 691,
+      "page": 691,
+      "status": "finished",
+      "logs-count": 38,
+      "days-unreading": 16,
+      "median-day": 11.91,
+      "finished-at": "2026-04-02"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+# Test Data Artifact - Project 450 (Go API)
+# Captured: 2026-04-18T16:05:00Z
+# API Version: v1
+# Endpoint: GET /v1/projects/450.json
+#
+# This file contains the recorded response from the Go API for project ID 450.
+# Use this as a baseline for regression testing with test/compare_responses.sh
+#
+# Note: The Go API uses snake_case field names (e.g., "started_at", "total_page")
+
+{
+  "id": 450,
+  "name": "História da Igreja VIII.1",
+  "started_at": "2026-02-19T00:00:00Z",
+  "progress": 100,
+  "total_page": 691,
+  "page": 691,
+  "status": "finished",
+  "logs_count": 38,
+  "days_unreading": 58,
+  "finished_at": null
+}

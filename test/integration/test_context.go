@@ -2,6 +2,7 @@ package integration
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -195,22 +196,6 @@ func (ctx *IntegrationTestContext) ParseHealthCheckResponse(t *testing.T, body s
 	return nil
 }
 
-// ParseProjectResponse parses a project response
-func (ctx *IntegrationTestContext) ParseProjectResponse(t *testing.T, body string) *dto.ProjectResponse {
-	t.Helper()
-
-	// This is a helper - actual parsing would be done by test code
-	return nil
-}
-
-// ParseLogResponse parses a log response
-func (ctx *IntegrationTestContext) ParseLogResponse(t *testing.T, body string) *dto.LogResponse {
-	t.Helper()
-
-	// This is a helper - actual parsing would be done by test code
-	return nil
-}
-
 // Helper function to setup test database with custom config
 func SetupTestDBWithConfig(t *testing.T, cfg *config.Config) *test.TestHelper {
 	t.Helper()
@@ -270,6 +255,160 @@ func VerifyErrorResponse(t *testing.T, recorder *httptest.ResponseRecorder, expe
 			t.Logf("Warning: Error response may not contain 'error' field: %s", body)
 		}
 	}
+}
+
+// ParseJSONAPIEnvelope parses a JSON:API envelope response
+func (ctx *IntegrationTestContext) ParseJSONAPIEnvelope(t *testing.T, body string) *dto.JSONAPIEnvelope {
+	t.Helper()
+
+	var envelope dto.JSONAPIEnvelope
+	if err := json.Unmarshal([]byte(body), &envelope); err != nil {
+		t.Fatalf("Failed to parse JSON:API envelope: %v", err)
+	}
+	return &envelope
+}
+
+// ParseProjectResponse parses a project response (handles both flat and JSON:API formats)
+func (ctx *IntegrationTestContext) ParseProjectResponse(t *testing.T, body string) *dto.ProjectResponse {
+	t.Helper()
+
+	// Try to parse as JSON:API envelope first
+	var envelope dto.JSONAPIEnvelope
+	if err := json.Unmarshal([]byte(body), &envelope); err == nil {
+		// Check if it's a collection or single object
+		switch v := envelope.Data.(type) {
+		case []interface{}:
+			// Collection - return first item or nil if empty
+			if len(v) > 0 {
+				if dataObj, ok := v[0].(map[string]interface{}); ok {
+					if attrs, ok := dataObj["attributes"].(map[string]interface{}); ok {
+						attrsJSON, _ := json.Marshal(attrs)
+						var parsed dto.ProjectResponse
+						json.Unmarshal(attrsJSON, &parsed)
+						return &parsed
+					}
+				}
+			}
+			return nil
+		case map[string]interface{}:
+			// Single object
+			if attrs, ok := v["attributes"].(map[string]interface{}); ok {
+				attrsJSON, _ := json.Marshal(attrs)
+				var parsed dto.ProjectResponse
+				json.Unmarshal(attrsJSON, &parsed)
+				return &parsed
+			}
+		}
+	}
+
+	// Fall back to parsing as flat JSON
+	var response dto.ProjectResponse
+	if err := json.Unmarshal([]byte(body), &response); err != nil {
+		t.Fatalf("Failed to parse project response: %v", err)
+	}
+	return &response
+}
+
+// ParseLogResponse parses a log response (handles both flat and JSON:API formats)
+func (ctx *IntegrationTestContext) ParseLogResponse(t *testing.T, body string) *dto.LogResponse {
+	t.Helper()
+
+	// Try to parse as JSON:API envelope first
+	var envelope dto.JSONAPIEnvelope
+	if err := json.Unmarshal([]byte(body), &envelope); err == nil {
+		switch v := envelope.Data.(type) {
+		case []interface{}:
+			if len(v) > 0 {
+				if dataObj, ok := v[0].(map[string]interface{}); ok {
+					if attrs, ok := dataObj["attributes"].(map[string]interface{}); ok {
+						attrsJSON, _ := json.Marshal(attrs)
+						var parsed dto.LogResponse
+						json.Unmarshal(attrsJSON, &parsed)
+						return &parsed
+					}
+				}
+			}
+			return nil
+		case map[string]interface{}:
+			if attrs, ok := v["attributes"].(map[string]interface{}); ok {
+				attrsJSON, _ := json.Marshal(attrs)
+				var parsed dto.LogResponse
+				json.Unmarshal(attrsJSON, &parsed)
+				return &parsed
+			}
+		}
+	}
+
+	// Fall back to parsing as flat JSON
+	var response dto.LogResponse
+	if err := json.Unmarshal([]byte(body), &response); err != nil {
+		t.Fatalf("Failed to parse log response: %v", err)
+	}
+	return &response
+}
+
+// ParseProjectResponseArray parses an array of project responses
+func (ctx *IntegrationTestContext) ParseProjectResponseArray(t *testing.T, body string) []*dto.ProjectResponse {
+	t.Helper()
+
+	// Try to parse as JSON:API envelope first
+	var envelope dto.JSONAPIEnvelope
+	if err := json.Unmarshal([]byte(body), &envelope); err == nil {
+		switch v := envelope.Data.(type) {
+		case []interface{}:
+			result := make([]*dto.ProjectResponse, len(v))
+			for i, item := range v {
+				if dataObj, ok := item.(map[string]interface{}); ok {
+					if attrs, ok := dataObj["attributes"].(map[string]interface{}); ok {
+						attrsJSON, _ := json.Marshal(attrs)
+						var parsed dto.ProjectResponse
+						json.Unmarshal(attrsJSON, &parsed)
+						result[i] = &parsed
+					}
+				}
+			}
+			return result
+		}
+	}
+
+	// Fall back to parsing as flat JSON array
+	var response []*dto.ProjectResponse
+	if err := json.Unmarshal([]byte(body), &response); err != nil {
+		t.Fatalf("Failed to parse project response array: %v", err)
+	}
+	return response
+}
+
+// ParseLogResponseArray parses an array of log responses
+func (ctx *IntegrationTestContext) ParseLogResponseArray(t *testing.T, body string) []*dto.LogResponse {
+	t.Helper()
+
+	// Try to parse as JSON:API envelope first
+	var envelope dto.JSONAPIEnvelope
+	if err := json.Unmarshal([]byte(body), &envelope); err == nil {
+		switch v := envelope.Data.(type) {
+		case []interface{}:
+			result := make([]*dto.LogResponse, len(v))
+			for i, item := range v {
+				if dataObj, ok := item.(map[string]interface{}); ok {
+					if attrs, ok := dataObj["attributes"].(map[string]interface{}); ok {
+						attrsJSON, _ := json.Marshal(attrs)
+						var parsed dto.LogResponse
+						json.Unmarshal(attrsJSON, &parsed)
+						result[i] = &parsed
+					}
+				}
+			}
+			return result
+		}
+	}
+
+	// Fall back to parsing as flat JSON array
+	var response []*dto.LogResponse
+	if err := json.Unmarshal([]byte(body), &response); err != nil {
+		t.Fatalf("Failed to parse log response array: %v", err)
+	}
+	return response
 }
 
 // contains checks if s contains substr

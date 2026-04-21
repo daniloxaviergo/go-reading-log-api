@@ -1,0 +1,88 @@
+# Test Data Artifact - Project 450 Logs (Go API)
+# Captured: 2026-04-18T16:06:00Z
+# API Version: v1
+# Endpoint: GET /v1/projects/450/logs.json
+#
+# This file contains the recorded response from the Go API for project ID 450 logs.
+# Use this as a baseline for regression testing with test/compare_responses.sh
+#
+# Note: The Go API returns first 4 logs ordered by data DESC
+
+[
+  {
+    "id": 9092,
+    "data": "2026-04-02 21:21:53",
+    "start_page": 665,
+    "end_page": 691,
+    "note": null,
+    "project": {
+      "id": 450,
+      "name": "História da Igreja VIII.1",
+      "started_at": "2026-02-19T00:00:00Z",
+      "progress": null,
+      "total_page": 691,
+      "page": 691,
+      "status": null,
+      "logs_count": null,
+      "days_unreading": null,
+      "finished_at": null
+    }
+  },
+  {
+    "id": 9091,
+    "data": "2026-04-01 23:34:35",
+    "start_page": 648,
+    "end_page": 665,
+    "note": null,
+    "project": {
+      "id": 450,
+      "name": "História da Igreja VIII.1",
+      "started_at": "2026-02-19T00:00:00Z",
+      "progress": null,
+      "total_page": 691,
+      "page": 691,
+      "status": null,
+      "logs_count": null,
+      "days_unreading": null,
+      "finished_at": null
+    }
+  },
+  {
+    "id": 9090,
+    "data": "2026-03-31 21:15:55",
+    "start_page": 629,
+    "end_page": 648,
+    "note": null,
+    "project": {
+      "id": 450,
+      "name": "História da Igreja VIII.1",
+      "started_at": "2026-02-19T00:00:00Z",
+      "progress": null,
+      "total_page": 691,
+      "page": 691,
+      "status": null,
+      "logs_count": null,
+      "days_unreading": null,
+      "finished_at": null
+    }
+  },
+  {
+    "id": 9089,
+    "data": "2026-03-31 00:43:52",
+    "start_page": 613,
+    "end_page": 629,
+    "note": null,
+    "project": {
+      "id": 450,
+      "name": "História da Igreja VIII.1",
+      "started_at": "2026-02-19T00:00:00Z",
+      "progress": null,
+      "total_page": 691,
+      "page": 691,
+      "status": null,
+      "logs_count": null,
+      "days_unreading": null,
+      "finished_at": null
+    }
+  }
+]

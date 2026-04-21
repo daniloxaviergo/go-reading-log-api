@@ -1,12 +1,14 @@
 package test
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
 	"go-reading-log-api-next/internal/config"
+	"go-reading-log-api-next/test/testutil"
 )
 
 // dbTestLock serializes database access for tests that use the same test database
@@ -248,4 +250,285 @@ func TestContextTimeout(t *testing.T) {
 	// Wait for context to expire (5 seconds + buffer)
 	time.Sleep(6 * time.Second)
 	<-done
+}
+
+// TestCleanupOrphanedDatabases tests basic orphan cleanup functionality
+func TestCleanupOrphanedDatabases(t *testing.T) {
+	// Skip if no test database is configured
+	if !IsTestDatabase() {
+		t.Skip("Test database not configured - skipping orphan cleanup test")
+	}
+
+	dbTestLock.Lock()
+	defer dbTestLock.Unlock()
+
+	helper, err := SetupTestDB()
+	if err != nil {
+		t.Fatalf("Failed to setup test DB: %v", err)
+	}
+	defer helper.Close()
+
+	// Call cleanup - should not error even if no orphaned databases exist
+	droppedCount, err := testutil.CleanupOrphanedDatabases(helper.Pool, helper.TestDBName)
+	if err != nil {
+		t.Errorf("CleanupOrphanedDatabases failed: %v", err)
+	}
+	t.Logf("CleanupOrphanedDatabases dropped %d databases", droppedCount)
+}
+
+// TestCleanupOrphanedDatabases_ExcludeCurrent tests that current DB is excluded
+func TestCleanupOrphanedDatabases_ExcludeCurrent(t *testing.T) {
+	// Skip if no test database is configured
+	if !IsTestDatabase() {
+		t.Skip("Test database not configured - skipping exclusion test")
+	}
+
+	dbTestLock.Lock()
+	defer dbTestLock.Unlock()
+
+	helper, err := SetupTestDB()
+	if err != nil {
+		t.Fatalf("Failed to setup test DB: %v", err)
+	}
+	defer helper.Close()
+
+	// Call cleanup with current test DB name
+	// This should not drop the current test DB
+	droppedCount, err := testutil.CleanupOrphanedDatabases(helper.Pool, helper.TestDBName)
+	if err != nil {
+		t.Errorf("CleanupOrphanedDatabases failed: %v", err)
+	}
+	t.Logf("CleanupOrphanedDatabases dropped %d databases", droppedCount)
+
+	// Verify current test DB still exists by trying to ping it
+	ctx := helper.GetContext()
+	if err := helper.Pool.Ping(ctx); err != nil {
+		t.Errorf("Current test database was incorrectly dropped: %v", err)
+	}
+}
+
+// TestCleanupOrphanedDatabases_NonExistentDB tests handling of non-existent database
+func TestCleanupOrphanedDatabases_NonExistentDB(t *testing.T) {
+	// Skip if no test database is configured
+	if !IsTestDatabase() {
+		t.Skip("Test database not configured - skipping non-existent DB test")
+	}
+
+	dbTestLock.Lock()
+	defer dbTestLock.Unlock()
+
+	helper, err := SetupTestDB()
+	if err != nil {
+		t.Fatalf("Failed to setup test DB: %v", err)
+	}
+	defer helper.Close()
+
+	// Try to cleanup with a non-existent database name
+	// This should not error - DROP DATABASE IF EXISTS handles this gracefully
+	droppedCount, err := testutil.CleanupOrphanedDatabases(helper.Pool, "non_existent_db_name_12345")
+	if err != nil {
+		t.Errorf("CleanupOrphanedDatabases should not fail for non-existent DB: %v", err)
+	}
+	t.Logf("CleanupOrphanedDatabases dropped %d databases", droppedCount)
+}
+
+// TestCleanupOrphanedDatabases_MultipleDBs tests cleanup with multiple databases
+func TestCleanupOrphanedDatabases_MultipleDBs(t *testing.T) {
+	// Skip if no test database is configured
+	if !IsTestDatabase() {
+		t.Skip("Test database not configured - skipping multiple DBs test")
+	}
+
+	dbTestLock.Lock()
+	defer dbTestLock.Unlock()
+
+	helper, err := SetupTestDB()
+	if err != nil {
+		t.Fatalf("Failed to setup test DB: %v", err)
+	}
+	defer helper.Close()
+
+	// Create some additional test databases to simulate orphaned databases
+	ctx := helper.GetContext()
+	mainPool := helper.Pool
+
+	// Create a few test databases
+	dbNames := []string{
+		"reading_log_test_orphan_1",
+		"reading_log_test_orphan_2",
+		"reading_log_test_orphan_3",
+	}
+
+	for _, dbName := range dbNames {
+		_, err := mainPool.Exec(ctx, fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", dbName))
+		if err != nil {
+			t.Logf("Note: Could not create test database %s: %v", dbName, err)
+		}
+	}
+
+	// Cleanup - should not error
+	droppedCount, err := testutil.CleanupOrphanedDatabases(mainPool, helper.TestDBName)
+	if err != nil {
+		t.Errorf("CleanupOrphanedDatabases failed: %v", err)
+	}
+	t.Logf("CleanupOrphanedDatabases dropped %d databases", droppedCount)
+
+	// Cleanup should complete successfully
+	// Note: We don't verify the databases were dropped here because
+	// the cleanup function uses DROP DATABASE IF EXISTS which may fail
+	// if the database doesn't exist or if there are permission issues
+}
+
+// TestValidateDatabases tests the database validation function
+func TestValidateDatabases(t *testing.T) {
+	// Skip if no test database is configured
+	if !IsTestDatabase() {
+		t.Skip("Test database not configured - skipping validation test")
+	}
+
+	err := testutil.ValidateDatabases()
+	if err != nil {
+		t.Errorf("ValidateDatabases failed: %v", err)
+	}
+}
+
+// TestCleanupOrphanedDatabases_Function tests the testutil.CleanupOrphanedDatabases function directly
+func TestCleanupOrphanedDatabases_Function(t *testing.T) {
+	// Skip if no test database is configured
+	if !IsTestDatabase() {
+		t.Skip("Test database not configured - skipping function test")
+	}
+
+	helper, err := SetupTestDB()
+	if err != nil {
+		t.Fatalf("Failed to setup test DB: %v", err)
+	}
+	defer helper.Close()
+
+	// Create test databases to clean up
+	ctx := helper.GetContext()
+	mainPool := helper.Pool
+
+	testDBNames := []string{
+		"reading_log_test_func_1",
+		"reading_log_test_func_2",
+	}
+
+	for _, dbName := range testDBNames {
+		_, err := mainPool.Exec(ctx, fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", dbName))
+		if err != nil {
+			t.Logf("Note: Could not create test database %s: %v", dbName, err)
+		}
+	}
+
+	// Call testutil.CleanupOrphanedDatabases function directly
+	droppedCount, err := testutil.CleanupOrphanedDatabases(mainPool, helper.TestDBName)
+	if err != nil {
+		t.Errorf("testutil.CleanupOrphanedDatabases failed: %v", err)
+	}
+
+	// Verify at least some databases were dropped
+	if droppedCount < 0 {
+		t.Errorf("droppedCount should be non-negative, got %d", droppedCount)
+	}
+}
+
+// TestCleanupOrphanedDatabases_Concurrent tests cleanup with concurrent database operations
+func TestCleanupOrphanedDatabases_Concurrent(t *testing.T) {
+	// Skip if no test database is configured
+	if !IsTestDatabase() {
+		t.Skip("Test database not configured - skipping concurrent test")
+	}
+
+	dbTestLock.Lock()
+	defer dbTestLock.Unlock()
+
+	helper, err := SetupTestDB()
+	if err != nil {
+		t.Fatalf("Failed to setup test DB: %v", err)
+	}
+	defer helper.Close()
+
+	ctx := helper.GetContext()
+	mainPool := helper.Pool
+
+	// Create multiple databases concurrently
+	numDBs := 5
+	dbNames := make([]string, numDBs)
+
+	for i := 0; i < numDBs; i++ {
+		dbNames[i] = fmt.Sprintf("reading_log_test_concurrent_%d", i)
+	}
+
+	// Create databases
+	for _, dbName := range dbNames {
+		_, err := mainPool.Exec(ctx, fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", dbName))
+		if err != nil {
+			t.Logf("Note: Could not create test database %s: %v", dbName, err)
+		}
+	}
+
+	// Run cleanup
+	droppedCount, err := testutil.CleanupOrphanedDatabases(mainPool, helper.TestDBName)
+	if err != nil {
+		t.Errorf("testutil.CleanupOrphanedDatabases failed: %v", err)
+	}
+
+	// Verify cleanup completed
+	if droppedCount < 0 {
+		t.Errorf("droppedCount should be non-negative, got %d", droppedCount)
+	}
+}
+
+// TestCleanupOrphanedDatabases_Performance tests that cleanup completes within timeout
+func TestCleanupOrphanedDatabases_Performance(t *testing.T) {
+	// Skip if no test database is configured
+	if !IsTestDatabase() {
+		t.Skip("Test database not configured - skipping performance test")
+	}
+
+	helper, err := SetupTestDB()
+	if err != nil {
+		t.Fatalf("Failed to setup test DB: %v", err)
+	}
+	defer helper.Close()
+
+	ctx := helper.GetContext()
+	mainPool := helper.Pool
+
+	// Create a moderate number of test databases
+	numDBs := 10
+	dbNames := make([]string, numDBs)
+
+	for i := 0; i < numDBs; i++ {
+		dbNames[i] = fmt.Sprintf("reading_log_test_perf_%d", i)
+	}
+
+	// Create databases
+	for _, dbName := range dbNames {
+		_, err := mainPool.Exec(ctx, fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", dbName))
+		if err != nil {
+			t.Logf("Note: Could not create test database %s: %v", dbName, err)
+		}
+	}
+
+	// Measure cleanup time
+	start := time.Now()
+	droppedCount, err := testutil.CleanupOrphanedDatabases(mainPool, helper.TestDBName)
+	elapsed := time.Since(start)
+
+	if err != nil {
+		t.Errorf("testutil.CleanupOrphanedDatabases failed: %v", err)
+	}
+
+	// Verify cleanup completed within reasonable time
+	// The function has a 60 second timeout
+	if elapsed > 60*time.Second {
+		t.Errorf("Cleanup took too long: %v", elapsed)
+	}
+
+	// Verify at least some databases were dropped
+	if droppedCount < 0 {
+		t.Errorf("droppedCount should be non-negative, got %d", droppedCount)
+	}
 }

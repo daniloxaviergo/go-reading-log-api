@@ -214,6 +214,7 @@ func (r *ProjectRepositoryImpl) GetWithLogs(ctx context.Context, id int64) (*rep
 	project.Status = domainProject.CalculateStatus(logResponses, config.LoadConfig())
 	project.DaysUnread = daysUnread
 	project.Progress = domainProject.CalculateProgress()
+	project.MedianDay = domainProject.CalculateMedianDay()
 	finishedAtPtr := domainProject.CalculateFinishedAt(logResponses)
 	project.FinishedAt = formatTimePtr(finishedAtPtr)
 
@@ -415,6 +416,7 @@ func (r *ProjectRepositoryImpl) GetAllWithLogs(ctx context.Context) ([]*reposito
 		projectResp.Status = project.CalculateStatus(logsForProject, config.LoadConfig())
 		projectResp.DaysUnread = daysUnread
 		projectResp.Progress = project.CalculateProgress()
+		projectResp.MedianDay = project.CalculateMedianDay()
 		projectResp.FinishedAt = formatTimePtr(project.CalculateFinishedAt(logsForProject))
 
 		pw := &repository.ProjectWithLogs{

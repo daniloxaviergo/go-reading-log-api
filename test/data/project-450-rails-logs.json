@@ -1,0 +1,102 @@
+# Test Data Artifact - Project 450 Logs (Rails API)
+# Captured: 2026-04-18T16:06:30Z
+# API Version: v1
+# Endpoint: GET /v1/projects/450/logs.json
+#
+# This file contains the recorded response from the Rails API for project ID 450 logs.
+# Use this as a baseline for regression testing with test/compare_responses.sh
+#
+# Note: The Rails API uses JSON:API format with included relationships
+
+{
+  "data": [
+    {
+      "id": "9092",
+      "type": "logs",
+      "attributes": {
+        "data": "2026-04-02T18:21:53.000-03:00",
+        "start-page": 665,
+        "end-page": 691,
+        "note": null
+      },
+      "relationships": {
+        "project": {
+          "data": {
+            "id": "450",
+            "type": "projects"
+          }
+        }
+      }
+    },
+    {
+      "id": "9091",
+      "type": "logs",
+      "attributes": {
+        "data": "2026-04-01T20:34:35.000-03:00",
+        "start-page": 648,
+        "end-page": 665,
+        "note": null
+      },
+      "relationships": {
+        "project": {
+          "data": {
+            "id": "450",
+            "type": "projects"
+          }
+        }
+      }
+    },
+    {
+      "id": "9090",
+      "type": "logs",
+      "attributes": {
+        "data": "2026-03-31T18:15:55.000-03:00",
+        "start-page": 629,
+        "end-page": 648,
+        "note": null
+      },
+      "relationships": {
+        "project": {
+          "data": {
+            "id": "450",
+            "type": "projects"
+          }
+        }
+      }
+    },
+    {
+      "id": "9089",
+      "type": "logs",
+      "attributes": {
+        "data": "2026-03-30T21:43:52.000-03:00",
+        "start-page": 613,
+        "end-page": 629,
+        "note": null
+      },
+      "relationships": {
+        "project": {
+          "data": {
+            "id": "450",
+            "type": "projects"
+          }
+        }
+      }
+    }
+  ],
+  "included": [
+    {
+      "id": "450",
+      "type": "projects",
+      "attributes": {
+        "name": "História da Igreja VIII.1",
+        "started-at": "2026-02-19",
+        "progress": 100.0,
+        "total-page": 691,
+        "page": 691,
+        "status": "finished",
+        "logs-count": 38,
+        "days-unreading": 16
+      }
+    }
+  ]
+}

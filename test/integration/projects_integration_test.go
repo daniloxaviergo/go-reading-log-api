@@ -1,7 +1,6 @@
 package integration
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -9,11 +8,10 @@ import (
 
 	"go-reading-log-api-next/internal/adapter/postgres"
 	"go-reading-log-api-next/internal/config"
-	"go-reading-log-api-next/internal/domain/dto"
 	"go-reading-log-api-next/test"
 )
 
-// TestProjectsIndexIntegration tests the GET /api/v1/projects endpoint
+// TestProjectsIndexIntegration tests the GET /v1/projects endpoint
 func TestProjectsIndexIntegration(t *testing.T) {
 	// Skip if no test database is configured
 	if !IsTestDatabase() {
@@ -27,8 +25,8 @@ func TestProjectsIndexIntegration(t *testing.T) {
 	project1ID := ctx.CreateTestProject(t)
 	project2ID := ctx.CreateTestProject(t)
 
-	// Test GET /api/v1/projects
-	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/api/v1/projects", nil))
+	// Test GET /v1/projects.json
+	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/v1/projects.json", nil))
 
 	// Verify response status
 	if recorder.Code != http.StatusOK {
@@ -36,19 +34,16 @@ func TestProjectsIndexIntegration(t *testing.T) {
 		t.Errorf("Response body: %s", recorder.Body.String())
 	}
 
-	// Parse and verify response
-	var response []*dto.ProjectResponse
-	if err := json.Unmarshal(recorder.Body.Bytes(), &response); err != nil {
-		t.Fatalf("Failed to parse response: %v", err)
-	}
+	// Parse and verify response using JSON:API envelope helper
+	envelope := ctx.ParseProjectResponseArray(t, recorder.Body.String())
 
-	if len(response) != 2 {
-		t.Errorf("Expected 2 projects, got %d", len(response))
+	if len(envelope) != 2 {
+		t.Errorf("Expected 2 projects, got %d", len(envelope))
 	}
 
 	// Verify project IDs are present
-	projectIDs := make([]int64, len(response))
-	for i, p := range response {
+	projectIDs := make([]int64, len(envelope))
+	for i, p := range envelope {
 		projectIDs[i] = p.ID
 		if p.ID != project1ID && p.ID != project2ID {
 			t.Errorf("Unexpected project ID: %d", p.ID)
@@ -70,23 +65,20 @@ func TestProjectsIndexEmpty(t *testing.T) {
 		t.Fatalf("Failed to clear test data: %v", err)
 	}
 
-	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/api/v1/projects", nil))
+	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/v1/projects.json", nil))
 
 	if recorder.Code != http.StatusOK {
 		t.Errorf("Expected status 200, got %d", recorder.Code)
 	}
 
-	var response []*dto.ProjectResponse
-	if err := json.Unmarshal(recorder.Body.Bytes(), &response); err != nil {
-		t.Fatalf("Failed to parse response: %v", err)
-	}
+	envelope := ctx.ParseProjectResponseArray(t, recorder.Body.String())
 
-	if len(response) != 0 {
-		t.Errorf("Expected 0 projects, got %d", len(response))
+	if len(envelope) != 0 {
+		t.Errorf("Expected 0 projects, got %d", len(envelope))
 	}
 }
 
-// TestProjectsShowIntegration tests the GET /api/v1/projects/:id endpoint
+// TestProjectsShowIntegration tests the GET /v1/projects/:id endpoint
 func TestProjectsShowIntegration(t *testing.T) {
 	if !IsTestDatabase() {
 		t.Skip("Test database not configured - skipping integration test")
@@ -99,17 +91,14 @@ func TestProjectsShowIntegration(t *testing.T) {
 	ctx.CreateTestLog(t, projectID)
 
 	idStr := strconv.Itoa(int(projectID))
-	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/api/v1/projects/"+idStr, nil))
+	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/v1/projects/"+idStr+".json", nil))
 
 	if recorder.Code != http.StatusOK {
 		t.Errorf("Expected status 200, got %d", recorder.Code)
 		t.Errorf("Response body: %s", recorder.Body.String())
 	}
 
-	var response *dto.ProjectResponse
-	if err := json.Unmarshal(recorder.Body.Bytes(), &response); err != nil {
-		t.Fatalf("Failed to parse response: %v", err)
-	}
+	response := ctx.ParseProjectResponse(t, recorder.Body.String())
 
 	if response.ID != projectID {
 		t.Errorf("Expected project ID %d, got %d", projectID, response.ID)
@@ -125,7 +114,7 @@ func TestProjectsShowNotFound(t *testing.T) {
 	ctx := Setup(t)
 	defer ctx.Teardown(t)
 
-	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/api/v1/projects/999999", nil))
+	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/v1/projects/999999", nil))
 
 	if recorder.Code != http.StatusNotFound {
 		t.Errorf("Expected status 404, got %d", recorder.Code)
@@ -138,7 +127,7 @@ func TestProjectsShowInvalidID(t *testing.T) {
 	ctx := Setup(t)
 	defer ctx.Teardown(t)
 
-	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/api/v1/projects/invalid", nil))
+	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/v1/projects/invalid.json", nil))
 
 	if recorder.Code != http.StatusBadRequest {
 		t.Errorf("Expected status 400, got %d", recorder.Code)
@@ -158,16 +147,13 @@ func TestProjectsShowWithLogs(t *testing.T) {
 	ctx.CreateTestLogWithNote(t, projectID)
 
 	idStr := strconv.Itoa(int(projectID))
-	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/api/v1/projects/"+idStr, nil))
+	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/v1/projects/"+idStr+".json", nil))
 
 	if recorder.Code != http.StatusOK {
 		t.Errorf("Expected status 200, got %d", recorder.Code)
 	}
 
-	var response *dto.ProjectResponse
-	if err := json.Unmarshal(recorder.Body.Bytes(), &response); err != nil {
-		t.Fatalf("Failed to parse response: %v", err)
-	}
+	response := ctx.ParseProjectResponse(t, recorder.Body.String())
 
 	// Note: The Show handler doesn't include logs in the response
 	// GetWithLogs is used for that in the repository
@@ -187,11 +173,22 @@ func TestProjectsResponseFormat(t *testing.T) {
 
 	ctx.CreateTestProject(t)
 
-	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/api/v1/projects", nil))
+	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/v1/projects.json", nil))
 
 	body := recorder.Body.String()
 
-	// Verify required fields are present
+	// Verify JSON:API envelope structure
+	if !contains(body, `"data"`) {
+		t.Errorf("Response missing 'data' field (JSON:API envelope)")
+	}
+	if !contains(body, `"type"`) {
+		t.Errorf("Response missing 'type' field (JSON:API envelope)")
+	}
+	if !contains(body, `"attributes"`) {
+		t.Errorf("Response missing 'attributes' field (JSON:API envelope)")
+	}
+
+	// Verify required fields are present in attributes
 	requiredFields := []string{"id", "name", "total_page", "page"}
 	for _, field := range requiredFields {
 		if !contains(body, `"`+field+`"`) {
@@ -212,7 +209,7 @@ func TestProjectsConcurrentReads(t *testing.T) {
 	done := make(chan bool, 5)
 	for i := 0; i < 5; i++ {
 		go func() {
-			recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/api/v1/projects", nil))
+			recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/v1/projects.json", nil))
 
 			if recorder.Code == http.StatusOK {
 				done <- true
@@ -267,7 +264,7 @@ func TestProjectsNewWithCustomConfig(t *testing.T) {
 
 	// Test via HTTP
 	client := &http.Client{}
-	req, err := http.NewRequest(http.MethodGet, server.URL+"/api/v1/projects", nil)
+	req, err := http.NewRequest(http.MethodGet, server.URL+"/v1/projects.json", nil)
 	if err != nil {
 		t.Fatalf("Failed to create request: %v", err)
 	}

@@ -8,6 +8,9 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
       POSTGRES_DB: ${DB_DATABASE}
+      # Timezone configuration for consistent date calculations
+      # This ensures PostgreSQL uses the same timezone as application containers
+      TZ: ${TZ_LOCATION:-America/Sao_Paulo}
     ports:
       - "5432:5432"
     volumes:
@@ -36,6 +39,8 @@ services:
       SERVER_HOST: ${SERVER_HOST}
       LOG_LEVEL: ${LOG_LEVEL}
       LOG_FORMAT: ${LOG_FORMAT}
+      # Timezone configuration for consistent date calculations
+      TZ: ${TZ_LOCATION:-America/Sao_Paulo}
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
     depends_on:
@@ -57,6 +62,8 @@ services:
       DB_DATABASE: ${DB_DATABASE}
       RAILS_ENV: development
       PORT: 3001
+      # Timezone configuration for consistent date calculations
+      TZ: ${TZ_LOCATION:-America/Sao_Paulo}
     ports:
       - "3001:3001"
     depends_on:

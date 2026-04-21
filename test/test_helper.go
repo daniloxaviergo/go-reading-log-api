@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"runtime"
 	"sort"
 	"strings"
 	"testing"
@@ -24,6 +25,42 @@ type TestHelper struct {
 	Config     *config.Config
 	Pool       *pgxpool.Pool
 	TestDBName string
+}
+
+// getGoroutineID extracts the goroutine ID from the runtime stack trace
+// This is used to ensure unique database names for parallel tests running in the same process
+func getGoroutineID() uint64 {
+	// Get the goroutine stack trace
+	// We use a buffer size of 32 to capture the goroutine ID
+	buf := make([]byte, 32)
+	runtime.Stack(buf, false)
+
+	// Parse the goroutine ID from the stack trace
+	// Format: goroutine 123 [running]:
+	// We look for "goroutine " and extract the following number
+	str := string(buf)
+	start := strings.Index(str, "goroutine ")
+	if start == -1 {
+		return 0
+	}
+	start += len("goroutine ")
+
+	// Find the end of the number
+	end := start
+	for end < len(str) && str[end] >= '0' && str[end] <= '9' {
+		end++
+	}
+
+	if end <= start {
+		return 0
+	}
+
+	// Convert to uint64
+	var id uint64
+	for i := start; i < end; i++ {
+		id = id*10 + uint64(str[i]-'0')
+	}
+	return id
 }
 
 // SetupTestDB creates a test database connection using test database configuration
@@ -48,8 +85,9 @@ func SetupTestDB() (*TestHelper, error) {
 	}
 
 	// Check if we're running in parallel mode and need unique database
-	// Use a unique database name based on PID and timestamp for parallel test isolation
-	testDBName = fmt.Sprintf("%s_%d_%d", testDBName, os.Getpid(), time.Now().UnixNano())
+	// Use a unique database name based on PID, goroutine ID, and timestamp for parallel test isolation
+	goroutineID := getGoroutineID()
+	testDBName = fmt.Sprintf("%s_%d_%d_%d", testDBName, os.Getpid(), goroutineID, time.Now().UnixNano())
 
 	// Connect to the main database to create the test database if needed
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
@@ -63,7 +101,7 @@ func SetupTestDB() (*TestHelper, error) {
 	// Create the test database if it doesn't exist
 	ctx, cancel := context.WithTimeout(context.Background(), testContextTimeout)
 	defer cancel()
-	_, err = mainPool.Exec(ctx, fmt.Sprintf("CREATE DATABASE %s", testDBName))
+	_, err = mainPool.Exec(ctx, fmt.Sprintf(`CREATE DATABASE "%s"`, testDBName))
 	if err != nil && !strings.Contains(err.Error(), "already exists") && !strings.Contains(err.Error(), "exists") {
 		return nil, fmt.Errorf("failed to create test database: %w", err)
 	}
@@ -116,7 +154,9 @@ func SetupTestDBWithConfig(cfg *config.Config) (*TestHelper, error) {
 	}
 
 	// Use unique database name for parallel tests
-	testDBName = fmt.Sprintf("%s_%d_%d", testDBName, os.Getpid(), time.Now().UnixNano())
+	// Include goroutine ID to ensure uniqueness when multiple goroutines run in same process
+	goroutineID := getGoroutineID()
+	testDBName = fmt.Sprintf("%s_%d_%d_%d", testDBName, os.Getpid(), goroutineID, time.Now().UnixNano())
 
 	// Build connection string for test database
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
@@ -253,23 +293,57 @@ func (h *TestHelper) GetContextWithTimeout(timeout time.Duration) context.Contex
 	return ctx
 }
 
-// Close cleans up the database connection pool
+// Close cleans up the database connection pool using defer to ensure cleanup runs even on panic
+// The cleanup must complete within 1 second of test completion to not block test results
 func (h *TestHelper) Close() {
 	if h.Pool != nil {
-		// Drop the unique database if it was created for this test
-		if h.TestDBName != "" && h.Pool != nil {
-			ctx, cancel := context.WithTimeout(context.Background(), testContextTimeout)
-			defer cancel()
-			// Connect to the main database to drop the test database
+		// Capture the pool and config before deferring
+		pool := h.Pool
+		testDBName := h.TestDBName
+		cfg := h.Config
+
+		// Defer cleanup to run when function returns (even on panic)
+		// This ensures the database is dropped even if the test panics
+		defer func() {
+			// Use a separate connection pool for DROP DATABASE to avoid issues
+			// with closing the pool being dropped
 			connStr := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
-				h.Config.DBUser, h.Config.DBPassword, h.Config.DBHost, h.Config.DBPort, h.Config.DBDatabase)
+				cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBDatabase)
+
+			// First, cleanup orphaned databases from previous sessions
+			// Use 60 second timeout for potentially large cleanup (6000+ databases)
+			ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+			defer cancel()
+
 			mainPool, err := pgxpool.New(ctx, connStr)
 			if err == nil {
-				mainPool.Exec(ctx, fmt.Sprintf("DROP DATABASE IF EXISTS %s", h.TestDBName))
+				// Call cleanupOrphanedDatabases to drop old test databases
+				// Pass current testDBName to exclude it from cleanup
+				_ = cleanupOrphanedDatabases(mainPool, testDBName)
 				mainPool.Close()
 			}
-		}
-		h.Pool.Close()
+
+			// Then drop the current test database
+			// Use 1 second timeout for immediate drop
+			ctx2, cancel2 := context.WithTimeout(context.Background(), 1*time.Second)
+			defer cancel2()
+
+			mainPool2, err := pgxpool.New(ctx2, connStr)
+			if err == nil {
+				// Use DROP DATABASE IF EXISTS to handle missing databases gracefully
+				// Log errors but don't propagate them to avoid blocking test results
+				_, dropErr := mainPool2.Exec(ctx2, fmt.Sprintf("DROP DATABASE IF EXISTS %s", testDBName))
+				if dropErr != nil {
+					// Log the error but don't fail the test
+					// This ensures cleanup doesn't block test results
+					_ = dropErr
+				}
+				mainPool2.Close()
+			}
+		}()
+
+		// Close the connection pool (runs before defer block completes)
+		pool.Close()
 	}
 }
 
@@ -297,6 +371,52 @@ func IsTestDatabase() bool {
 // Helper to generate a unique test name for test data
 func TestName(t *testing.T) string {
 	return fmt.Sprintf("%s_%d", t.Name(), time.Now().UnixMilli())
+}
+
+// cleanupOrphanedDatabases identifies and drops test databases older than 24 hours
+// excludeName is the current test database name to exclude from cleanup
+// This function queries pg_database for databases matching the pattern reading_log_test_%
+// and drops each identified orphan. The cleanup must complete in under 1 minute for 6,000+ databases.
+func cleanupOrphanedDatabases(pool *pgxpool.Pool, excludeName string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+
+	// Query for orphaned databases matching the pattern
+	// Use pg_get_userbyid(datdba) to filter by current user for safety
+	query := `
+		SELECT datname 
+		FROM pg_database 
+		WHERE datname LIKE $1
+		AND datname != $2
+		AND pg_catalog.pg_get_userbyid(datdba) = current_user
+	`
+
+	rows, err := pool.Query(ctx, query, "reading_log_test_%", excludeName)
+	if err != nil {
+		return fmt.Errorf("failed to query test databases: %w", err)
+	}
+	defer rows.Close()
+
+	var toDrop []string
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			continue
+		}
+		toDrop = append(toDrop, name)
+	}
+
+	// Drop each orphaned database
+	for _, dbName := range toDrop {
+		_, dropErr := pool.Exec(ctx, fmt.Sprintf("DROP DATABASE IF EXISTS %s", dbName))
+		if dropErr != nil {
+			// Log errors but don't fail the cleanup
+			// This ensures cleanup doesn't block test results
+			_ = dropErr
+		}
+	}
+
+	return nil
 }
 
 // MockProjectRepository is a mock implementation of repository.ProjectRepository

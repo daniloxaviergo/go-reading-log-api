@@ -1,16 +1,13 @@
 package integration
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"testing"
-
-	"go-reading-log-api-next/internal/domain/dto"
 )
 
-// TestLogsIndexIntegration tests the GET /api/v1/projects/:project_id/logs endpoint
+// TestLogsIndexIntegration tests the GET /v1/projects/:project_id/logs.json endpoint
 func TestLogsIndexIntegration(t *testing.T) {
 	if !IsTestDatabase() {
 		t.Skip("Test database not configured - skipping integration test")
@@ -24,7 +21,7 @@ func TestLogsIndexIntegration(t *testing.T) {
 	ctx.CreateTestLog(t, projectID)
 
 	// Make HTTP request to the test server
-	url := "/api/v1/projects/" + strconv.Itoa(int(projectID)) + "/logs"
+	url := "/v1/projects/" + strconv.Itoa(int(projectID)) + "/logs.json"
 	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, url, nil))
 
 	if recorder.Code != http.StatusOK {
@@ -32,14 +29,11 @@ func TestLogsIndexIntegration(t *testing.T) {
 		t.Errorf("Response body: %s", recorder.Body.String())
 	}
 
-	var response []*dto.LogResponse
-	if err := json.Unmarshal(recorder.Body.Bytes(), &response); err != nil {
-		t.Fatalf("Failed to parse response: %v", err)
-	}
+	logs := ctx.ParseLogResponseArray(t, recorder.Body.String())
 
 	// Should return first 4 logs (we created 2)
-	if len(response) != 2 {
-		t.Errorf("Expected 2 logs, got %d", len(response))
+	if len(logs) != 2 {
+		t.Errorf("Expected 2 logs, got %d", len(logs))
 	}
 }
 
@@ -55,20 +49,17 @@ func TestLogsIndexEmpty(t *testing.T) {
 	projectID := ctx.CreateTestProject(t)
 
 	// Make HTTP request to the test server
-	url := "/api/v1/projects/" + strconv.Itoa(int(projectID)) + "/logs"
+	url := "/v1/projects/" + strconv.Itoa(int(projectID)) + "/logs.json"
 	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, url, nil))
 
 	if recorder.Code != http.StatusOK {
 		t.Errorf("Expected status 200, got %d", recorder.Code)
 	}
 
-	var response []*dto.LogResponse
-	if err := json.Unmarshal(recorder.Body.Bytes(), &response); err != nil {
-		t.Fatalf("Failed to parse response: %v", err)
-	}
+	logs := ctx.ParseLogResponseArray(t, recorder.Body.String())
 
-	if len(response) != 0 {
-		t.Errorf("Expected 0 logs, got %d", len(response))
+	if len(logs) != 0 {
+		t.Errorf("Expected 0 logs, got %d", len(logs))
 	}
 }
 
@@ -82,7 +73,7 @@ func TestLogsIndexProjectNotFound(t *testing.T) {
 	defer ctx.Teardown(t)
 
 	// Make HTTP request to the test server
-	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/api/v1/projects/999999/logs", nil))
+	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/v1/projects/999999/logs.json", nil))
 
 	if recorder.Code != http.StatusNotFound {
 		t.Errorf("Expected status 404, got %d", recorder.Code)
@@ -96,7 +87,7 @@ func TestLogsIndexInvalidProjectID(t *testing.T) {
 	defer ctx.Teardown(t)
 
 	// Make HTTP request to the test server
-	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/api/v1/projects/invalid/logs", nil))
+	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, "/v1/projects/invalid/logs.json", nil))
 
 	if recorder.Code != http.StatusBadRequest {
 		t.Errorf("Expected status 400, got %d", recorder.Code)
@@ -120,21 +111,18 @@ func TestLogsIndexLimit(t *testing.T) {
 	}
 
 	// Make HTTP request to the test server
-	url := "/api/v1/projects/" + strconv.Itoa(int(projectID)) + "/logs"
+	url := "/v1/projects/" + strconv.Itoa(int(projectID)) + "/logs.json"
 	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, url, nil))
 
 	if recorder.Code != http.StatusOK {
 		t.Errorf("Expected status 200, got %d", recorder.Code)
 	}
 
-	var response []*dto.LogResponse
-	if err := json.Unmarshal(recorder.Body.Bytes(), &response); err != nil {
-		t.Fatalf("Failed to parse response: %v", err)
-	}
+	logs := ctx.ParseLogResponseArray(t, recorder.Body.String())
 
 	// Should be limited to 4
-	if len(response) != 4 {
-		t.Errorf("Expected 4 logs (limited), got %d", len(response))
+	if len(logs) != 4 {
+		t.Errorf("Expected 4 logs (limited), got %d", len(logs))
 	}
 }
 
@@ -151,24 +139,21 @@ func TestLogsIndexWithLogs(t *testing.T) {
 	ctx.CreateTestLogWithNote(t, projectID)
 
 	// Make HTTP request to the test server
-	url := "/api/v1/projects/" + strconv.Itoa(int(projectID)) + "/logs"
+	url := "/v1/projects/" + strconv.Itoa(int(projectID)) + "/logs.json"
 	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, url, nil))
 
 	if recorder.Code != http.StatusOK {
 		t.Errorf("Expected status 200, got %d", recorder.Code)
 	}
 
-	var response []*dto.LogResponse
-	if err := json.Unmarshal(recorder.Body.Bytes(), &response); err != nil {
-		t.Fatalf("Failed to parse response: %v", err)
-	}
+	logs := ctx.ParseLogResponseArray(t, recorder.Body.String())
 
-	if len(response) != 1 {
-		t.Errorf("Expected 1 log, got %d", len(response))
+	if len(logs) != 1 {
+		t.Errorf("Expected 1 log, got %d", len(logs))
 	}
 
 	// Verify log data is present
-	if response[0].Data == nil {
+	if logs[0].Data == nil {
 		t.Error("Log data should not be nil")
 	}
 }
@@ -187,7 +172,7 @@ func TestLogsIndexConcurrent(t *testing.T) {
 	done := make(chan bool, 5)
 	for i := 0; i < 5; i++ {
 		go func() {
-			url := "/api/v1/projects/" + strconv.Itoa(int(projectID)) + "/logs"
+			url := "/v1/projects/" + strconv.Itoa(int(projectID)) + "/logs.json"
 			recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, url, nil))
 
 			if recorder.Code == http.StatusOK {
@@ -223,7 +208,7 @@ func TestLogsIndexResponseFormat(t *testing.T) {
 	ctx.CreateTestLog(t, projectID)
 
 	// Make HTTP request to the test server
-	url := "/api/v1/projects/" + strconv.Itoa(int(projectID)) + "/logs"
+	url := "/v1/projects/" + strconv.Itoa(int(projectID)) + "/logs.json"
 	recorder := ctx.MakeRequest(t, httptest.NewRequest(http.MethodGet, url, nil))
 
 	body := recorder.Body.String()

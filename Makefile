@@ -59,6 +59,7 @@ help:
 	@echo "  make test              Run all tests"
 	@echo "  make test-verbose      Run tests with verbose output"
 	@echo "  make test-coverage     Run tests and generate coverage report"
+	@echo "  make test-clean        Clean up orphaned test databases"
 	@echo ""
 	@echo "$(GREEN)Examples:$(NC)"
 	@echo "  make run              # Start the server on :3000"
@@ -67,10 +68,30 @@ help:
 	@echo "  make test-coverage    # Generate coverage.out report"
 	@echo ""
 
-# Run the server in development mode
 run: build
-	@echo "$(YELLOW)Starting server...$(NC)"
-	$(GO_RUN) $(SERVER_CMD)
+	@PORT=$${SERVER_PORT:-3000}; \
+	if command -v lsof >/dev/null; then \
+		PIDS=$$(lsof -t -i :$$PORT); \
+		if [ -n "$$PIDS" ]; then \
+			echo "$(YELLOW)Killing existing processes: $$PIDS$(NC)"; \
+			kill -9 $$PIDS; \
+		fi; \
+	else \
+		echo "$(YELLOW)Warning: lsof not installed. Skipping port check.$(NC)"; \
+	fi; \
+ 	nohup bin/$(BINARY_NAME) > server.log 2>&1 &
+
+stop:
+	@PORT=$${SERVER_PORT:-3000}; \
+	if command -v lsof >/dev/null; then \
+		PIDS=$$(lsof -t -i :$$PORT); \
+		if [ -n "$$PIDS" ]; then \
+			echo "$(YELLOW)Killing existing processes: $$PIDS$(NC)"; \
+			kill -9 $$PIDS; \
+		fi; \
+	else \
+		echo "$(YELLOW)Warning: lsof not installed. Skipping port check.$(NC)"; \
+	fi; \
 
 # Build the binary
 build:
@@ -98,6 +119,27 @@ test-coverage:
 	@export $$(xargs < .env.test | grep -v '^#' | xargs) && $(GO_TEST) -coverprofile=$(COVERAGE_FILE) $(TEST_PKG)
 	@echo "$(GREEN)Coverage report generated: $(COVERAGE_FILE)$(NC)"
 	$(GO) tool cover -func=$(COVERAGE_FILE)
+
+# Clean up orphaned test databases
+test-clean:
+	@echo "$(BLUE)Cleaning up orphaned test databases...$(NC)"
+	@export $$(xargs < .env.test | grep -v '^#' | xargs) && \
+		$(GO) run ./test/cleanup_orphaned_databases.go 2>/dev/null || \
+		echo "$(YELLOW)No orphaned databases found or cleanup skipped$(NC)"
+	@echo "$(GREEN)Cleanup complete$(NC)"
+
+# Run parallel performance benchmarks
+benchmark-parallel:
+	@echo "$(BLUE)========================================$(NC)"
+	@echo "$(BLUE)  Running Parallel Performance Benchmarks$(NC)"
+	@echo "$(BLUE)========================================$(NC)"
+	@export $$(xargs < .env.test | grep -v '^#' | xargs) && \
+		$(GO) test -bench=BenchmarkParallel -benchmem -count=3 $(TEST_PKG)/performance
+	@echo "$(GREEN)Benchmark complete$(NC)"
+	@echo "$(YELLOW)Run 'go tool pprof -http=:8080 profile.out' to analyze results$(NC)"
+
+# Alias for test-clean (convenience)
+test-cleanup: test-clean
 
 # Format code
 fmt:

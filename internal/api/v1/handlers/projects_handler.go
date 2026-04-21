@@ -26,7 +26,7 @@ func NewProjectsHandler(repo repository.ProjectRepository) *ProjectsHandler {
 	return &ProjectsHandler{repo: repo}
 }
 
-// Create handles POST /api/v1/projects - creates a new project with page <= total_page validation
+// Create handles POST /v1/projects - creates a new project with page <= total_page validation
 func (h *ProjectsHandler) Create(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -99,9 +99,16 @@ func (h *ProjectsHandler) Create(w http.ResponseWriter, r *http.Request) {
 		response.StartedAt = &s
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	// Wrap response in JSON:API envelope
+	envelope := dto.NewJSONAPIEnvelope(dto.JSONAPIData{
+		Type:       "projects",
+		ID:         strconv.FormatInt(createdProject.ID, 10), // ID as string per JSON:API spec
+		Attributes: response,
+	})
+
+	w.Header().Set("Content-Type", "application/vnd.api+json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(response)
+	json.NewEncoder(w).Encode(envelope)
 }
 
 // Index returns all projects ordered by logs data DESC
@@ -117,14 +124,21 @@ func (h *ProjectsHandler) Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Convert to response DTOs
-	response := make([]*dto.ProjectResponse, len(projectsWithLogs))
+	// Convert to JSON:API data objects
+	dataObjects := make([]dto.JSONAPIData, len(projectsWithLogs))
 	for i, pw := range projectsWithLogs {
-		response[i] = pw.Project
+		dataObjects[i] = dto.JSONAPIData{
+			Type:       "projects",
+			ID:         strconv.FormatInt(pw.Project.ID, 10), // ID as string per JSON:API spec
+			Attributes: pw.Project,
+		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	// Wrap collection in envelope
+	envelope := dto.NewJSONAPIEnvelopeWithArray(dataObjects)
+
+	w.Header().Set("Content-Type", "application/vnd.api+json")
+	json.NewEncoder(w).Encode(envelope)
 }
 
 // Show returns a single project by ID with eager-loaded logs
@@ -150,6 +164,13 @@ func (h *ProjectsHandler) Show(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(projectWithLogs.Project)
+	// Wrap response in JSON:API envelope
+	envelope := dto.NewJSONAPIEnvelope(dto.JSONAPIData{
+		Type:       "projects",
+		ID:         strconv.FormatInt(projectWithLogs.Project.ID, 10), // ID as string per JSON:API spec
+		Attributes: projectWithLogs.Project,
+	})
+
+	w.Header().Set("Content-Type", "application/vnd.api+json")
+	json.NewEncoder(w).Encode(envelope)
 }

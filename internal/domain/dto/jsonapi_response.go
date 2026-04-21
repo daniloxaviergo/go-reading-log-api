@@ -1,11 +1,15 @@
 package dto
 
-import "context"
+import (
+	"context"
+	"strconv"
+)
 
 // JSONAPIEnvelope represents the JSON:API response envelope
 // Format: { "data": { "type": "...", "attributes": {...} } }
+// The data field can contain either a single JSONAPIData object or an array of them
 type JSONAPIEnvelope struct {
-	Data JSONAPIData `json:"data"`
+	Data interface{} `json:"data"`
 }
 
 // JSONAPIData represents the data object within JSON:API envelope
@@ -16,7 +20,18 @@ type JSONAPIData struct {
 }
 
 // NewJSONAPIEnvelope creates a new JSON:API envelope with the given data
-func NewJSONAPIEnvelope(data JSONAPIData) *JSONAPIEnvelope {
+// Supports both single data objects and collections (arrays)
+func NewJSONAPIEnvelope(data interface{}) *JSONAPIEnvelope {
+	return &JSONAPIEnvelope{Data: data.(JSONAPIData)}
+}
+
+// NewJSONAPIEnvelopeWithArray creates a new JSON:API envelope with an array of data objects
+// For collections, the data field contains an array of JSONAPIData objects
+func NewJSONAPIEnvelopeWithArray(data []JSONAPIData) *JSONAPIEnvelope {
+	// Ensure we have a non-nil slice to preserve type information
+	if data == nil {
+		data = []JSONAPIData{}
+	}
 	return &JSONAPIEnvelope{Data: data}
 }
 
@@ -33,7 +48,7 @@ type ProjectJSONAPIResponse struct {
 func NewProjectJSONAPIResponse(project *ProjectResponse) *ProjectJSONAPIResponse {
 	return &ProjectJSONAPIResponse{
 		ctx:        context.Background(),
-		ID:         project.ID,
+		ID:         strconv.FormatInt(project.ID, 10), // ID as string per JSON:API spec
 		Type:       "projects",
 		Attributes: project,
 	}

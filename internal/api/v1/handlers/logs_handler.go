@@ -74,8 +74,8 @@ func (h *LogsHandler) Index(w http.ResponseWriter, r *http.Request) {
 		limit = len(logs)
 	}
 
-	// Convert to response DTOs (with nested project object for Rails API compatibility)
-	response := make([]*dto.LogResponse, limit)
+	// Convert to JSON:API data objects
+	dataObjects := make([]dto.JSONAPIData, limit)
 	for i := 0; i < limit; i++ {
 		// Format StartedAt as string
 		var startedAtStr *string
@@ -84,7 +84,7 @@ func (h *LogsHandler) Index(w http.ResponseWriter, r *http.Request) {
 			startedAtStr = &formatted
 		}
 
-		response[i] = &dto.LogResponse{
+		logResponse := &dto.LogResponse{
 			ID:        logs[i].ID,
 			Data:      logs[i].Data,
 			StartPage: logs[i].StartPage,
@@ -100,8 +100,17 @@ func (h *LogsHandler) Index(w http.ResponseWriter, r *http.Request) {
 				Progress:  project.Progress,
 			},
 		}
+
+		dataObjects[i] = dto.JSONAPIData{
+			Type:       "logs",
+			ID:         strconv.FormatInt(logs[i].ID, 10), // ID as string per JSON:API spec
+			Attributes: logResponse,
+		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	// Wrap collection in envelope
+	envelope := dto.NewJSONAPIEnvelopeWithArray(dataObjects)
+
+	w.Header().Set("Content-Type", "application/vnd.api+json")
+	json.NewEncoder(w).Encode(envelope)
 }

@@ -28,17 +28,39 @@ func TestProjectsHandler_Index(t *testing.T) {
 		t.Errorf("Expected status code %d, got %d", http.StatusOK, w.Code)
 	}
 
-	var response []*dto.ProjectResponse
-	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+	// Verify Content-Type header
+	contentType := w.Header().Get("Content-Type")
+	if contentType != "application/vnd.api+json" {
+		t.Errorf("Expected Content-Type 'application/vnd.api+json', got '%s'", contentType)
+	}
+
+	// Decode JSON:API envelope
+	var envelope dto.JSONAPIEnvelope
+	if err := json.NewDecoder(w.Body).Decode(&envelope); err != nil {
 		t.Fatalf("Failed to decode response: %v", err)
 	}
 
-	if response == nil {
-		t.Error("Expected empty array, got nil")
+	// Verify data is an array of JSONAPIData
+	// Note: Empty slices may be encoded as []interface{} due to Go's json package behavior
+	dataArray, ok := envelope.Data.([]dto.JSONAPIData)
+	if !ok {
+		// Try interface{} slice for empty collections
+		if ifaceArr, ok := envelope.Data.([]interface{}); ok && len(ifaceArr) == 0 {
+			// Empty array is valid
+			return
+		}
+		t.Fatalf("Expected Data to be array of JSONAPIData, got %T", envelope.Data)
 	}
 
-	if len(response) != 0 {
-		t.Errorf("Expected 0 projects, got %d", len(response))
+	if len(dataArray) != 0 {
+		t.Errorf("Expected 0 projects, got %d", len(dataArray))
+	}
+
+	// Verify all IDs are strings
+	for _, item := range dataArray {
+		if _, ok := item.ID.(string); !ok {
+			t.Error("All project IDs must be strings")
+		}
 	}
 }
 
@@ -73,17 +95,48 @@ func TestProjectsHandler_IndexWithProjects(t *testing.T) {
 		t.Errorf("Expected status code %d, got %d", http.StatusOK, w.Code)
 	}
 
-	var response []*dto.ProjectResponse
-	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+	// Verify Content-Type header
+	contentType := w.Header().Get("Content-Type")
+	if contentType != "application/vnd.api+json" {
+		t.Errorf("Expected Content-Type 'application/vnd.api+json', got '%s'", contentType)
+	}
+
+	// Decode JSON:API envelope
+	var envelope dto.JSONAPIEnvelope
+	if err := json.NewDecoder(w.Body).Decode(&envelope); err != nil {
 		t.Fatalf("Failed to decode response: %v", err)
 	}
 
-	if len(response) != 2 {
-		t.Errorf("Expected 2 projects, got %d", len(response))
+	// Verify data structure - after json.Unmarshal, arrays become []interface{} containing map[string]interface{}
+	dataArray, ok := envelope.Data.([]dto.JSONAPIData)
+	if !ok {
+		// Try interface{} slice for collections
+		if ifaceArr, ok := envelope.Data.([]interface{}); ok {
+			if len(ifaceArr) != 2 {
+				t.Errorf("Expected 2 projects, got %d", len(ifaceArr))
+			}
+			// Verify all IDs are strings
+			for _, item := range ifaceArr {
+				if idMap, ok := item.(map[string]interface{}); ok {
+					if _, ok := idMap["id"].(string); !ok {
+						t.Errorf("Expected ID to be string, got %T", idMap["id"])
+					}
+				}
+			}
+			return
+		}
+		t.Fatalf("Expected Data to be array of JSONAPIData, got %T", envelope.Data)
 	}
 
-	if response[0].ID != 1 {
-		t.Errorf("Expected first project ID to be 1, got %d", response[0].ID)
+	if len(dataArray) != 2 {
+		t.Errorf("Expected 2 projects, got %d", len(dataArray))
+	}
+
+	// Verify all IDs are strings
+	for _, item := range dataArray {
+		if _, ok := item.ID.(string); !ok {
+			t.Error("All project IDs must be strings")
+		}
 	}
 }
 
@@ -134,13 +187,56 @@ func TestProjectsHandler_Show(t *testing.T) {
 		t.Errorf("Expected status code %d, got %d", http.StatusOK, w.Code)
 	}
 
-	var response dto.ProjectResponse
-	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+	// Verify Content-Type header
+	contentType := w.Header().Get("Content-Type")
+	if contentType != "application/vnd.api+json" {
+		t.Errorf("Expected Content-Type 'application/vnd.api+json', got '%s'", contentType)
+	}
+
+	// Decode JSON:API envelope
+	var envelope dto.JSONAPIEnvelope
+	if err := json.NewDecoder(w.Body).Decode(&envelope); err != nil {
 		t.Fatalf("Failed to decode response: %v", err)
 	}
 
-	if response.ID != 1 {
-		t.Errorf("Expected project ID to be 1, got %d", response.ID)
+	// Verify data structure - after json.Unmarshal, the interface{} becomes map[string]interface{}
+	// We need to verify the structure manually
+	dataMap, ok := envelope.Data.(map[string]interface{})
+	if !ok {
+		t.Fatalf("Expected Data to be a JSON object, got %T", envelope.Data)
+	}
+
+	// Verify required fields exist
+	if _, ok := dataMap["type"]; !ok {
+		t.Error("Missing 'type' field in data object")
+	}
+	if _, ok := dataMap["attributes"]; !ok {
+		t.Error("Missing 'attributes' field in data object")
+	}
+
+	// Verify ID is string (could be int or string depending on JSON)
+	idVal, ok := dataMap["id"]
+	if !ok {
+		t.Error("Missing 'id' field in data object")
+	} else {
+		// ID should be string per JSON:API spec
+		if _, ok := idVal.(string); !ok {
+			t.Errorf("Expected ID to be string type, got %T", idVal)
+		}
+	}
+
+	// Verify attributes structure
+	attrsMap, ok := dataMap["attributes"].(map[string]interface{})
+	if !ok {
+		t.Fatal("Expected Attributes to be an object")
+	}
+
+	if nameStr, ok := attrsMap["name"].(string); !ok || nameStr != "Test Project" {
+		t.Errorf("Expected name 'Test Project', got '%v'", attrsMap["name"])
+	}
+
+	if totalPage, ok := attrsMap["total_page"].(float64); !ok || int(totalPage) != 100 {
+		t.Errorf("Expected total_page 100, got %v", attrsMap["total_page"])
 	}
 }
 

@@ -42,17 +42,32 @@ func TestLogsHandler_Index(t *testing.T) {
 		t.Errorf("Expected status code %d, got %d", http.StatusOK, w.Code)
 	}
 
-	var response []*dto.LogResponse
-	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+	// Verify Content-Type header
+	contentType := w.Header().Get("Content-Type")
+	if contentType != "application/vnd.api+json" {
+		t.Errorf("Expected Content-Type 'application/vnd.api+json', got '%s'", contentType)
+	}
+
+	// Decode JSON:API envelope
+	var envelope dto.JSONAPIEnvelope
+	if err := json.NewDecoder(w.Body).Decode(&envelope); err != nil {
 		t.Fatalf("Failed to decode response: %v", err)
 	}
 
-	if response == nil {
-		t.Error("Expected empty array, got nil")
+	// Verify data is an array (for empty collection)
+	// Note: Empty slices may be encoded as []interface{} due to Go's json package behavior
+	dataArray, ok := envelope.Data.([]dto.JSONAPIData)
+	if !ok {
+		// Try interface{} slice for empty collections
+		if ifaceArr, ok := envelope.Data.([]interface{}); ok && len(ifaceArr) == 0 {
+			// Empty array is valid - just verify it's an array
+			return
+		}
+		t.Fatalf("Expected Data to be array of JSONAPIData, got %T", envelope.Data)
 	}
 
-	if len(response) != 0 {
-		t.Errorf("Expected 0 logs, got %d", len(response))
+	if len(dataArray) != 0 {
+		t.Errorf("Expected 0 logs, got %d", len(dataArray))
 	}
 }
 
@@ -99,14 +114,49 @@ func TestLogsHandler_IndexWithLogs(t *testing.T) {
 		t.Errorf("Expected status code %d, got %d", http.StatusOK, w.Code)
 	}
 
-	var response []*dto.LogResponse
-	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+	// Verify Content-Type header
+	contentType := w.Header().Get("Content-Type")
+	if contentType != "application/vnd.api+json" {
+		t.Errorf("Expected Content-Type 'application/vnd.api+json', got '%s'", contentType)
+	}
+
+	// Decode JSON:API envelope
+	var envelope dto.JSONAPIEnvelope
+	if err := json.NewDecoder(w.Body).Decode(&envelope); err != nil {
 		t.Fatalf("Failed to decode response: %v", err)
 	}
 
+	// Verify data structure - after json.Unmarshal, arrays become []interface{} containing map[string]interface{}
+	dataArray, ok := envelope.Data.([]dto.JSONAPIData)
+	if !ok {
+		// Try interface{} slice for collections
+		if ifaceArr, ok := envelope.Data.([]interface{}); ok {
+			if len(ifaceArr) != 4 {
+				t.Errorf("Expected 4 logs (limited), got %d", len(ifaceArr))
+			}
+			// Verify all IDs are strings
+			for _, item := range ifaceArr {
+				if idMap, ok := item.(map[string]interface{}); ok {
+					if _, ok := idMap["id"].(string); !ok {
+						t.Errorf("Expected ID to be string, got %T", idMap["id"])
+					}
+				}
+			}
+			return
+		}
+		t.Fatalf("Expected Data to be array of JSONAPIData, got %T", envelope.Data)
+	}
+
 	// Should limit to 4 logs
-	if len(response) != 4 {
-		t.Errorf("Expected 4 logs (limited), got %d", len(response))
+	if len(dataArray) != 4 {
+		t.Errorf("Expected 4 logs (limited), got %d", len(dataArray))
+	}
+
+	// Verify all IDs are strings
+	for _, item := range dataArray {
+		if _, ok := item.ID.(string); !ok {
+			t.Error("All log IDs must be strings")
+		}
 	}
 }
 
@@ -145,13 +195,48 @@ func TestLogsHandler_IndexWithLessThanLimit(t *testing.T) {
 		t.Errorf("Expected status code %d, got %d", http.StatusOK, w.Code)
 	}
 
-	var response []*dto.LogResponse
-	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+	// Verify Content-Type header
+	contentType := w.Header().Get("Content-Type")
+	if contentType != "application/vnd.api+json" {
+		t.Errorf("Expected Content-Type 'application/vnd.api+json', got '%s'", contentType)
+	}
+
+	// Decode JSON:API envelope
+	var envelope dto.JSONAPIEnvelope
+	if err := json.NewDecoder(w.Body).Decode(&envelope); err != nil {
 		t.Fatalf("Failed to decode response: %v", err)
 	}
 
-	if len(response) != 2 {
-		t.Errorf("Expected 2 logs, got %d", len(response))
+	// Verify data structure - after json.Unmarshal, arrays become []interface{} containing map[string]interface{}
+	dataArray, ok := envelope.Data.([]dto.JSONAPIData)
+	if !ok {
+		// Try interface{} slice for collections
+		if ifaceArr, ok := envelope.Data.([]interface{}); ok {
+			if len(ifaceArr) != 2 {
+				t.Errorf("Expected 2 logs, got %d", len(ifaceArr))
+			}
+			// Verify all IDs are strings
+			for _, item := range ifaceArr {
+				if idMap, ok := item.(map[string]interface{}); ok {
+					if _, ok := idMap["id"].(string); !ok {
+						t.Errorf("Expected ID to be string, got %T", idMap["id"])
+					}
+				}
+			}
+			return
+		}
+		t.Fatalf("Expected Data to be array of JSONAPIData, got %T", envelope.Data)
+	}
+
+	if len(dataArray) != 2 {
+		t.Errorf("Expected 2 logs, got %d", len(dataArray))
+	}
+
+	// Verify all IDs are strings
+	for _, item := range dataArray {
+		if _, ok := item.ID.(string); !ok {
+			t.Error("All log IDs must be strings")
+		}
 	}
 }
 
@@ -187,13 +272,48 @@ func TestLogsHandler_IndexWithOneLog(t *testing.T) {
 		t.Errorf("Expected status code %d, got %d", http.StatusOK, w.Code)
 	}
 
-	var response []*dto.LogResponse
-	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+	// Verify Content-Type header
+	contentType := w.Header().Get("Content-Type")
+	if contentType != "application/vnd.api+json" {
+		t.Errorf("Expected Content-Type 'application/vnd.api+json', got '%s'", contentType)
+	}
+
+	// Decode JSON:API envelope
+	var envelope dto.JSONAPIEnvelope
+	if err := json.NewDecoder(w.Body).Decode(&envelope); err != nil {
 		t.Fatalf("Failed to decode response: %v", err)
 	}
 
-	if len(response) != 1 {
-		t.Errorf("Expected 1 log, got %d", len(response))
+	// Verify data structure - after json.Unmarshal, arrays become []interface{} containing map[string]interface{}
+	dataArray, ok := envelope.Data.([]dto.JSONAPIData)
+	if !ok {
+		// Try interface{} slice for collections
+		if ifaceArr, ok := envelope.Data.([]interface{}); ok {
+			if len(ifaceArr) != 1 {
+				t.Errorf("Expected 1 log, got %d", len(ifaceArr))
+			}
+			// Verify all IDs are strings
+			for _, item := range ifaceArr {
+				if idMap, ok := item.(map[string]interface{}); ok {
+					if _, ok := idMap["id"].(string); !ok {
+						t.Errorf("Expected ID to be string, got %T", idMap["id"])
+					}
+				}
+			}
+			return
+		}
+		t.Fatalf("Expected Data to be array of JSONAPIData, got %T", envelope.Data)
+	}
+
+	if len(dataArray) != 1 {
+		t.Errorf("Expected 1 log, got %d", len(dataArray))
+	}
+
+	// Verify all IDs are strings
+	for _, item := range dataArray {
+		if _, ok := item.ID.(string); !ok {
+			t.Error("All log IDs must be strings")
+		}
 	}
 }
 

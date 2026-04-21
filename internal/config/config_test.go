@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"testing"
+	"time"
 )
 
 // TestLoadConfigDefaultValues tests that LoadConfig returns default values
@@ -224,5 +225,83 @@ func TestLoadConfigStatusRangesEmptyValues(t *testing.T) {
 	}
 	if config.DormindoRange != 14 {
 		t.Errorf("expected DormindoRange=14 (default for empty value), got %d", config.DormindoRange)
+	}
+}
+
+// TestLoadConfigTimezoneDefault tests that timezone defaults to BRT.
+func TestLoadConfigTimezoneDefault(t *testing.T) {
+	os.Unsetenv("TZ_LOCATION")
+
+	config := LoadConfig()
+
+	if config.TZLocation == nil {
+		t.Fatal("expected TZLocation to be set")
+	}
+
+	// Check that it's the Brazil timezone (BRT) by using FixedZone comparison
+	expectedLoc := time.FixedZone("BRT", -3*60*60)
+
+	// Compare string representation as Zone() is not exported
+	if config.TZLocation.String() != expectedLoc.String() {
+		t.Errorf("expected timezone '%s', got '%s'", expectedLoc.String(), config.TZLocation.String())
+	}
+}
+
+// TestLoadConfigTimezoneFromEnv tests that TZ_LOCATION env var is loaded.
+func TestLoadConfigTimezoneFromEnv(t *testing.T) {
+	os.Setenv("TZ_LOCATION", "America/Sao_Paulo")
+
+	config := LoadConfig()
+
+	if config.TZLocation == nil {
+		t.Fatal("expected TZLocation to be set")
+	}
+
+	// Verify the location can be used for time calculations
+	// We use a Time value's Zone() method with our Location
+	now := time.Now()
+	_, offset := now.In(config.TZLocation).Zone()
+
+	// Sao Paulo is UTC-3 (like BRT)
+	expectedOffset := -3 * 60 * 60
+
+	if offset != expectedOffset {
+		t.Errorf("expected timezone offset %d, got %d", expectedOffset, offset)
+	}
+}
+
+// TestLoadConfigTimezoneInvalidFallback tests that invalid TZ_LOCATION falls back to BRT.
+func TestLoadConfigTimezoneInvalidFallback(t *testing.T) {
+	os.Setenv("TZ_LOCATION", "Invalid/Timezone")
+
+	config := LoadConfig()
+
+	if config.TZLocation == nil {
+		t.Fatal("expected TZLocation to be set")
+	}
+
+	// Should fallback to BRT
+	expectedLoc := time.FixedZone("BRT", -3*60*60)
+
+	if config.TZLocation.String() != expectedLoc.String() {
+		t.Errorf("expected timezone '%s' (fallback), got '%s'", expectedLoc.String(), config.TZLocation.String())
+	}
+}
+
+// TestLoadConfigTimezoneEmptyFallback tests that empty TZ_LOCATION falls back to BRT.
+func TestLoadConfigTimezoneEmptyFallback(t *testing.T) {
+	os.Setenv("TZ_LOCATION", "")
+
+	config := LoadConfig()
+
+	if config.TZLocation == nil {
+		t.Fatal("expected TZLocation to be set")
+	}
+
+	// Should fallback to BRT
+	expectedLoc := time.FixedZone("BRT", -3*60*60)
+
+	if config.TZLocation.String() != expectedLoc.String() {
+		t.Errorf("expected timezone '%s' (fallback), got '%s'", expectedLoc.String(), config.TZLocation.String())
 	}
 }
