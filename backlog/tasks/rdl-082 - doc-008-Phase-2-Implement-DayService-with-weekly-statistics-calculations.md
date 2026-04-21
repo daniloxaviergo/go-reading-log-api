@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 20:22'
+updated_date: '2026-04-21 20:23'
 labels:
   - phase-2
   - service
@@ -276,6 +276,58 @@ ok      go-reading-log-api-next/internal/api/v1/handlers        0.011s
 - ✅ Clean Architecture layers properly followed
 - ✅ Error responses consistent with existing patterns
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Task RDL-082 - DayService with Weekly Statistics Calculations
+
+### What Was Done
+
+Implemented `internal/service/dashboard/day_service.go` calculating weekly statistics for dashboard views:
+
+**Core Implementation:**
+- Created `DayService` struct with repository and config dependencies
+- Implemented `CalculateWeeklyStats()` method computing:
+  - `previous_week_pages`: Sum of pages from 14-7 days ago
+  - `last_week_pages`: Sum of pages from 7 days ago to today  
+  - `per_pages`: Ratio (last_week / previous_week * 100) with 3 decimal precision
+  - `mean_day`: Average pages per day for current weekday
+  - `spec_mean_day`: mean_day * (1 + prediction_pct from config)
+- Created `GetToday()` helper function for consistent date references
+- All float values rounded to 3 decimal places as per AC-DASH-001
+
+**Repository Extension:**
+- Added `CalculatePeriodPages()`, `GetProjectWeekdayMean()`, and `GetPool()` methods to `DashboardRepository` interface
+- Implemented PostgreSQL adapter methods in `postgres.DashboardRepositoryImpl`
+
+**Testing:**
+- Created comprehensive unit tests in `test/unit/day_service_test.go`
+- Tests cover all calculation methods, edge cases (zero division, empty data), and float precision
+- All 13 test cases passing
+- Updated existing mocks in `dashboard_handler_test.go` and `routes_test.go`
+
+**Files Modified:**
+| File | Change |
+|------|--------|
+| `internal/service/dashboard/day_service.go` | New - Main service implementation |
+| `internal/repository/dashboard_repository.go` | Extended interface |
+| `internal/adapter/postgres/dashboard_repository.go` | Added implementations |
+| `internal/domain/dto/dashboard_response.go` | Added ProjectID to LogEntry |
+| `test/unit/day_service_test.go` | New - Unit tests |
+| `internal/api/v1/handlers/dashboard_handler_test.go` | Updated mock |
+| `internal/api/v1/routes_test.go` | Updated mock |
+
+### Verification
+- ✅ All unit tests pass (0.848s)
+- ✅ All integration tests pass (3.481s)
+- ✅ `go fmt` passes
+- ✅ `go vet` passes with no errors
+- ✅ Clean Architecture layers properly followed
+- ✅ Error responses consistent with existing patterns
+- ✅ All acceptance criteria checked
+- ✅ All Definition of Done items satisfied
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
