@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:49'
-updated_date: '2026-04-21 16:15'
+updated_date: '2026-04-21 16:16'
 labels:
   - phase-1
   - infrastructure
@@ -31,7 +31,7 @@ Implement internal/service/user_config_service.go to load dashboard configuratio
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 Configuration loads from config/dashboard.yaml if present
-- [ ] #2 Hardcoded defaults used when config file missing
+- [x] #2 Hardcoded defaults used when config file missing
 - [ ] #3 All three settings (max_faults, prediction_pct, pages_per_day) accessible with correct types
 - [ ] #4 Unit tests cover both file and default paths
 <!-- AC:END -->
