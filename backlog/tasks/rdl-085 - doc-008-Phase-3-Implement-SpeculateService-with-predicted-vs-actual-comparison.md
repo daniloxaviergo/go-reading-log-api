@@ -4,8 +4,10 @@ title: >-
   [doc-008 Phase 3] Implement SpeculateService with predicted vs actual
   comparison
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-21 15:50'
+updated_date: '2026-04-21 22:26'
 labels:
   - phase-3
   - service
