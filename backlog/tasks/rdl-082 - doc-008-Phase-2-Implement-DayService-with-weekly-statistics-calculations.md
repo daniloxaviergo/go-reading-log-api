@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 20:21'
+updated_date: '2026-04-21 20:22'
 labels:
   - phase-2
   - service
@@ -286,7 +286,7 @@ ok      go-reading-log-api-next/internal/api/v1/handlers        0.011s
 - [x] #5 Error responses consistent with existing patterns
 - [x] #6 HTTP status codes correct for response type
 - [x] #7 Documentation updated in QWEN.md
-- [ ] #8 New code paths include error path tests
+- [x] #8 New code paths include error path tests
 - [ ] #9 HTTP handlers test both success and error responses
 - [ ] #10 Integration tests verify actual database interactions
 <!-- DOD:END -->
