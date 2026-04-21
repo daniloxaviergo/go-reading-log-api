@@ -5,7 +5,7 @@ status: Done
 assignee:
   - thomas
 created_date: '2026-04-21 12:11'
-updated_date: '2026-04-21 13:55'
+updated_date: '2026-04-21 13:56'
 labels:
   - testing
   - backend
@@ -216,6 +216,66 @@ PASS
 ### Notes:
 The JSON:API response structure was corrected during this task. Previously, relationships were incorrectly placed inside the `attributes` object. The fix moves them to the envelope level (sibling to attributes), which is the correct JSON:API specification format.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Completed the update of integration tests for JSON:API schema compliance. This task involved fixing the JSON:API response structure (moving relationships from attributes to envelope level) and adding comprehensive validation tests.
+
+## Changes Made
+
+### 1. Fixed JSON:API Response Structure
+- **`internal/domain/dto/log_response.go`**: Removed `Relationships` field from `LogResponse` struct
+- **`internal/domain/dto/jsonapi_response.go`**: Added `Relationships` field to `JSONAPIData` struct
+- **`internal/api/v1/handlers/logs_handler.go`**: Updated handler to place relationships at envelope level (sibling to attributes)
+
+### 2. Enhanced Test Helpers (`test/integration/test_context.go`)
+- `ValidateJSONAPIStructure()`: Validates JSON:API schema structure
+- `VerifyRFC3339Date()`: Verifies RFC3339 date format compliance
+- `CalculatePayloadSize()`: Calculates response payload size
+- `ExtractRelationships()`: Extracts relationship data from responses
+- `ExtractIncludedResources()`: Extracts included resources from envelope
+
+### 3. Added New Integration Tests (`test/integration/logs_integration_test.go`)
+- `TestLogsIndexJSONAPIStructure`: Validates JSON:API envelope structure
+- `TestLogsIndexRFC3339DateFormat`: Verifies RFC3339 date format
+- `TestLogsIndexPayloadSize`: Validates payload size (under 5KB)
+- `TestLogsIndexRelationshipReference`: Confirms proper relationship references
+- `TestLogsIndexEmptyJSONAPIStructure`: Tests empty result structure
+
+### 4. Updated Test Data
+- Removed `Relationships` field usage from test data files
+- Updated `GetProject450Logs()` and related functions
+
+## Test Results
+All 13 logs-related tests pass:
+- ✅ TestLogsIndexIntegration
+- ✅ TestLogsIndexEmpty
+- ✅ TestLogsIndexProjectNotFound
+- ✅ TestLogsIndexInvalidProjectID
+- ✅ TestLogsIndexLimit
+- ✅ TestLogsIndexWithLogs
+- ✅ TestLogsIndexConcurrent
+- ✅ TestLogsIndexResponseFormat
+- ✅ TestLogsIndexJSONAPIStructure
+- ✅ TestLogsIndexRFC3339DateFormat
+- ✅ TestLogsIndexPayloadSize
+- ✅ TestLogsIndexRelationshipReference
+- ✅ TestLogsIndexEmptyJSONAPIStructure
+
+## Code Quality
+- ✅ `go fmt` passes
+- ✅ `go vet` passes
+- ✅ All unit tests pass
+- ✅ All integration tests pass
+
+## Acceptance Criteria Met
+- [x] #1 Tests validate JSON:API schema
+- [x] #2 Date format checked for RFC3339
+- [x] #3 Payload size verified
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
