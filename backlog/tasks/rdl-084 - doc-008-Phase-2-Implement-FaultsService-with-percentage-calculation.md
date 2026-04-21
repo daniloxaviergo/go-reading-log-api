@@ -29,7 +29,7 @@ Implement internal/service/dashboard/faults_service.go counting ALL faults (rega
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 Counts all faults regardless of status (matches Rails)
-- [ ] #2 Percentage calculation correct with 2 decimal precision
+- [x] #2 Percentage calculation correct with 2 decimal precision
 - [ ] #3 Zero faults returns 0% not NaN/error
 - [ ] #4 Max faults from config with default fallback
 <!-- AC:END -->
