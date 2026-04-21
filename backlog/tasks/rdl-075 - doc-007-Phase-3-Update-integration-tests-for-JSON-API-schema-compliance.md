@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 12:11'
-updated_date: '2026-04-21 13:37'
+updated_date: '2026-04-21 13:38'
 labels:
   - testing
   - backend
@@ -109,7 +109,7 @@ The goal is to update integration tests for the logs endpoint to validate JSON:A
 <!-- SECTION:NOTES:BEGIN -->
 ## Implementation Progress - RDL-075
 
-### Status: In Progress
+### Status: In Progress (Coding Phase)
 
 ### Completed Analysis:
 1.  **Codebase Review**: Reviewed `logs_handler.go`, `log_response.go`, and `jsonapi_response.go`.
@@ -120,20 +120,22 @@ The goal is to update integration tests for the logs endpoint to validate JSON:A
     *   Existing test file (`logs_integration_test.go`) parses responses but lacks specific assertions for JSON:API schema elements like `relationships`, `included`, and strict RFC3339 format validation.
 
 ### Implementation Plan (from PRD):
-1.  Enhance `test/integration/test_context.go` to include robust JSON:API parsing helpers.
+1.  Enhance `test_context.go` to include robust JSON:API parsing helpers.
 2.  Update `logs_integration_test.go` to add specific test cases for JSON:API schema compliance.
-3.  Ensure tests handle the new envelope structure correctly.
+
+### Changes Made:
+
+#### 1. Updated `test/integration/test_context.go`
+Added new helper methods to support JSON:API validation:
+*   `ValidateJSONAPIStructure`: Verifies the presence of `data`, `relationships`, and `included` fields.
+*   `VerifyRFC3339Date`: Parses date strings using RFC3339 format to ensure compliance.
+*   `CalculatePayloadSize`: Returns the byte size of a response body for size verification.
+*   `ExtractRelationships`: Helper to extract relationship data from parsed JSON.
 
 ### Next Steps:
-1.  Modify `test_context.go` to add helper methods specifically for JSON:API envelope validation.
-2.  Modify `logs_integration_test.go` to add tests for:
-    *   Schema structure validation (presence of `data`, `relationships`, `included`).
-    *   RFC3339 date format verification.
-    *   Payload size verification.
-    *   Relationship reference correctness.
-
-### Blockers/Decisions:
-*   None currently. Ready to write code.
+1.  Modify `logs_integration_test.go` to add tests for schema structure, date format, and payload size.
+2.  Run tests to ensure they pass.
+3.  Check acceptance criteria.
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
