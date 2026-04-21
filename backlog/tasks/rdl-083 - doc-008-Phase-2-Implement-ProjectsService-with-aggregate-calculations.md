@@ -3,9 +3,9 @@ id: RDL-083
 title: '[doc-008 Phase 2] Implement ProjectsService with aggregate calculations'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 21:25'
+updated_date: '2026-04-21 21:26'
 labels:
   - phase-2
   - service
