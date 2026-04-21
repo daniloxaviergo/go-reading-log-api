@@ -2,8 +2,10 @@
 id: RDL-072
 title: '[doc-007 Phase 1] Update LogResponse DTO for RFC3339 dates and relationships'
 status: To Do
-assignee: []
+assignee:
+  - workflow
 created_date: '2026-04-21 12:11'
+updated_date: '2026-04-21 12:18'
 labels:
   - refactoring
   - backend
