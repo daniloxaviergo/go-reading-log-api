@@ -3,9 +3,9 @@ id: RDL-084
 title: '[doc-008 Phase 2] Implement FaultsService with percentage calculation'
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 21:34'
+updated_date: '2026-04-21 21:36'
 labels:
   - phase-2
   - service
