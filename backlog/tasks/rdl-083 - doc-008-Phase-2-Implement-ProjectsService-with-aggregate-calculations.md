@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 20:27'
+updated_date: '2026-04-21 20:29'
 labels:
   - phase-2
   - service
@@ -172,6 +172,57 @@ projects, err := projectService.GetAll(r.Context())
 - [ ] #4: Ensure `total_pages` and `pages` match database values exactly
 - [ ] #5: Confirm results sorted by progress descending (highest first)
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+# Implementation Progress - RDL-083: ProjectsService with Aggregate Calculations
+
+## Date: 2026-04-21
+
+### Current Status
+Started implementation of `ProjectsService` in `internal/service/dashboard/`.
+
+### What's Been Done
+1. **Analyzed codebase structure**:
+   - Reviewed existing `DayService` as a pattern reference
+   - Examined `DashboardRepository` interface and PostgreSQL implementation
+   - Understood DTO structures in `dashboard_response.go`
+   - Identified testing patterns from `dashboard_repository_test.go`
+
+2. **Created initial implementation plan**:
+   - Service should query all projects with eager-loaded logs
+   - First 4 logs per project, ordered by date DESC
+   - Calculate aggregates: progress_geral, total_pages, pages
+   - Order results by progress descending
+
+### In Progress
+Currently implementing the `ProjectsService` with the following components:
+
+**Files to create/modify:**
+- `internal/service/dashboard/projects_service.go` - Main service implementation
+- `internal/service/dashboard/projects_service_test.go` - Unit tests
+- `internal/api/v1/handlers/dashboards_handler.go` - Wire service into handler
+
+**Key Design Decisions:**
+1. Use existing `DashboardRepository` interface methods
+2. Implement eager loading with single JOIN query pattern
+3. Calculate aggregates in Go for testability and precision
+4. Follow Clean Architecture layers properly
+
+### Next Steps
+1. Implement `ProjectsService` with `GetAll` method
+2. Add eager loading logic for logs (first 4, date DESC)
+3. Implement aggregate calculations
+4. Add sorting by progress descending
+5. Write unit tests
+6. Write integration tests
+7. Wire into handler
+8. Run all tests and verify acceptance criteria
+
+### Blockers/Issues
+None currently.
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
