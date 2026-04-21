@@ -3,7 +3,7 @@ id: RDL-082
 title: '[doc-008 Phase 2] Implement DayService with weekly statistics calculations'
 status: To Do
 assignee:
-  - workflow
+  - thomas
 created_date: '2026-04-21 15:50'
 updated_date: '2026-04-21 19:40'
 labels:
