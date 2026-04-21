@@ -28,7 +28,7 @@ Implement internal/service/dashboard/projects_service.go querying all projects w
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 All projects retrieved with eager-loaded logs
+- [x] #1 All projects retrieved with eager-loaded logs
 - [ ] #2 Log ordering correct (first 4, date DESC)
 - [ ] #3 Progress aggregate calculated correctly
 - [ ] #4 Total pages and pages aggregates accurate
