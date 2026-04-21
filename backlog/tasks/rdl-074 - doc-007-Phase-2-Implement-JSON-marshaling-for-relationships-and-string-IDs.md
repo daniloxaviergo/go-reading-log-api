@@ -1,7 +1,7 @@
 ---
 id: RDL-074
 title: '[doc-007 Phase 2] Implement JSON marshaling for relationships and string IDs'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-21 12:11'
