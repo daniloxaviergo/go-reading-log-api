@@ -5,9 +5,9 @@ title: >-
   loading
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-21 15:49'
-updated_date: '2026-04-21 16:00'
+updated_date: '2026-04-21 16:02'
 labels:
   - phase-1
   - infrastructure
