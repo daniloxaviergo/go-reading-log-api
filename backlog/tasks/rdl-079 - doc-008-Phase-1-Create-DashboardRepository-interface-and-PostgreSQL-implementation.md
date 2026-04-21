@@ -5,7 +5,7 @@ title: >-
   implementation
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-21 15:49'
 updated_date: '2026-04-21 16:29'
 labels:
