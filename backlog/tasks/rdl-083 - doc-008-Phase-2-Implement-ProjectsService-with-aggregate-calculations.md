@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 21:20'
+updated_date: '2026-04-21 21:21'
 labels:
   - phase-2
   - service
@@ -237,7 +237,7 @@ projects, err := projectService.GetAll(r.Context())
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 All unit tests pass
+- [x] #1 All unit tests pass
 - [ ] #2 All integration tests pass execution and verification
 - [ ] #3 go fmt and go vet pass with no errors
 - [ ] #4 Clean Architecture layers properly followed
