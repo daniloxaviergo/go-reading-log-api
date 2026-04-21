@@ -3,7 +3,7 @@ id: RDL-071
 title: Create a documentation of differencies
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-21 10:35'
 updated_date: '2026-04-21 11:49'
 labels: []
