@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 10:15'
-updated_date: '2026-04-21 10:24'
+updated_date: '2026-04-21 10:27'
 labels: []
 dependencies: []
 ---
@@ -175,34 +175,72 @@ This task fixes a **timezone conversion bug** where Go was extracting date parts
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-## Implementation Progress - RDL-070
+## Implementation Progress - RDL-070 (Updated)
 
-### Analysis Complete
-Identified the root cause: timezone conversion bug in `project.go` where date calculations use UTC time instead of the application's configured timezone (BRT).
+### Changes Made
 
-**The Bug:**
+**1. Created Timezone Middleware (`internal/api/v1/middleware/timezone.go`)**
+- New middleware that sets the timezone in request context from config
+- Ensures all handlers have access to the configured timezone (BRT by default)
+- Follows existing middleware pattern in the codebase
+
+**2. Updated Server Setup (`cmd/server.go`)**
+- Added `TimezoneMiddleware(cfg)` to the middleware chain
+- Positioned after RequestIDMiddleware, before LoggingMiddleware
+- Chain now: Recovery → CORS → RequestID → Timezone → Logging → Handler
+
+**3. Fixed Date Calculations in `internal/domain/models/project.go`**
+
+Fixed three methods that had the timezone bug:
+
+| Method | Fix Applied |
+|--------|-------------|
+| `CalculateDaysUnreading()` | Changed `time.Now()` to `time.Now().In(tzLocation)` before extracting date parts |
+| `CalculateMedianDay()` | Changed `time.Now()` to `time.Now().In(tzLocation)` before extracting date parts |
+| `CalculateFinishedAt()` | Changed `time.Now()` to `time.Now().In(tzLocation)` before extracting date parts |
+
+**Before (buggy):**
 ```go
 now := time.Now()  // Gets UTC time
+ctx := p.GetContext()
+tzLocation := getTimezoneFromContext(ctx)
 nowDate := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, tzLocation)
 ```
 
-When UTC is `2026-04-21 02:00:00`, extracting date parts gives Year=2026, Month=4, Day=21. Then applying BRT (-3 hours) shifts the date to `2026-04-20`.
-
-**The Fix:**
+**After (fixed):**
 ```go
-now := time.Now().In(tzLocation)  // Convert to target timezone first
+ctx := p.GetContext()
+tzLocation := getTimezoneFromContext(ctx)
+now := time.Now().In(tzLocation)  // Convert to target timezone FIRST
 nowDate := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, tzLocation)
 ```
 
-### Files to Modify
-1. `internal/domain/models/project.go` - Fix all three methods using `.In(tzLocation)`
-2. Add timezone middleware to set context timezone
+### Test Results
+
+**Unit Tests:** ✅ All PASS
+```bash
+go test -v ./internal/domain/models/...
+go test -v ./internal/validation/...
+go test -v ./test/unit/...
+```
+
+**Integration Tests:** ⚠️ Expected failure (no database setup)
+- Test requires PostgreSQL running and test database created
+
+### Verification Checklist
+
+| Criterion | Status |
+|-----------|--------|
+| go fmt passes | ✅ No output, code properly formatted |
+| go vet passes | ✅ No errors |
+| Clean Architecture layers followed | ✅ Middleware in api layer, config injected from cmd |
+| Timezone fix matches Rails behavior | ✅ Uses `.In(tzLocation)` before date extraction |
+| Existing tests still pass | ✅ All unit tests pass |
 
 ### Next Steps
-1. Create a timezone middleware to populate context with configured timezone
-2. Update project.go methods to use `.In(tzLocation)` before extracting date parts
-3. Write tests for timezone-aware calculations
-4. Run all tests to verify fix
+
+1. Run integration tests with database setup to verify end-to-end behavior
+2. Manual testing against Rails API to confirm `days_unreading` and `median_day` values match
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
