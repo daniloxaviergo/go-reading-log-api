@@ -3,9 +3,9 @@ id: RDL-091
 title: '[doc-008 Phase 5] Update API documentation with dashboard endpoints'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-21 15:52'
-updated_date: '2026-04-22 16:58'
+updated_date: '2026-04-22 16:59'
 labels:
   - phase-5
   - documentation
