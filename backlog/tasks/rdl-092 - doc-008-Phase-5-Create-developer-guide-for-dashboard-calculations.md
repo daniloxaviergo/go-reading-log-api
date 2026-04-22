@@ -2,8 +2,10 @@
 id: RDL-092
 title: '[doc-008 Phase 5] Create developer guide for dashboard calculations'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-21 15:52'
+updated_date: '2026-04-22 16:59'
 labels:
   - phase-5
   - documentation
