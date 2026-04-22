@@ -27,7 +27,7 @@ Document all 8 dashboard endpoints in API docs including request/response format
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 All 8 endpoints documented with request/response formats
+- [x] #1 All 8 endpoints documented with request/response formats
 - [ ] #2 Example requests and responses provided
 - [ ] #3 Parameter descriptions complete and accurate
 - [ ] #4 Documentation consistent with existing style
