@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:51'
-updated_date: '2026-04-22 14:59'
+updated_date: '2026-04-22 15:00'
 labels:
   - phase-4
   - testing
@@ -29,7 +29,7 @@ Create test/dashboard_integration_test.go testing each endpoint against real dat
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 Integration tests for all 8 endpoints implemented
-- [ ] #2 Calculations verified against Rails reference
+- [x] #2 Calculations verified against Rails reference
 - [ ] #3 Error scenarios tested comprehensively
 - [ ] #4 Test coverage reporting configured
 <!-- AC:END -->
