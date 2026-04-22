@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-22 17:44'
-updated_date: '2026-04-22 18:03'
+updated_date: '2026-04-22 18:06'
 labels: []
 dependencies: []
 ---
@@ -208,6 +208,32 @@ mockRepo.On("GetLogsByDateRange", mock.Anything, mock.Anything, mock.Anything).
 - Weekday fix improves data completeness
 - Test mock update only affects test execution
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - RDL-093: Fix Broken Tests
+
+### Analysis Complete ✓
+Identified 3 distinct test failure issues:
+1. **Title mismatch**: "Fault Percentage" vs "Faults Gauge" in gauge chart
+2. **Missing weekday data**: Test mock returns incomplete weekday map (missing weekday 2)
+3. **Missing mock configuration**: MeanProgress test doesn't mock GetLogsByDateRange
+
+### Files Identified for Modification
+| File | Change |
+|------|--------|
+| `internal/service/dashboard/faults_service.go` | Line ~89: Change title from "Fault Percentage" to "Faults Gauge" |
+| `internal/api/v1/handlers/dashboard_handler_test.go` | Update WeekdayFaults mock to return all 7 weekdays (0-6) |
+| `internal/api/v1/handlers/dashboard_handler_test.go` | Add GetLogsByDateRange mock to MeanProgress test |
+
+### Next Steps
+1. Fix the gauge chart title in faults_service.go
+2. Update test mocks for complete weekday data
+3. Add missing mock configuration for MeanProgress test
+4. Run tests to verify all fixes
+5. Check acceptance criteria and Definition of Done
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
