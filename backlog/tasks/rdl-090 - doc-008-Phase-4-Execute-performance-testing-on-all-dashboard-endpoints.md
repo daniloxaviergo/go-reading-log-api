@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-21 15:51'
-updated_date: '2026-04-22 15:09'
+updated_date: '2026-04-22 15:20'
 labels:
   - phase-4
   - testing
@@ -33,6 +33,364 @@ Run benchmark tests on all dashboard endpoints identifying slow queries and veri
 - [ ] #3 Slow queries identified and optimized
 - [ ] #4 Connection pooling verified working
 <!-- AC:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+### 1. Technical Approach
+
+The implementation will create a comprehensive performance testing suite for all 8 dashboard endpoints using Go's built-in benchmarking framework and external load testing tools.
+
+**Architecture Decisions:**
+
+1. **Benchmark Structure**: Create dedicated benchmark test files following the existing `test/performance/` pattern with:
+   - `dashboard_benchmark_test.go` - Main benchmark tests for all endpoints
+   - `dashboard_load_test.go` - Load testing with concurrent requests
+   - `dashboard_query_analyzer.go` - Query performance analysis utilities
+
+2. **Benchmark Categories**:
+   - **Single-request latency**: Measure time for single request (warm-up + measured iterations)
+   - **Concurrent capacity**: Use `b.RunParallel()` to test QPS under load
+   - **Cold start**: Measure first request latency after process restart
+   - **Sustained load**: Long-running benchmarks to test connection pooling
+
+3. **Query Analysis**: Integrate with existing `pgx` query tracing to identify slow queries:
+   - Use `pgx.QueryTracer` for detailed query timing
+   - Log queries exceeding threshold (10ms)
+   - Track query plan statistics
+
+4. **Connection Pooling Verification**: 
+   - Monitor pool stats during benchmarks (`pool.Stats()`)
+   - Verify connections are reused efficiently
+   - Test under concurrent load to ensure pool doesn't exhaust
+
+5. **Comparison with Baseline**:
+   - Extend existing `baseline.go` with dashboard-specific metrics
+   - Track p50, p95, p99 latency percentiles
+   - Alert on regression > 20% from baseline
+
+**Why This Approach:**
+- Uses Go's native benchmarking (no external dependencies)
+- Consistent with existing project patterns
+- Provides detailed metrics for analysis
+- Easy to integrate into CI/CD pipeline
+
+---
+
+### 2. Files to Modify
+
+#### New Files to Create:
+
+| File Path | Purpose |
+|-----------|---------|
+| `test/performance/dashboard_benchmark_test.go` | Main benchmark tests for all 8 dashboard endpoints |
+| `test/performance/dashboard_load_test.go` | Concurrent load testing with golang.org/x/sync/errgroup |
+| `test/performance/dashboard_query_analyzer.go` | Query performance analysis and slow query detection |
+| `test/performance/baseline_dashboard.go` | Dashboard-specific baseline metrics management |
+| `docs/performance/dashboard-benchmarks.md` | Documentation of benchmark results and methodology |
+
+#### Existing Files to Modify:
+
+| File Path | Modification |
+|-----------|--------------|
+| `test/performance/baseline.go` | Add `DashboardStats` struct and update `BenchmarkStats` to include dashboard metrics |
+| `test/performance/comparison_test.go` | Add dashboard endpoint benchmarks (`BenchmarkDashboardDay`, `BenchmarkDashboardProjects`, etc.) |
+| `internal/api/v1/handlers/dashboard_handler.go` | Add timing instrumentation for request duration tracking |
+| `go.mod` | Add `golang.org/x/sync/errgroup` for concurrent load testing |
+
+---
+
+### 3. Dependencies
+
+**Prerequisites:**
+- [ ] All dashboard endpoints implemented (RDL-081-RDL-087 completed)
+- [ ] Dashboard integration tests passing (RDL-089 completed)
+- [ ] Test database fixtures available (RDL-088 completed)
+
+**External Dependencies to Add:**
+```go
+// Add to go.mod
+golang.org/x/sync/errgroup v0.10.0  // For concurrent load testing
+```
+
+**Internal Dependencies:**
+- `internal/service/dashboard/*` - All service implementations
+- `internal/repository/dashboard_repository.go` - Repository interface
+- `test/test_helper.go` - Test database setup/teardown
+
+---
+
+### 4. Code Patterns
+
+**Benchmark Pattern (following existing projects_benchmark_test.go):**
+
+```go
+func BenchmarkDashboardDay(b *testing.B) {
+    // Setup
+    helper := setupDashboardBenchmark(b)
+    defer cleanupDashboardBenchmark(b, helper)
+    
+    handler := createDashboardHandler(helper.Pool)
+    
+    // Warm-up
+    req := httptest.NewRequest("GET", "/v1/dashboard/day.json", nil)
+    recorder := httptest.NewRecorder()
+    handler.Day(recorder, req)
+    
+    // Benchmark
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        req := httptest.NewRequest("GET", "/v1/dashboard/day.json", nil)
+        recorder := httptest.NewRecorder()
+        handler.Day(recorder, req)
+        
+        if recorder.Code != http.StatusOK {
+            b.Fatalf("Expected 200, got %d", recorder.Code)
+        }
+    }
+}
+```
+
+**Concurrent Load Test Pattern:**
+
+```go
+func BenchmarkDashboardConcurrent(b *testing.B) {
+    helper := setupDashboardBenchmark(b)
+    defer cleanupDashboardBenchmark(b, helper)
+    
+    handler := createDashboardHandler(helper.Pool)
+    var wg sync.WaitGroup
+    
+    b.ResetTimer()
+    b.RunParallel(func(pb *testing.PB) {
+        for pb.Next() {
+            wg.Add(1)
+            go func() {
+                defer wg.Done()
+                req := httptest.NewRequest("GET", "/v1/dashboard/day.json", nil)
+                recorder := httptest.NewRecorder()
+                handler.Day(recorder, req)
+            }()
+        }
+    })
+    wg.Wait()
+}
+```
+
+**Query Analysis Pattern:**
+
+```go
+// Track query timing using pgx QueryTracer
+type DashboardQueryTracer struct {
+    threshold time.Duration
+    slowQueries []string
+}
+
+func (t *DashboardQueryTracer) TraceQueryStart(ctx context.Context, info *pgx.QueryInfo) context.Context {
+    return context.WithValue(ctx, "query_start", time.Now())
+}
+
+func (t *DashboardQueryTracer) TraceQueryEnd(ctx context.Context, info *pgx.QueryInfo, err error) {
+    start := ctx.Value("query_start").(time.Time)
+    duration := time.Since(start)
+    
+    if duration > t.threshold {
+        t.slowQueries = append(t.slowQueries, 
+            fmt.Sprintf("%s: %v", info.SQL, duration))
+    }
+}
+```
+
+**Connection Pool Verification Pattern:**
+
+```go
+func verifyConnectionPool(pool *pgxpool.Pool) error {
+    stats := pool.Stats()
+    
+    // Check pool is being utilized
+    if stats.TotalConns() == 0 {
+        return fmt.Errorf("connection pool has no connections")
+    }
+    
+    // Verify connections are being reused (not creating new ones each request)
+    if stats.AcquireCount > stats.ReleaseCount * 2 {
+        return fmt.Errorf("connection pool not reusing connections efficiently")
+    }
+    
+    // Check for connection leaks
+    if stats.AcquiredConns != stats.ReleasedConns {
+        return fmt.Errorf("potential connection leak detected")
+    }
+    
+    return nil
+}
+```
+
+---
+
+### 5. Testing Strategy
+
+**Unit Tests (test/unit/):**
+- Test each dashboard service in isolation
+- Mock repository for fast iteration
+- Focus on calculation correctness
+- Target: >90% coverage
+
+**Integration Tests (test/dashboard_integration_test.go):**
+- Test full handler stack with real database
+- Verify JSON:API response format
+- Test error scenarios and edge cases
+- Validate calculated fields against expected values
+
+**Benchmark Tests (test/performance/):**
+
+| Benchmark | Description | Target |
+|-----------|-------------|--------|
+| `BenchmarkDashboardDay` | Single request latency | <100ms p95 |
+| `BenchmarkDashboardProjects` | Project aggregate query | <150ms p95 |
+| `BenchmarkDashboardLastDays` | Trend data query | <200ms p95 |
+| `BenchmarkDashboardFaults` | Fault percentage calculation | <100ms p95 |
+| `BenchmarkDashboardSpeculateActual` | Speculated vs actual chart | <150ms p95 |
+| `BenchmarkDashboardWeekdayFaults` | Weekday fault distribution | <200ms p95 |
+| `BenchmarkDashboardMeanProgress` | Mean progress calculation | <150ms p95 |
+| `BenchmarkDashboardYearlyTotal` | Yearly trend chart | <300ms p95 |
+
+**Concurrent Load Tests:**
+- 10, 50, 100 concurrent users
+- Measure QPS and error rates
+- Verify connection pooling under load
+
+**Slow Query Detection:**
+- Run benchmarks with query tracer enabled
+- Log queries > 10ms threshold
+- Review execution plans for optimization opportunities
+
+---
+
+### 6. Risks and Considerations
+
+**Blocking Issues:**
+- ⚠️ **None currently identified**
+
+**Potential Pitfalls:**
+1. **Test Database Contention**: Multiple concurrent benchmarks may compete for database resources
+   - *Mitigation*: Use unique test databases per benchmark suite, or serialize benchmarks
+
+2. **Flaky Benchmarks**: Network variability and GC can cause benchmark noise
+   - *Mitigation*: Run multiple iterations, use statistical analysis, establish baselines
+
+3. **Connection Pool Exhaustion**: High concurrency may exhaust pool if not configured properly
+   - *Mitigation*: Configure pool with adequate max connections, monitor pool stats during tests
+
+4. **Data Warm-up Effects**: First request performance differs from subsequent requests
+   - *Mitigation*: Include warm-up phase, report both cold and warm metrics
+
+5. **Memory Allocation Overhead**: JSON marshaling can dominate timing
+   - *Mitigation*: Profile allocations, consider object pooling for high-frequency operations
+
+**Trade-offs:**
+- **Accuracy vs Speed**: More benchmark iterations = more accurate but slower tests
+  - *Decision*: Default 100 iterations, configurable via environment variable
+
+- **Realistic Load vs Test Stability**: Very high concurrency may destabilize test environment
+  - *Decision*: Max 100 concurrent users in CI, allow higher for local development
+
+**Deployment Considerations:**
+- Benchmark results should be stored and tracked over time
+- Consider integrating with Grafana/Prometheus for continuous monitoring
+- Set up alerts for performance regression > 20%
+
+---
+
+### 7. Implementation Checklist
+
+#### Phase 1: Foundation (Blocker)
+- [ ] Create `test/performance/dashboard_benchmark_test.go` with all 8 endpoint benchmarks
+- [ ] Implement warm-up and measurement phases
+- [ ] Add latency percentile calculations (p50, p95, p99)
+- [ ] Create `test/performance/baseline_dashboard.go` for metric tracking
+
+#### Phase 2: Concurrent Testing (Blocker)
+- [ ] Implement concurrent load tests using `errgroup`
+- [ ] Add connection pool monitoring during benchmarks
+- [ ] Test with 10, 50, 100 concurrent users
+- [ ] Verify QPS targets (>100 QPS)
+
+#### Phase 3: Query Analysis (Must-have)
+- [ ] Integrate `pgx.QueryTracer` for query timing
+- [ ] Implement slow query detection (threshold: 10ms)
+- [ ] Create query analysis utility (`dashboard_query_analyzer.go`)
+- [ ] Document slow queries and optimization opportunities
+
+#### Phase 4: Verification (Must-have)
+- [ ] Run all benchmarks and capture baseline metrics
+- [ ] Verify p95 latency < 100ms for all endpoints
+- [ ] Confirm connection pooling works under load
+- [ ] Generate performance report
+
+#### Phase 5: Documentation (Should-have)
+- [ ] Document benchmark methodology in `docs/performance/dashboard-benchmarks.md`
+- [ ] Include example benchmark output
+- [ ] Add troubleshooting guide for common issues
+- [ ] Update QWEN.md with new benchmark commands
+
+---
+
+### 8. Acceptance Criteria Verification
+
+| AC | Verification Method |
+|----|---------------------|
+| #1 All endpoints benchmarked for latency | Run `go test -bench=BenchmarkDashboard` and verify all 8 benchmarks complete |
+| #2 Concurrent request testing completed | Run `go test -bench=BenchmarkDashboardConcurrent` with 10/50/100 users |
+| #3 Slow queries identified and optimized | Review query tracer output, optimize queries > 10ms |
+| #4 Connection pooling verified working | Monitor pool stats: `TotalConns`, `AcquireCount`, `ReleaseCount` |
+
+---
+
+### 9. Commands and Tools
+
+```bash
+# Run all dashboard benchmarks
+go test -bench=BenchmarkDashboard -run=^$ ./test/performance/
+
+# Run with verbose output
+go test -bench=BenchmarkDashboard -v -run=^$ ./test/performance/
+
+# Run concurrent tests
+go test -bench=BenchmarkDashboardConcurrent -parallel 4 -run=^$ ./test/performance/
+
+# Generate benchmark profile for analysis
+go test -bench=BenchmarkDashboardDay -cpuprofile=cpu.out ./test/performance/
+go tool pprof cpu.out
+
+# Track benchmarks against baseline
+./scripts/benchmark-dashboard.sh
+```
+
+---
+
+### 10. Expected Outcomes
+
+**Success Metrics:**
+- All 8 dashboard endpoints have benchmark tests
+- p95 latency < 100ms for all endpoints (subsequent requests)
+- > 100 QPS concurrent capacity achieved
+- Connection pooling verified with no leaks
+- Slow queries identified and documented
+
+**Deliverables:**
+1. `test/performance/dashboard_benchmark_test.go` - Complete benchmark suite
+2. `test/performance/baseline_dashboard.go` - Metric tracking utilities
+3. `docs/performance/dashboard-benchmarks.md` - Documentation
+4. Performance report with baseline metrics
+5. Query analysis results with optimization recommendations
+
+---
+
+*Implementation Plan Version: 1.0*
+*Created: 2026-04-22*
+*Status: Ready for Review*
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
