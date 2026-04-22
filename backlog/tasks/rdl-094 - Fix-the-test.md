@@ -3,7 +3,7 @@ id: RDL-094
 title: Fix the test
 status: To Do
 assignee:
-  - workflow
+  - catarina
 created_date: '2026-04-22 18:25'
 updated_date: '2026-04-22 18:25'
 labels: []
