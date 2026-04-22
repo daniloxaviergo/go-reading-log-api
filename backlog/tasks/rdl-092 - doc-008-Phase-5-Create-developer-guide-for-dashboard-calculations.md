@@ -1,7 +1,7 @@
 ---
 id: RDL-092
 title: '[doc-008 Phase 5] Create developer guide for dashboard calculations'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-21 15:52'
