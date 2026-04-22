@@ -3,7 +3,7 @@ id: RDL-093
 title: Fix the test broken
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-22 17:44'
 updated_date: '2026-04-22 18:23'
 labels: []
