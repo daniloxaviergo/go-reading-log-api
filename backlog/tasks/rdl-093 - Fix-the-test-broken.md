@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-22 17:44'
-updated_date: '2026-04-22 17:44'
+updated_date: '2026-04-22 17:52'
 labels: []
 dependencies: []
 ---
@@ -107,6 +107,100 @@ created by testing.(*T).Run in goroutine 1
 FAIL	go-reading-log-api-next/internal/api/v1/handlers	0.008s
 ```
 <!-- SECTION:DESCRIPTION:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+### 1. Technical Approach
+
+The test failures indicate three distinct issues that need to be addressed:
+
+**Issue 1 - Title Mismatch (Faults Gauge vs Fault Percentage)**
+- The test expects the gauge chart title to be "Faults Gauge"
+- The current implementation uses "Fault Percentage" 
+- This is a simple string mismatch in the service layer
+
+**Issue 2 - Missing Weekday Data (Weekday 2)**
+- The `GetWeekdayFaults` method must ensure all 7 weekdays (0-6) are present
+- The test expects weekday 2 (Tuesday) to have a value of 0 when no faults exist
+- Need to verify the database query handles empty results correctly
+
+**Issue 3 - Missing Mock Configuration (MeanProgress)**
+- The `MeanProgressService` calls `GetLogsByDateRange` but the test only mocks `GetProjectAggregates`
+- The test needs to be updated to mock the correct repository method
+- Alternatively, the service implementation may need adjustment
+
+**Architecture Decision**: 
+- Fix the title in `faults_service.go` to match test expectations
+- Ensure `GetWeekdayFaults` returns all 7 days with default value of 0
+- Update the test mock for `MeanProgress` to properly configure `GetLogsByDateRange`
+
+### 2. Files to Modify
+
+| File | Action | Reason |
+|------|--------|--------|
+| `internal/service/dashboard/faults_service.go` | Modify | Change gauge chart title from "Fault Percentage" to "Faults Gauge" (line ~107) |
+| `internal/service/dashboard/weekday_faults_service.go` | Review | Verify all 7 weekdays are populated with default value of 0 |
+| `internal/api/v1/handlers/dashboard_handler_test.go` | Modify | Add mock for `GetLogsByDateRange` in `TestDashboardHandler_MeanProgress` test (around line 423) |
+
+### 3. Dependencies
+
+- No new dependencies required
+- Existing test infrastructure is sufficient
+- All services use the same repository interface pattern
+
+### 4. Code Patterns
+
+**Pattern to Follow:**
+1. **Consistent Naming**: Match ECharts chart titles exactly as expected by tests
+2. **Default Values**: Ensure all array/map entries have default values (0) for missing data
+3. **Mock Completeness**: Tests must mock ALL methods called by the service under test
+
+**Specific Changes:**
+```go
+// In faults_service.go - line ~107
+SetTitle("Faults Gauge") // Changed from "Fault Percentage"
+
+// In weekday_faults_service.go - ensure all 7 days present
+for i := 0; i < 7; i++ {
+    if _, exists := faults[i]; !exists {
+        faults[i] = 0 // Default value for missing days
+    }
+}
+
+// In test file - mock the correct method
+mockRepo.On("GetLogsByDateRange", mock.Anything, mock.Anything, mock.Anything).
+    Return([]*dto.LogEntry{}, nil)
+```
+
+### 5. Testing Strategy
+
+**Unit Tests to Verify:**
+1. `TestDashboardHandler_Faults` - Verify gauge chart title matches "Faults Gauge"
+2. `TestDashboardHandler_WeekdayFaults` - Verify all 7 weekdays (0-6) are present with correct values
+3. `TestDashboardHandler_MeanProgress` - Verify service doesn't panic and returns valid data
+
+**Edge Cases to Cover:**
+- Empty log entries for mean progress
+- Zero faults for weekday distribution
+- Boundary dates for date range queries
+
+### 6. Risks and Considerations
+
+| Risk | Mitigation |
+|------|------------|
+| Title change may affect client consumers | Update API documentation in QWEN.md |
+| Weekday logic assumes DOW = 0-6 (Sun-Sat) | Verify PostgreSQL EXTRACT(DOW) behavior matches expectation |
+| Mock changes could break other tests | Run full test suite after changes |
+
+**Blocking Issues:**
+- None identified - all issues are code-level fixes
+
+**Deployment Considerations:**
+- Simple string change - zero risk for existing clients
+- Weekday fix improves data completeness
+- Test mock update only affects test execution
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
