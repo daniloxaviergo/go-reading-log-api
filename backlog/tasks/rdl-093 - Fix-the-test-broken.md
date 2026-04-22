@@ -2,8 +2,10 @@
 id: RDL-093
 title: Fix the test broken
 status: To Do
-assignee: []
+assignee:
+  - workflow
 created_date: '2026-04-22 17:44'
+updated_date: '2026-04-22 17:44'
 labels: []
 dependencies: []
 ---
