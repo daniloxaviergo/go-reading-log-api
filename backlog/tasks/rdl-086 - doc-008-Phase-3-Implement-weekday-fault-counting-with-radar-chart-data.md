@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:51'
-updated_date: '2026-04-22 10:06'
+updated_date: '2026-04-22 10:10'
 labels:
   - phase-3
   - service
@@ -582,6 +582,68 @@ From PRD AC-DASH-006:
 
 Ready to implement when approved.
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress for RDL-086
+
+### Status: In Progress
+
+I've completed researching the codebase and understanding the requirements. Here's what I found:
+
+### Codebase Analysis
+
+**Existing Patterns to Follow:**
+1. **DayService** (`internal/service/dashboard/day_service.go`) - Shows the pattern for dashboard services with:
+   - Dependency injection via `UserConfigProvider` interface
+   - `GetToday()` helper for consistent date references
+   - `CalculateWeeklyStats()` main method returning `StatsData`
+   - 3-decimal precision rounding
+
+2. **FaultsService** (`internal/service/dashboard/faults_service.go`) - Shows:
+   - Date range helpers like `GetDateRangeLast30Days()`
+   - Percentage calculation with zero-handling
+   - ECharts chart creation methods
+   - Config-based max values
+
+3. **DashboardRepository** already has `GetWeekdayFaults()` implemented which:
+   - Returns `map[int]int` with keys 0-6 (Sunday-Saturday)
+   - Ensures all 7 days present with default value of 0
+   - Uses SQL `EXTRACT(DOW FROM data::timestamp)` for weekday extraction
+
+4. **DashboardResponse DTOs** (`internal/domain/dto/dashboard_response.go`) already have:
+   - `WeekdayFaults` type with `Faults map[int]int`
+   - `EchartConfig`, `Series`, and chart configuration types
+   - JSON:API envelope support
+
+### Critical Issue Identified
+
+The current `WeekdayFaults` handler in `dashboard_handler.go` uses a **7-day date range** but the requirement is **6 months**:
+
+```go
+// CURRENT (WRONG):
+startDate := endDate.AddDate(0, 0, -7)  // Only 7 days
+
+// REQUIRED:
+startDate := endDate.AddDate(0, -6, 0)  // 6 months
+```
+
+### Implementation Plan
+
+1. **Create `WeekdayFaultsService`** - New service following the DayService/FaultsService pattern
+2. **Fix date range** - Change from 7 days to 6 months in handler
+3. **Add unit tests** - Following `day_service_test.go` patterns
+4. **Verify acceptance criteria** - All 4 ACs must be met
+
+### Next Steps
+
+I will now implement the `WeekdayFaultsService` with:
+- Constructor with dependency injection
+- `GetWeekdayFaults()` method for fetching data
+- `CreateRadarChart()` helper for ECharts configuration
+- `ValidateOutput()` for acceptance criteria verification
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
