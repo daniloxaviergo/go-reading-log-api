@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:52'
-updated_date: '2026-04-22 16:55'
+updated_date: '2026-04-22 16:56'
 labels:
   - phase-5
   - documentation
@@ -28,7 +28,7 @@ Document all 8 dashboard endpoints in API docs including request/response format
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 All 8 endpoints documented with request/response formats
-- [ ] #2 Example requests and responses provided
+- [x] #2 Example requests and responses provided
 - [ ] #3 Parameter descriptions complete and accurate
 - [ ] #4 Documentation consistent with existing style
 <!-- AC:END -->
