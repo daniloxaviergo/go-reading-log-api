@@ -2,8 +2,10 @@
 id: RDL-088
 title: '[doc-008 Phase 4] Set up test database with sample data fixtures'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-21 15:51'
+updated_date: '2026-04-22 10:56'
 labels:
   - phase-4
   - testing
