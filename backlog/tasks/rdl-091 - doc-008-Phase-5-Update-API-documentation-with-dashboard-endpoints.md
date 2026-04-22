@@ -2,8 +2,10 @@
 id: RDL-091
 title: '[doc-008 Phase 5] Update API documentation with dashboard endpoints'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-21 15:52'
+updated_date: '2026-04-22 16:30'
 labels:
   - phase-5
   - documentation
