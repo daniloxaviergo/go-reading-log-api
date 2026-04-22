@@ -3,7 +3,7 @@ id: RDL-088
 title: '[doc-008 Phase 4] Set up test database with sample data fixtures'
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-21 15:51'
 updated_date: '2026-04-22 11:46'
 labels:
