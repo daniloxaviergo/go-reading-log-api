@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:51'
-updated_date: '2026-04-22 10:10'
+updated_date: '2026-04-22 10:19'
 labels:
   - phase-3
   - service
@@ -28,7 +28,7 @@ Implement weekday fault grouping logic generating radar chart data. Group faults
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Faults grouped by weekday (0-6)
+- [x] #1 Faults grouped by weekday (0-6)
 - [ ] #2 6-month date range covered
 - [ ] #3 All 7 weekdays present in output
 - [ ] #4 Integer counts non-negative
