@@ -28,7 +28,7 @@ Create comprehensive developer guide explaining calculation methodologies, confi
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 Calculation methodologies documented
-- [ ] #2 Configuration options explained
+- [x] #2 Configuration options explained
 - [ ] #3 Troubleshooting guide created
 - [ ] #4 Developer onboarding information included
 <!-- AC:END -->
