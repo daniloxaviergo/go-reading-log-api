@@ -3,7 +3,7 @@ id: RDL-089
 title: '[doc-008 Phase 4] Implement integration tests for all dashboard endpoints'
 status: To Do
 assignee:
-  - workflow
+  - thomas
 created_date: '2026-04-21 15:51'
 updated_date: '2026-04-22 14:23'
 labels:
