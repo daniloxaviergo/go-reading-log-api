@@ -5,7 +5,7 @@ status: Done
 assignee:
   - thomas
 created_date: '2026-04-21 15:51'
-updated_date: '2026-04-22 10:26'
+updated_date: '2026-04-22 10:27'
 labels:
   - phase-3
   - service
@@ -644,6 +644,121 @@ I will now implement the `WeekdayFaultsService` with:
 - `CreateRadarChart()` helper for ECharts configuration
 - `ValidateOutput()` for acceptance criteria verification
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Task RDL-086 has been completed successfully. This task implemented weekday fault counting with radar chart data for the dashboard API, fixing a critical bug where the date range was incorrectly set to 7 days instead of 6 months.
+
+## What Was Done
+
+### 1. Created WeekdayFaultsService (`internal/service/dashboard/weekday_faults_service.go`)
+- Implemented `WeekdayFaultsService` following Clean Architecture patterns
+- Dependency injection via `UserConfigProvider` interface
+- Key methods:
+  - `NewWeekdayFaultsService()` - Constructor with repo and config
+  - `GetWeekdayFaults()` - Fetches weekday fault data for last 6 months
+  - `CreateRadarChart()` - Generates ECharts radar chart configuration
+  - `ValidateOutput()` - Validates acceptance criteria (7 days, non-negative counts)
+- Helper functions:
+  - `GetDateRangeLast6Months()` - Returns 6-month date range (start of today minus 6 months)
+  - `GetToday()` - Returns current date truncated to midnight
+
+### 2. Updated Dashboard Handler (`internal/api/v1/handlers/dashboard_handler.go`)
+- **Critical Fix**: Changed date range from 7 days to 6 months
+  - Before: `endDate.AddDate(0, 0, -7)` (7 days)
+  - After: Uses service's `GetDateRangeLast6Months()` (6 months)
+- Refactored to use `WeekdayFaultsService` instead of inline implementation
+- Added validation call before returning response
+
+### 3. Created Unit Tests (`test/unit/weekday_faults_service_test.go`)
+Comprehensive test suite with 11 test cases covering:
+- Normal data retrieval with all 7 days present
+- Missing days handling (repository fills in zeros)
+- Empty data scenarios
+- Repository error handling
+- Radar chart creation with various inputs
+- Output validation (all criteria)
+- Date range calculation verification
+- Integration test verifying complete flow
+
+## Key Changes
+
+| File | Change |
+|------|--------|
+| `internal/service/dashboard/weekday_faults_service.go` | Created new service (~370 lines) |
+| `internal/api/v1/handlers/dashboard_handler.go` | Updated WeekdayFaults handler to use service + fix date range |
+| `test/unit/weekday_faults_service_test.go` | Created unit tests (~450 lines) |
+
+## Acceptance Criteria Status
+
+- ✅ **AC #1**: Faults grouped by weekday (0-6) - Service groups by `weekday` key
+- ✅ **AC #2**: 6-month date range covered - Fixed from 7 days to 6 months using `AddDate(0, -6, 0)`
+- ✅ **AC #3**: All 7 weekdays present in output - Repository ensures all 7 days with default 0
+- ✅ **AC #4**: Integer counts non-negative - Validation checks all counts >= 0
+
+## Definition of Done Status
+
+- ✅ **DoD #1**: All unit tests pass (11/11 passing)
+- ✅ **DoD #2**: Integration tests pass execution and verification
+- ✅ **DoD #3**: go fmt and go vet pass with no errors
+- ✅ **DoD #4**: Clean Architecture layers properly followed
+- ✅ **DoD #5**: Error responses consistent with existing patterns
+
+## Testing Results
+
+```
+TestWeekdayFaultsService_GetWeekdayFaults/normal_data_with_all_days  PASS
+TestWeekdayFaultsService_GetWeekdayFaults/missing_days_in_data       PASS
+TestWeekdayFaultsService_GetWeekdayFaults/empty_data                 PASS
+TestWeekdayFaultsService_GetWeekdayFaults/repository_error           PASS
+TestWeekdayFaultsService_CreateRadarChart/all_7_days_present         PASS
+TestWeekdayFaultsService_CreateRadarChart/missing_some_days          PASS
+TestWeekdayFaultsService_CreateRadarChart/empty_map                  PASS
+TestWeekdayFaultsService_ValidateOutput/valid_data_all_days_present  PASS
+TestWeekdayFaultsService_ValidateOutput/missing_one_day              PASS
+TestWeekdayFaultsService_ValidateOutput/negative_count               PASS
+TestWeekdayFaultsService_Integration                                 PASS
+```
+
+## Technical Notes
+
+- **Date Range Fix**: The original implementation used `AddDate(0, 0, -7)` which only covered 7 days. Changed to `AddDate(0, -6, 0)` for proper 6-month coverage using Go's month arithmetic which correctly handles varying month lengths.
+- **Weekday Mapping**: Go's `time.Weekday()` returns 0=Sunday through 6=Saturday, matching the PRD requirement "Sunday=0 through Saturday=6".
+- **Radar Chart Data**: Integer counts converted to float64 for ECharts v5 API compatibility.
+- **Missing Day Handling**: Repository `GetWeekdayFaults` ensures all 7 days present with default value of 0 if no data exists for that day.
+
+## Risks/Mitigations
+
+1. **Date Range Accuracy**: Used `AddDate(0, -6, 0)` for exact month arithmetic
+2. **Weekday Index**: Verified Go's mapping matches PRD (0-6 = Sunday-Saturday)
+3. **Empty Results**: Repository handles empty data by filling missing days with 0
+4. **JSON Serialization**: Float64 conversion ensures ECharts compatibility
+
+## Files Modified
+
+- `internal/service/dashboard/weekday_faults_service.go` (new)
+- `internal/api/v1/handlers/dashboard_handler.go` (modified)
+- `test/unit/weekday_faults_service_test.go` (new)
+
+## Verification Commands
+
+```bash
+# Build verification
+go build ./...
+
+# Format verification  
+go fmt ./...
+
+# Vet verification
+go vet ./...
+
+# Test execution
+go test -v ./test/unit/... -run "TestWeekdayFaults"
+```
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
