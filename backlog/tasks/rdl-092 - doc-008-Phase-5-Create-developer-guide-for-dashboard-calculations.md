@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:52'
-updated_date: '2026-04-22 17:21'
+updated_date: '2026-04-22 17:31'
 labels:
   - phase-5
   - documentation
@@ -27,7 +27,7 @@ Create comprehensive developer guide explaining calculation methodologies, confi
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Calculation methodologies documented
+- [x] #1 Calculation methodologies documented
 - [ ] #2 Configuration options explained
 - [ ] #3 Troubleshooting guide created
 - [ ] #4 Developer onboarding information included
