@@ -3,9 +3,9 @@ id: RDL-092
 title: '[doc-008 Phase 5] Create developer guide for dashboard calculations'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-21 15:52'
-updated_date: '2026-04-22 17:34'
+updated_date: '2026-04-22 17:35'
 labels:
   - phase-5
   - documentation
