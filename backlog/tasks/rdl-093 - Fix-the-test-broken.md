@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-22 17:44'
-updated_date: '2026-04-22 17:52'
+updated_date: '2026-04-22 17:57'
 labels: []
 dependencies: []
 ---
@@ -121,9 +121,10 @@ The test failures indicate three distinct issues that need to be addressed:
 - This is a simple string mismatch in the service layer
 
 **Issue 2 - Missing Weekday Data (Weekday 2)**
-- The `GetWeekdayFaults` method must ensure all 7 weekdays (0-6) are present
-- The test expects weekday 2 (Tuesday) to have a value of 0 when no faults exist
-- Need to verify the database query handles empty results correctly
+- The `ValidateOutput` method in `WeekdayFaultsService` requires ALL 7 weekdays (0-6) to be present
+- The test mock returns only keys 0, 1, and 3, causing validation to fail with 400 error
+- The PostgreSQL implementation already ensures all 7 days are present with default value of 0
+- The test needs to return a complete map with all 7 weekdays
 
 **Issue 3 - Missing Mock Configuration (MeanProgress)**
 - The `MeanProgressService` calls `GetLogsByDateRange` but the test only mocks `GetProjectAggregates`
@@ -132,16 +133,16 @@ The test failures indicate three distinct issues that need to be addressed:
 
 **Architecture Decision**: 
 - Fix the title in `faults_service.go` to match test expectations
-- Ensure `GetWeekdayFaults` returns all 7 days with default value of 0
-- Update the test mock for `MeanProgress` to properly configure `GetLogsByDateRange`
+- Update test mock for `WeekdayFaults` to return all 7 weekdays (with 2 having value 0)
+- Update test mock for `MeanProgress` to properly configure `GetLogsByDateRange`
 
 ### 2. Files to Modify
 
 | File | Action | Reason |
 |------|--------|--------|
 | `internal/service/dashboard/faults_service.go` | Modify | Change gauge chart title from "Fault Percentage" to "Faults Gauge" (line ~107) |
-| `internal/service/dashboard/weekday_faults_service.go` | Review | Verify all 7 weekdays are populated with default value of 0 |
-| `internal/api/v1/handlers/dashboard_handler_test.go` | Modify | Add mock for `GetLogsByDateRange` in `TestDashboardHandler_MeanProgress` test (around line 423) |
+| `internal/api/v1/handlers/dashboard_handler_test.go` | Modify | Update `TestDashboardHandler_WeekdayFaults` mock to return all 7 weekdays (0-6) with weekday 2 set to 0 |
+| `internal/api/v1/handlers/dashboard_handler_test.go` | Modify | Add mock for `GetLogsByDateRange` in `TestDashboardHandler_MeanProgress` test |
 
 ### 3. Dependencies
 
@@ -153,7 +154,7 @@ The test failures indicate three distinct issues that need to be addressed:
 
 **Pattern to Follow:**
 1. **Consistent Naming**: Match ECharts chart titles exactly as expected by tests
-2. **Default Values**: Ensure all array/map entries have default values (0) for missing data
+2. **Complete Data Maps**: Test mocks must return complete data structures that pass validation
 3. **Mock Completeness**: Tests must mock ALL methods called by the service under test
 
 **Specific Changes:**
@@ -161,14 +162,19 @@ The test failures indicate three distinct issues that need to be addressed:
 // In faults_service.go - line ~107
 SetTitle("Faults Gauge") // Changed from "Fault Percentage"
 
-// In weekday_faults_service.go - ensure all 7 days present
-for i := 0; i < 7; i++ {
-    if _, exists := faults[i]; !exists {
-        faults[i] = 0 // Default value for missing days
-    }
-}
+// In test file - TestDashboardHandler_WeekdayFaults
+mockRepo.On("GetWeekdayFaults", mock.Anything, mock.Anything, mock.Anything).
+    Return(dto.NewWeekdayFaults(map[int]int{
+        0: 5,
+        1: 8,
+        2: 0,  // Added to pass validation
+        3: 3,
+        4: 0,  // Added to pass validation
+        5: 0,  // Added to pass validation
+        6: 0,  // Added to pass validation
+    }), nil)
 
-// In test file - mock the correct method
+// In test file - TestDashboardHandler_MeanProgress
 mockRepo.On("GetLogsByDateRange", mock.Anything, mock.Anything, mock.Anything).
     Return([]*dto.LogEntry{}, nil)
 ```
