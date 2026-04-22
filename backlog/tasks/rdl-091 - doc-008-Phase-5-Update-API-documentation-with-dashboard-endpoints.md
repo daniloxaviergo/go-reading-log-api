@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:52'
-updated_date: '2026-04-22 16:41'
+updated_date: '2026-04-22 16:46'
 labels:
   - phase-5
   - documentation
@@ -220,7 +220,7 @@ go test -coverprofile=dashboard-coverage.out ./internal/api/v1/handlers/dashboar
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-## Research Phase - Started
+## Research Phase - Completed
 
 ### Task Understanding
 This task requires documenting 8 dashboard endpoints that were implemented in Phase 2. I need to:
@@ -228,25 +228,44 @@ This task requires documenting 8 dashboard endpoints that were implemented in Ph
 2. Create comprehensive API documentation following existing patterns
 3. Ensure all acceptance criteria are met
 
-### Initial Codebase Investigation
+### Codebase Investigation Results
 
-I'll investigate the following areas:
-- Dashboard handler implementation
-- Route registrations
-- Service layer implementations
-- Existing documentation patterns
+**Dashboard Endpoints Verified:**
 
-**Verification Steps Before Documentation**:
-```bash
-# Verify all dashboard routes are registered
-grep -r "dashboard" internal/api/v1/routes.go
+| Endpoint | Handler | Status |
+|----------|---------|--------|
+| `/v1/dashboard/day.json` | `Day()` | ✅ Implemented |
+| `/v1/dashboard/projects.json` | `Projects()` | ✅ Implemented |
+| `/v1/dashboard/last_days.json` | `LastDays()` | ✅ Implemented |
+| `/v1/dashboard/projects_with_logs.json` | `ProjectsWithLogs()` | ✅ Implemented |
+| `/v1/dashboard/echart/faults.json` | `Faults()` | ✅ Implemented |
+| `/v1/dashboard/echart/speculate_actual.json` | `SpeculateActual()` | ✅ Implemented |
+| `/v1/dashboard/echart/faults_week_day.json` | `WeekdayFaults()` | ✅ Implemented |
+| `/v1/dashboard/echart/mean_progress.json` | `MeanProgress()` | ✅ Implemented |
+| `/v1/dashboard/echart/last_year_total.json` | `YearlyTotal()` | ✅ Implemented |
 
-# Verify handlers exist
-ls -la internal/api/v1/handlers/*dashboard*
+**Key Findings:**
+- All 8 endpoints are properly registered in `routes.go`
+- Handler implementations exist in `dashboard_handler.go` (18,991 bytes)
+- Comprehensive unit tests exist in `dashboard_handler_test.go` (17,404 bytes)
+- DTOs defined in `dashboard_response.go` (28,271 bytes)
+- All endpoints use JSON:API envelope format
+- Error responses consistent with existing patterns
 
-# Run tests to ensure endpoints are functional
-go test -v ./internal/api/v1/handlers/... -run TestDashboardHandler
-```
+**Documentation Style to Follow:**
+- Mirror the structure of `docs/README.go-project.md`
+- Use consistent endpoint table format
+- Include curl examples
+- Document request/response formats
+- Add calculated fields tables
+- Reference existing documentation for consistency
+
+**Next Steps:**
+1. Create `docs/dashboard-api-reference.md` with all 8 endpoints documented
+2. Follow the established pattern from README.go-project.md
+3. Include example requests and responses for each endpoint
+4. Document parameter descriptions
+5. Verify against acceptance criteria
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
