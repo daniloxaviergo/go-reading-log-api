@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-21 15:52'
-updated_date: '2026-04-22 17:14'
+updated_date: '2026-04-22 17:21'
 labels:
   - phase-5
   - documentation
@@ -255,6 +255,80 @@ For each of the 8 endpoints, document:
 - Documentation should be clear enough for new developers to understand the dashboard system
 - Link to related documentation (API reference, project README) for cross-referencing
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - RDL-092
+
+### Task Status: In Progress
+
+I'm executing task RDL-092 to create a comprehensive developer guide for dashboard calculations. This is a documentation-only task (no code changes required).
+
+### Research Completed
+
+I've reviewed the following files to understand the calculation methodologies:
+
+**Service Implementations:**
+1. `internal/service/dashboard/day_service.go` - Daily statistics and weekly calculations
+2. `internal/service/dashboard/projects_service.go` - Project aggregates and progress calculations
+3. `internal/service/dashboard/faults_service.go` - Fault percentage calculations
+4. `internal/service/dashboard/speculate_service.go` - Speculative mean calculations
+5. `internal/service/dashboard/mean_progress_service.go` - Mean progress with color coding
+6. `internal/service/dashboard/weekday_faults_service.go` - Weekday fault distribution
+
+**Configuration:**
+- `internal/service/user_config_service.go` - UserConfig service with file-based configuration
+
+### Key Calculations Identified
+
+| Calculation | Formula | Location |
+|------------|---------|----------|
+| **previous_week_pages** | Sum of pages from 14-7 days ago | day_service.go |
+| **last_week_pages** | Sum of pages from 7 days ago to today | day_service.go |
+| **per_pages** | (last_week / previous_week) × 100 | day_service.go |
+| **mean_day** | Average pages per day for current weekday | day_service.go |
+| **spec_mean_day** | mean_day × (1 + prediction_pct) | day_service.go |
+| **progress_geral** | (pages / total_pages) × 100 | projects_service.go |
+| **fault_percentage** | (faults / max_faults) × 100 | faults_service.go |
+| **speculative_mean** | actual_mean × (1 + prediction_pct) | speculate_service.go |
+| **daily_progress** | (daily_pages / mean_pages) × 100 - 100 | mean_progress_service.go |
+
+### Documentation Structure Planned
+
+```
+docs/dashboard-developer-guide.md
+├── Overview
+│   ├── Dashboard Architecture
+│   ├── Clean Architecture Layers
+│   └── Request/Response Flow
+├── Calculation Methodologies
+│   ├── Daily Statistics
+│   ├── Project Aggregates
+│   ├── Fault Calculations
+│   ├── Speculative Mean
+│   ├── Mean Progress
+│   └── Weekday Faults
+├── Configuration Options
+│   ├── UserConfig Service
+│   ├── Configuration File Format
+│   └── Default Values
+└── Troubleshooting Guide
+    ├── Common Errors
+    ├── Debugging Tips
+    └── Performance Considerations
+```
+
+### Next Steps
+
+1. Create the documentation file structure
+2. Write overview and architecture sections
+3. Document each calculation methodology in detail
+4. Document configuration options
+5. Create troubleshooting guide
+6. Add code examples
+7. Review and verify against implementation
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
