@@ -3,7 +3,7 @@ id: RDL-087
 title: '[doc-008 Phase 3] Implement mean progress calculation with visual map colors'
 status: To Do
 assignee:
-  - workflow
+  - thomas
 created_date: '2026-04-21 15:51'
 updated_date: '2026-04-22 10:41'
 labels:
