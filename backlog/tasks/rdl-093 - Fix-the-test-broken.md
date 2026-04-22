@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-22 17:44'
-updated_date: '2026-04-22 17:57'
+updated_date: '2026-04-22 17:59'
 labels: []
 dependencies: []
 ---
@@ -117,19 +117,20 @@ The test failures indicate three distinct issues that need to be addressed:
 
 **Issue 1 - Title Mismatch (Faults Gauge vs Fault Percentage)**
 - The test expects the gauge chart title to be "Faults Gauge"
-- The current implementation uses "Fault Percentage" 
+- The current implementation in `faults_service.go` line 89 uses "Fault Percentage" 
 - This is a simple string mismatch in the service layer
+- Fix: Change `SetTitle("Fault Percentage")` to `SetTitle("Faults Gauge")`
 
 **Issue 2 - Missing Weekday Data (Weekday 2)**
 - The `ValidateOutput` method in `WeekdayFaultsService` requires ALL 7 weekdays (0-6) to be present
 - The test mock returns only keys 0, 1, and 3, causing validation to fail with 400 error
 - The PostgreSQL implementation already ensures all 7 days are present with default value of 0
-- The test needs to return a complete map with all 7 weekdays
+- The test needs to return a complete map with all 7 weekdays (0-6) for the mock to pass validation
 
 **Issue 3 - Missing Mock Configuration (MeanProgress)**
 - The `MeanProgressService` calls `GetLogsByDateRange` but the test only mocks `GetProjectAggregates`
 - The test needs to be updated to mock the correct repository method
-- Alternatively, the service implementation may need adjustment
+- The service implementation is correct; the test is missing the required mock
 
 **Architecture Decision**: 
 - Fix the title in `faults_service.go` to match test expectations
@@ -140,7 +141,7 @@ The test failures indicate three distinct issues that need to be addressed:
 
 | File | Action | Reason |
 |------|--------|--------|
-| `internal/service/dashboard/faults_service.go` | Modify | Change gauge chart title from "Fault Percentage" to "Faults Gauge" (line ~107) |
+| `internal/service/dashboard/faults_service.go` | Modify | Change gauge chart title from "Fault Percentage" to "Faults Gauge" (line ~89) |
 | `internal/api/v1/handlers/dashboard_handler_test.go` | Modify | Update `TestDashboardHandler_WeekdayFaults` mock to return all 7 weekdays (0-6) with weekday 2 set to 0 |
 | `internal/api/v1/handlers/dashboard_handler_test.go` | Modify | Add mock for `GetLogsByDateRange` in `TestDashboardHandler_MeanProgress` test |
 
@@ -159,7 +160,7 @@ The test failures indicate three distinct issues that need to be addressed:
 
 **Specific Changes:**
 ```go
-// In faults_service.go - line ~107
+// In faults_service.go - line ~89
 SetTitle("Faults Gauge") // Changed from "Fault Percentage"
 
 // In test file - TestDashboardHandler_WeekdayFaults
