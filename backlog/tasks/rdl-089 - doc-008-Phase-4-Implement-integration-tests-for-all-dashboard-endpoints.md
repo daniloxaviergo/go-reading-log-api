@@ -2,10 +2,9 @@
 id: RDL-089
 title: '[doc-008 Phase 4] Implement integration tests for all dashboard endpoints'
 status: To Do
-assignee:
-  - catarina
+assignee: []
 created_date: '2026-04-21 15:51'
-updated_date: '2026-04-22 11:59'
+updated_date: '2026-04-22 14:09'
 labels:
   - phase-4
   - testing
