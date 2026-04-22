@@ -3,7 +3,7 @@ id: RDL-086
 title: '[doc-008 Phase 3] Implement weekday fault counting with radar chart data'
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-21 15:51'
 updated_date: '2026-04-22 10:30'
 labels:
