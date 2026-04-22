@@ -3,9 +3,9 @@ id: RDL-090
 title: '[doc-008 Phase 4] Execute performance testing on all dashboard endpoints'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-21 15:51'
-updated_date: '2026-04-22 16:28'
+updated_date: '2026-04-22 16:29'
 labels:
   - phase-4
   - testing
