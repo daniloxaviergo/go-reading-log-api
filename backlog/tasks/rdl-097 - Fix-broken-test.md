@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-23 18:15'
-updated_date: '2026-04-23 18:15'
+updated_date: '2026-04-23 18:22'
 labels: []
 dependencies: []
 ---
@@ -133,6 +133,76 @@ DEBUG: Raw JSON: {"data":{"type":"dashboard_echart_mean_progress","attributes":{
 --- FAIL: TestErrorScenarios (0.82s)
 ```
 <!-- SECTION:DESCRIPTION:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+### 1. Technical Approach
+
+The tests are failing because there's a mismatch between what the handlers return and what the test expectations expect. The key issues are:
+
+1. **DashboardHandler.Day()** returns `DailyStats` (with `total_pages`, `log_count`) but tests expect `StatsData` (with `per_pages`, `mean_day`, etc.)
+2. **DashboardHandler.Projects()** returns `ProjectAggregateResponse` array but tests expect `logs` field with specific structure
+3. **DashboardHandler.LastDays()** returns basic stats but tests expect `logs` array with proper data
+4. **DashboardHandler.Faults()** returns gauge chart but tests expect valid echart config
+5. **Missing calculated fields**: `per_pages`, `mean_day`, `spec_mean_day`, `progress_geral` are not being calculated
+
+The solution requires:
+- Modifying handlers to return the correct response structure matching test expectations
+- Implementing missing calculations for stats fields
+- Ensuring proper JSON:API envelope wrapping
+- Fixing the response parsing in tests to handle the actual response format
+
+### 2. Files to Modify
+
+| File | Action | Reason |
+|------|--------|--------|
+| `internal/api/v1/handlers/dashboard_handler.go` | Modify | Update Day(), Projects(), LastDays(), Faults() handlers to return correct response structure |
+| `internal/domain/dto/dashboard_response.go` | Review | Ensure StatsData and DailyStats structures match requirements |
+| `test/dashboard_integration_test.go` | Review | Update test expectations to match actual handler responses |
+| `test/integration/error_scenarios_test.go` | Review | Fix parseDashboardResponse helper for correct envelope structure |
+
+### 3. Dependencies
+
+- No new dependencies required
+- Requires understanding of existing DTO structures in `internal/domain/dto/`
+- Requires knowledge of JSON:API envelope format used throughout the codebase
+
+### 4. Code Patterns
+
+Follow existing patterns:
+- Use `dto.NewJSONAPIEnvelope()` for wrapping responses
+- Use `dto.NewDailyStats()` for day endpoint responses
+- Calculate derived fields using math operations with proper rounding
+- Return zero values instead of nil for empty data (per AC-DASH-004)
+
+### 5. Testing Strategy
+
+- Run tests incrementally after each handler fix
+- Verify JSON output matches expected format from test assertions
+- Check that all 8 dashboard endpoints return valid responses
+- Ensure error handling returns appropriate HTTP status codes
+
+### 6. Risks and Considerations
+
+**Blocking Issues:**
+1. The `Day` endpoint currently returns `DailyStats` but tests expect `StatsData` with calculated fields like `per_pages`, `mean_day`, etc.
+2. The `Projects` endpoint returns `ProjectAggregateResponse` in `logs` field but tests may expect different structure
+3. The `LastDays` endpoint needs to return actual log data, not just stats
+4. The `Faults` endpoint needs to return valid gauge chart configuration
+
+**Trade-offs:**
+- May need to refactor response structures to unify `DailyStats` and `StatsData`
+- Need to ensure backward compatibility with existing API consumers
+- Must maintain JSON:API envelope format consistent with other endpoints
+
+**Implementation Steps:**
+1. Update `Day()` handler to calculate and return all required stats fields
+2. Update `Projects()` handler to return proper project data structure
+3. Update `LastDays()` handler to include actual log data in response
+4. Fix `Faults()` handler to return valid gauge chart configuration
+5. Update test expectations to match corrected responses
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
