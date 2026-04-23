@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-23 12:16'
-updated_date: '2026-04-23 12:23'
+updated_date: '2026-04-23 12:30'
 labels: []
 dependencies: []
 ---
@@ -324,50 +324,39 @@ After implementing, verify:
 
 ### Status: In Progress
 
-I've analyzed the codebase and identified the root cause of the integration test failures.
+I've made the primary fix to add `SetupTestSchema()` calls to integration tests. However, I discovered additional issues:
 
-### Root Cause Analysis
+### Primary Fix Applied ✓
+Added `helper.SetupTestSchema()` calls after `SetupTestDB()` in:
+1. **test/dashboard_integration_test.go** - All 9 test functions
+2. **test/integration/error_scenarios_test.go** - `RunErrorScenarios` function
 
-The integration tests are failing because `SetupTestDB()` creates a database connection but does NOT create the required database tables. The `SetupTestSchema()` method must be explicitly called to execute SQL DDL statements that create:
-- `projects` table
-- `logs` table
-- Indexes
+### Secondary Issue Discovered
+The tests are failing because of a response format mismatch:
+- **Handler returns**: JSON:API envelope structure with `data.attributes`
+- **Test expects**: Direct `DashboardResponse` structure
 
-### Files to Fix
-
-I need to add `helper.SetupTestSchema()` calls after `SetupTestDB()` in:
-
-1. **test/dashboard_integration_test.go** (9 test functions)
-2. **test/integration/error_scenarios_test.go** (1 function: `RunErrorScenarios`)
-
-### Implementation Plan
-
-For each test function, I'll add the schema setup immediately after `SetupTestDB()`:
-
-```go
-func TestYourIntegrationTest(t *testing.T) {
-    if !IsTestDatabase() {
-        t.Skip("Test database not configured")
-    }
-
-    helper, err := SetupTestDB()
-    require.NoError(t, err)
-    defer helper.Close()
-    
-    // ADD THIS LINE - Create database tables
-    err = helper.SetupTestSchema()
-    require.NoError(t, err)
-    
-    // ... rest of test code
+The test code tries to unmarshal into `dto.DashboardResponse` but the handler returns:
+```json
+{
+  "data": {
+    "type": "dashboard_day",
+    "attributes": {...}
+  }
 }
 ```
 
-### Next Steps
+### Current Status
+Tests are running (no more "relation does not exist" errors), but failing due to:
+1. Response structure mismatch between handler and test expectations
+2. Tests need to be updated to parse JSON:API envelope or handlers need to return `DashboardResponse`
 
-1. Fix `test/dashboard_integration_test.go` - add schema setup to all 9 integration test functions
-2. Fix `test/integration/error_scenarios_test.go` - add schema setup to `RunErrorScenarios`
-3. Run tests to verify fix: `go test -v -timeout=10s ./test/...`
-4. Check acceptance criteria and mark task as done
+### Next Steps Required
+The tests need to be updated to either:
+1. Parse the JSON:API envelope correctly, OR
+2. Modify handlers to return `DashboardResponse` directly (not JSON:API envelope)
+
+This appears to be a pre-existing test design issue that wasn't caught because the tests were never fully working.
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
