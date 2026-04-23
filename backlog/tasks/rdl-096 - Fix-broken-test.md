@@ -1,11 +1,11 @@
 ---
 id: RDL-096
 title: Fix broken test
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-23 15:01'
-updated_date: '2026-04-23 15:29'
+updated_date: '2026-04-23 15:30'
 labels: []
 dependencies: []
 ---
