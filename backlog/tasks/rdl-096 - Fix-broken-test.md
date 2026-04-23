@@ -4,6 +4,7 @@ title: Fix broken test
 status: To Do
 assignee: []
 created_date: '2026-04-23 15:01'
+updated_date: '2026-04-23 15:01'
 labels: []
 dependencies: []
 ---
@@ -12,7 +13,7 @@ dependencies: []
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
 go test -timeout=5s ./...
-
+```go
 ?   	go-reading-log-api-next/cmd	[no test files]
 ?   	go-reading-log-api-next/internal/adapter/postgres	[no test files]
 ok  	go-reading-log-api-next/internal/api/v1	0.003s
@@ -272,7 +273,7 @@ created by github.com/jackc/pgx/v5/pgxpool.NewWithConfig in goroutine 20
 	/home/danilo/go/pkg/mod/github.com/jackc/pgx/v5@v5.9.1/pgxpool/pool.go:335 +0x43e
 FAIL	go-reading-log-api-next/test/unit	5.008s
 ?   	go-reading-log-api-next/tools	[no test files]
-FAIL
+FAIL```
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Definition of Done
