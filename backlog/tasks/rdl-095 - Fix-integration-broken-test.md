@@ -3,7 +3,7 @@ id: RDL-095
 title: Fix integration broken test
 status: To Do
 assignee:
-  - workflow
+  - catarina
 created_date: '2026-04-23 12:16'
 updated_date: '2026-04-23 12:16'
 labels: []
