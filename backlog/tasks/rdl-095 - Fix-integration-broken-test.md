@@ -1,11 +1,11 @@
 ---
 id: RDL-095
 title: Fix integration broken test
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-23 12:16'
-updated_date: '2026-04-23 12:46'
+updated_date: '2026-04-23 12:50'
 labels: []
 dependencies: []
 ---
