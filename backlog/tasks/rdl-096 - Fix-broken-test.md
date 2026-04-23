@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-04-23 15:01'
-updated_date: '2026-04-23 15:01'
+updated_date: '2026-04-23 15:08'
 labels: []
 dependencies: []
 ---
@@ -276,6 +276,123 @@ FAIL	go-reading-log-api-next/test/unit	5.008s
 ?   	go-reading-log-api-next/tools	[no test files]
 FAIL```
 <!-- SECTION:DESCRIPTION:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+### 1. Technical Approach
+
+The test failures are caused by **database connection timeouts** during test setup. The stack traces show that `SetupTestSchema()` is hanging when executing database queries, likely due to:
+
+1. **Connection pool exhaustion** - Multiple tests running in parallel creating their own pools
+2. **Long-running cleanup operations** - The `cleanupOrphanedDatabases` function has a 60-second timeout but may be processing thousands of old databases
+3. **Blocking DROP DATABASE operations** - Dropping a database while connections exist can hang
+
+The solution involves:
+- Reusing connection pools across tests where possible
+- Improving the cleanup mechanism to be faster and more reliable
+- Adding proper timeout handling for all database operations
+- Ensuring test databases are properly isolated
+
+### 2. Files to Modify
+
+| File | Action | Reason |
+|------|--------|--------|
+| `test/test_helper.go` | Modify | Fix connection pool management, improve cleanup speed, add better error handling |
+| `internal/adapter/postgres/dashboard_repository.go` | No change needed | Queries already have proper timeouts |
+| `test/integration/error_scenarios_test.go` | No change needed | Test structure is correct |
+| `test/unit/dashboard_repository_test.go` | No change needed | Test structure is correct |
+| `test/dashboard_integration_test.go` | No change needed | Test structure is correct |
+
+### 3. Dependencies
+
+- No external dependencies required
+- Relies on existing pgx/v5 connection pooling
+- Uses standard library `context` for timeouts
+
+### 4. Code Patterns
+
+Follow these patterns from the existing codebase:
+
+1. **Context with timeout** - All database operations use `context.WithTimeout`
+2. **Defer for cleanup** - Use `defer` to ensure cleanup runs even on panic
+3. **Separate connection for DROP DATABASE** - Don't use the pool being dropped
+4. **Error logging without failure** - Log errors but don't fail tests during cleanup
+
+### 5. Testing Strategy
+
+After implementing fixes:
+
+1. Run individual failing tests to verify they pass:
+   ```bash
+   go test -v -timeout=30s ./test -run TestDashboardDayEndpoint_Integration
+   go test -v -timeout=30s ./test/integration -run TestErrorScenarios
+   go test -v -timeout=30s ./test/unit -run TestDashboardRepository_GetDailyStats
+   ```
+
+2. Run all tests to ensure no regressions:
+   ```bash
+   go test -timeout=60s ./...
+   ```
+
+3. Verify cleanup works by checking for orphaned databases:
+   ```bash
+   psql -c "SELECT datname FROM pg_database WHERE datname LIKE 'reading_log_test_%';"
+   ```
+
+### 6. Risks and Considerations
+
+**Blocking Issues:**
+- The current `cleanupOrphanedDatabases` function queries ALL test databases and drops them - this can take minutes if there are thousands of old databases
+- The 60-second timeout on cleanup may not be enough for large cleanup operations
+- Dropping a database while connections exist can cause hanging
+
+**Trade-offs:**
+- Option A: Speed up cleanup by limiting how many old databases to clean (e.g., only those older than 1 hour)
+- Option B: Increase timeouts significantly (not recommended - masks real issues)
+- Option C: Use a dedicated test database that gets truncated rather than dropped/created
+
+**Recommended Approach:**
+Implement a hybrid solution:
+1. Limit orphaned database cleanup to databases older than 1 hour (not all `reading_log_test_%`)
+2. Add a max count limit (e.g., only clean up to 100 old databases per run)
+3. Use `DROP DATABASE IF EXISTS` with proper timeout
+4. Ensure no active connections exist before dropping
+
+**Implementation Details:**
+
+The main changes needed in `test/test_helper.go`:
+
+```go
+// Reduced cleanup timeout - 10 seconds instead of 60
+const cleanupTimeout = 10 * time.Second
+
+// Modified cleanupOrphanedDatabases with limits
+func cleanupOrphanedDatabases(pool *pgxpool.Pool, excludeName string) error {
+    ctx, cancel := context.WithTimeout(context.Background(), cleanupTimeout)
+    defer cancel()
+
+    // Query only databases older than 1 hour AND limit results
+    query := `
+        SELECT datname 
+        FROM pg_database 
+        WHERE datname LIKE $1
+        AND datname != $2
+        AND pg_catalog.pg_get_userbyid(datdba) = current_user
+        AND pg_catalog.pg_encoding_to_char(encoding) != '' -- Valid database
+        ORDER BY datname DESC
+        LIMIT 100 -- Limit to 100 most recent orphaned databases
+    `
+
+    // ... rest of implementation
+}
+```
+
+This approach ensures:
+- Cleanup completes quickly (under 10 seconds)
+- Only relevant old databases are cleaned
+- Test runs don't accumulate thousands of unused databases
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
