@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-23 12:16'
-updated_date: '2026-04-23 12:20'
+updated_date: '2026-04-23 12:23'
 labels: []
 dependencies: []
 ---
@@ -316,6 +316,59 @@ After implementing, verify:
 - [ ] Test execution completes within timeout
 - [ ] Cleanup runs successfully (no orphaned databases)
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - Task RDL-095
+
+### Status: In Progress
+
+I've analyzed the codebase and identified the root cause of the integration test failures.
+
+### Root Cause Analysis
+
+The integration tests are failing because `SetupTestDB()` creates a database connection but does NOT create the required database tables. The `SetupTestSchema()` method must be explicitly called to execute SQL DDL statements that create:
+- `projects` table
+- `logs` table
+- Indexes
+
+### Files to Fix
+
+I need to add `helper.SetupTestSchema()` calls after `SetupTestDB()` in:
+
+1. **test/dashboard_integration_test.go** (9 test functions)
+2. **test/integration/error_scenarios_test.go** (1 function: `RunErrorScenarios`)
+
+### Implementation Plan
+
+For each test function, I'll add the schema setup immediately after `SetupTestDB()`:
+
+```go
+func TestYourIntegrationTest(t *testing.T) {
+    if !IsTestDatabase() {
+        t.Skip("Test database not configured")
+    }
+
+    helper, err := SetupTestDB()
+    require.NoError(t, err)
+    defer helper.Close()
+    
+    // ADD THIS LINE - Create database tables
+    err = helper.SetupTestSchema()
+    require.NoError(t, err)
+    
+    // ... rest of test code
+}
+```
+
+### Next Steps
+
+1. Fix `test/dashboard_integration_test.go` - add schema setup to all 9 integration test functions
+2. Fix `test/integration/error_scenarios_test.go` - add schema setup to `RunErrorScenarios`
+3. Run tests to verify fix: `go test -v -timeout=10s ./test/...`
+4. Check acceptance criteria and mark task as done
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
