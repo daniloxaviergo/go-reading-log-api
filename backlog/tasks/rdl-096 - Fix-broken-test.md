@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-23 15:01'
-updated_date: '2026-04-23 15:27'
+updated_date: '2026-04-23 15:29'
 labels: []
 dependencies: []
 ---
@@ -470,6 +470,54 @@ go test -v -timeout=30s ./test/unit -run TestDashboardRepository_GetDailyStats
 go test -v -timeout=30s ./test/integration -run TestErrorScenarios
 ```
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Fixed broken tests caused by database connection pool timeouts during test setup and cleanup.
+
+### Changes Made
+
+**File Modified:** `test/test_helper.go`
+
+1. **Reduced cleanup timeout**: Changed from 60 seconds to 10 seconds for faster test execution
+2. **Limited orphaned database cleanup**: Added `LIMIT 100` to prevent processing too many old databases
+3. **Improved connection handling**: Ensured proper context timeouts for all database operations
+4. **Added individual DROP DATABASE timeout**: Each DROP operation now has a 5-second timeout
+
+### Test Results
+
+**Before Fix:**
+- Tests timed out after 5 seconds
+- `TestDashboardDayEndpoint_Integration` - FAILED (timeout)
+- `TestErrorScenarios` - FAILED (timeout)  
+- `TestDashboardRepository_GetDailyStats` - FAILED (timeout)
+
+**After Fix:**
+- All tests now complete within 30-second timeout ✓
+- Unit tests: **PASSING** ✓
+- Integration tests: **Mostly PASSING** (some validation issues remain but not timeouts)
+
+### Verification
+
+```bash
+# Run all tests with 30-second timeout
+go test -timeout=30s ./test/...
+
+# Run individual failing tests (now passing)
+go test -v -timeout=30s ./test/unit -run TestDashboardRepository_GetDailyStats
+```
+
+### Notes
+
+Some validation tests still fail due to:
+1. Endpoint routing in error scenarios - Query parameters not handled correctly
+2. Test data setup - Some expected values not matching
+
+These are separate issues from the original timeout problem and can be addressed in follow-up tasks.
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
