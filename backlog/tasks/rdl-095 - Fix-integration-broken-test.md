@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-23 12:16'
-updated_date: '2026-04-23 12:41'
+updated_date: '2026-04-23 12:46'
 labels: []
 dependencies: []
 ---
@@ -381,6 +381,74 @@ The response format mismatch requires either:
 
 This is a separate architectural decision that should be discussed with the team.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Task RDL-095 - Fix Integration Broken Test
+
+### What Was Done
+
+**Primary Issue Fixed: Missing Database Schema Creation**
+
+The integration tests were failing with "relation 'projects' does not exist" errors because `SetupTestDB()` creates the database connection but does NOT create the required tables. The `SetupTestSchema()` method must be explicitly called.
+
+**Changes Made:**
+
+1. **test/dashboard_integration_test.go** - Added `helper.SetupTestSchema()` calls to all 9 integration test functions:
+   - `TestDashboardDayEndpoint_Integration`
+   - `TestDashboardProjectsEndpoint_Integration`
+   - `TestDashboardLastDaysEndpoint_Integration`
+   - `TestDashboardFaultsChart_Integration`
+   - `TestDashboardSpeculateActual_Integration`
+   - `TestDashboardWeekdayFaults_Integration`
+   - `TestDashboardMeanProgress_Integration`
+   - `TestDashboardYearlyTotal_Integration`
+   - `TestDashboardEndpoints_ErrorHandling`
+
+2. **test/integration/error_scenarios_test.go** - Added `helper.SetupTestSchema()` call in `RunErrorScenarios` function
+
+3. **test/fixtures/dashboard/fixtures.go** - Fixed SQL type mismatch by adding `data::timestamp` cast in derived field calculations
+
+4. **Response Parser Helper** - Created `parseDashboardResponse()` helper to handle JSON:API envelope format returned by handlers
+
+### Current Status
+
+| Test Category | Status |
+|---------------|--------|
+| Unit Tests | ✅ All passing |
+| Integration Tests (schema fix) | ✅ Running without "relation does not exist" errors |
+| Integration Tests (full verification) | ⚠️ Some failing due to response format mismatches |
+
+### Known Issues (Separate from Primary Fix)
+
+1. **Response Format Mismatch**: Handlers return `DailyStats` in JSON:API envelope, but tests expect `DashboardResponse`
+2. **Data Loading**: Some tests show `total_pages: 0` indicating fixture data may not be queried correctly
+3. **Date Filtering**: Tests may fail due to date range mismatches between fixture data and query filters
+
+### Verification
+
+```bash
+# Run all tests
+go test -v -timeout=10s ./test/...
+
+# Check for schema-related errors (should be zero)
+go test -v ./test/... 2>&1 | grep -c "relation.*does not exist"
+# Result: 0 (schema fix verified)
+
+# Unit tests pass
+go test -v ./test/unit/...
+# Result: All passing
+```
+
+### Files Modified
+
+- `test/dashboard_integration_test.go` - Added schema setup + response parser
+- `test/integration/error_scenarios_test.go` - Added schema setup + response parser  
+- `test/fixtures/dashboard/fixtures.go` - Fixed SQL type casting
+
+This addresses the primary issue documented in the task: missing `SetupTestSchema()` calls causing "relation does not exist" errors.
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
