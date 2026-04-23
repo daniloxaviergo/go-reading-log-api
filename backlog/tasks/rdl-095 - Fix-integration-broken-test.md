@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-23 12:16'
-updated_date: '2026-04-23 12:30'
+updated_date: '2026-04-23 12:41'
 labels: []
 dependencies: []
 ---
@@ -322,41 +322,64 @@ After implementing, verify:
 <!-- SECTION:NOTES:BEGIN -->
 ## Implementation Progress - Task RDL-095
 
-### Status: In Progress
-
-I've made the primary fix to add `SetupTestSchema()` calls to integration tests. However, I discovered additional issues:
+### Status: In Progress (Primary Fix Complete)
 
 ### Primary Fix Applied ✓
 Added `helper.SetupTestSchema()` calls after `SetupTestDB()` in:
 1. **test/dashboard_integration_test.go** - All 9 test functions
 2. **test/integration/error_scenarios_test.go** - `RunErrorScenarios` function
 
-### Secondary Issue Discovered
-The tests are failing because of a response format mismatch:
-- **Handler returns**: JSON:API envelope structure with `data.attributes`
-- **Test expects**: Direct `DashboardResponse` structure
+Also fixed SQL type mismatch in fixtures (`data::timestamp` cast).
 
-The test code tries to unmarshal into `dto.DashboardResponse` but the handler returns:
+### Secondary Issue Discovered (Separate Problem)
+The tests are failing because of a **response format mismatch**:
+- **Handler returns**: `DailyStats` object wrapped in JSON:API envelope
+- **Test expects**: `DashboardResponse` structure with `stats` field
+
+The handler for `/v1/dashboard/day.json` returns:
 ```json
 {
   "data": {
     "type": "dashboard_day",
-    "attributes": {...}
+    "attributes": {
+      "total_pages": 0,
+      "log_count": 0
+    }
   }
 }
 ```
 
+But tests expect:
+```json
+{
+  "stats": {
+    "per_pages": 133.333,
+    "mean_day": ...
+  }
+}
+```
+
+This is a **pre-existing test design issue** - the tests were written for a different response structure than what the handlers actually return.
+
 ### Current Status
-Tests are running (no more "relation does not exist" errors), but failing due to:
-1. Response structure mismatch between handler and test expectations
-2. Tests need to be updated to parse JSON:API envelope or handlers need to return `DashboardResponse`
+- ✅ Schema creation fixed - no more "relation does not exist" errors
+- ✅ Tests run without panicking on schema setup
+- ⚠️ Response parsing fails due to format mismatch (separate issue)
+- ✅ Unit tests pass completely
 
-### Next Steps Required
-The tests need to be updated to either:
-1. Parse the JSON:API envelope correctly, OR
-2. Modify handlers to return `DashboardResponse` directly (not JSON:API envelope)
+### What Works Now
+1. Database tables are created before tests run
+2. Fixture data loads correctly
+3. Handlers execute without database errors
+4. Unit tests (`test/unit/`) pass completely
 
-This appears to be a pre-existing test design issue that wasn't caught because the tests were never fully working.
+### What Still Needs Work (Separate Task)
+The response format mismatch requires either:
+1. Updating all integration tests to parse `DailyStats` instead of `DashboardResponse`
+2. Modifying handlers to return `DashboardResponse` directly
+3. Creating a response adapter to convert between formats
+
+This is a separate architectural decision that should be discussed with the team.
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
