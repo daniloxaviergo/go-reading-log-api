@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-23 18:15'
-updated_date: '2026-04-23 18:26'
+updated_date: '2026-04-23 18:31'
 labels: []
 dependencies: []
 ---
@@ -212,18 +212,40 @@ Follow existing patterns:
 ### Current Status
 Task is in "To Do" status with an implementation plan defined. The tests are failing across multiple dashboard endpoints due to response structure mismatches.
 
-### Research Phase
-I need to research the codebase to understand:
-1. Current handler implementations and their return types
-2. Test expectations and what they're checking
-3. DTO structures being used
-4. The mismatch between actual and expected responses
+### Research Phase Complete
+I've analyzed the codebase and identified the following issues:
+
+**Test Failure Summary:**
+
+1. **Day endpoint (`/v1/dashboard/day.json`)**:
+   - Returns `DailyStats` (with `total_pages`, `log_count`) 
+   - Tests expect `StatsData` with calculated fields like `per_pages`, `mean_day`, `spec_mean_day`, `progress_geral`
+   - Expected value: `per_pages = 133.333`, `progress_geral = 12.5`
+
+2. **Projects endpoint (`/v1/dashboard/projects.json`)**:
+   - Returns `ProjectAggregateResponse` array in `attributes`
+   - Tests expect `logs` field with specific structure (line 121: `assert.NotNil(t, response.Logs)`)
+   
+3. **LastDays endpoint (`/v1/dashboard/last_days.json`)**:
+   - Returns basic stats but tests expect `logs` array with proper data
+   - Invalid type parameter returns 200 instead of 422
+
+4. **Faults endpoint (`/v1/dashboard/echart/faults.json`)**:
+   - Returns gauge chart but tests expect valid echart config
+   - Causes nil pointer dereference at line 261
+
+5. **MeanProgress endpoint (`/v1/dashboard/echart/mean_progress.json`)**:
+   - Empty database returns empty series data, causing nil pointer issues
+
+**Root Cause:**
+The handlers are returning `DailyStats` structure but the tests expect `StatsData` with calculated fields. The response parsing in tests expects specific field names that don't match the actual handler responses.
 
 ### Next Steps
-- Read the dashboard handler implementation
-- Review the test file to understand expectations
-- Examine DTO structures
-- Execute fixes following the implementation plan
+1. Update `Day()` handler to calculate and return all required stats fields
+2. Update `Projects()` handler to return proper project data structure  
+3. Update `LastDays()` handler to include actual log data in response
+4. Fix `Faults()` handler to return valid gauge chart configuration
+5. Update test expectations to match corrected responses
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
