@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-23 18:15'
-updated_date: '2026-04-23 18:23'
+updated_date: '2026-04-23 18:26'
 labels: []
 dependencies: []
 ---
@@ -203,6 +203,28 @@ Follow existing patterns:
 4. Fix `Faults()` handler to return valid gauge chart configuration
 5. Update test expectations to match corrected responses
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Task RDL-097 - Fix Broken Tests
+
+### Current Status
+Task is in "To Do" status with an implementation plan defined. The tests are failing across multiple dashboard endpoints due to response structure mismatches.
+
+### Research Phase
+I need to research the codebase to understand:
+1. Current handler implementations and their return types
+2. Test expectations and what they're checking
+3. DTO structures being used
+4. The mismatch between actual and expected responses
+
+### Next Steps
+- Read the dashboard handler implementation
+- Review the test file to understand expectations
+- Examine DTO structures
+- Execute fixes following the implementation plan
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
