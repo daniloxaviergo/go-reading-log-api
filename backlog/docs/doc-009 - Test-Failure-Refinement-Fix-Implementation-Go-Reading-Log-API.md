@@ -2,15 +2,15 @@
 id: doc-009
 title: Test Failure Refinement & Fix Implementation - Go Reading Log API
 type: other
-created_date: '2026-04-24 12:36'
+created_date: '2026-04-24 12:41'
 ---
 
 
 # Test Failure Refinement & Fix Implementation - Go Reading Log API
 
-**PRD ID:** doc-1  
+**PRD ID:** doc-009  
 **Created:** 2026-04-24  
-**Version:** 1.0  
+**Version:** 1.1 (Updated)  
 **Status:** Ready for Sprint Planning  
 
 ---
@@ -60,7 +60,7 @@ This PRD addresses **14 failing tests** across the Go Reading Log API test suite
 
 ### Decision 1: Context Timeout Pattern
 
-**Problem:** `GetTestContext()` discards the cancel function, causing resource leaks.
+**Problem:** Both `GetTestContext()` and `GetTestContextWithTimeout()` discard the cancel function, causing resource leaks.
 
 **Decision:** Return both context and cancel function for proper cleanup.
 
@@ -72,9 +72,19 @@ func GetTestContext() context.Context {
     return ctx
 }
 
+func GetTestContextWithTimeout(timeout time.Duration) context.Context {
+    ctx, cancel := context.WithTimeout(context.Background(), timeout)
+    _ = cancel  // ❌ Resource leak!
+    return ctx
+}
+
 // AFTER (FIXED)
 func GetTestContext() (context.Context, context.CancelFunc) {
     return context.WithTimeout(context.Background(), testContextTimeout)
+}
+
+func GetTestContextWithTimeout(timeout time.Duration) (context.Context, context.CancelFunc) {
+    return context.WithTimeout(context.Background(), timeout)
 }
 ```
 
@@ -239,7 +249,7 @@ chart := dto.NewEchartConfig().
 
 | File | Changes | Lines Changed |
 |------|---------|---------------|
-| `test/test_helper_test.go` | Fix `TestContextTimeout` - use proper cancel function | ~20 |
+| `test/test_helper.go` | Fix `GetTestContext()` and `GetTestContextWithTimeout()` - return cancel functions | ~25 |
 | `test/integration/projects_integration_test.go` | Add database availability check with timeout | ~30 |
 | `internal/domain/dto/dashboard.go` | Add date abstraction layer (`GetTodayFunc`) | ~15 |
 
@@ -309,7 +319,7 @@ The following items are explicitly excluded from this PRD:
 
 ### Phase 1: Critical Fixes (Week 1)
 
-- [ ] **REQ-01** Fix `TestContextTimeout` - implement proper cancel function pattern
+- [ ] **REQ-01** Fix `GetTestContext()` and `GetTestContextWithTimeout()` - return cancel functions
 - [ ] **REQ-02** Fix database connection hangs - add availability checks with timeout
 - [ ] **REQ-05** Fix Faults Gauge chart title mismatch
 - [ ] Run full test suite to verify P1 fixes
@@ -363,7 +373,7 @@ The following items are explicitly excluded from this PRD:
 
 | Requirement | User Story | Acceptance Criteria | Test File | Status |
 |-------------|------------|---------------------|-----------|--------|
-| REQ-01 | As a developer, I want context timeouts to work correctly | AC-03 | `test/test_helper_test.go` | P1 |
+| REQ-01 | As a developer, I want context timeouts to work correctly | AC-03 | `test/test_helper.go` | P1 |
 | REQ-02 | As a developer, I want integration tests to connect reliably | AC-02 | `test/integration/projects_integration_test.go` | P1 |
 | REQ-03 | As a developer, I want date-dependent tests to be deterministic | AC-04 | `test/unit/speculate_service_test.go` | P2 |
 | REQ-04 | As a QA engineer, I want complete fixture data | AC-05 | `test/fixtures/dashboard/scenarios.go` | P2 |
@@ -433,4 +443,4 @@ This PRD has been validated and is ready for sprint planning:
 
 ---
 
-*PRD Version: 1.0 | Last Updated: 2026-04-24 | Status: Ready for Implementation*
+*PRD Version: 1.1 | Last Updated: 2026-04-24 | Status: Ready for Implementation*
