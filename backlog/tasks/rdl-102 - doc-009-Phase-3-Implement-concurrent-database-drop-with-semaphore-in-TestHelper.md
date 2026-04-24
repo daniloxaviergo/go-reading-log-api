@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-24 13:42'
-updated_date: '2026-04-24 18:00'
+updated_date: '2026-04-24 18:11'
 labels:
   - bug
   - test-fix
@@ -29,7 +29,7 @@ Implement concurrent database cleanup in test/test_helper.go using goroutines an
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Concurrent database drops complete without deadlocks
+- [x] #1 Concurrent database drops complete without deadlocks
 - [ ] #2 Maximum 5 concurrent drop operations enforced via semaphore
 - [ ] #3 All orphaned test databases are properly cleaned up
 - [ ] #4 Error collection provides visibility into cleanup failures
