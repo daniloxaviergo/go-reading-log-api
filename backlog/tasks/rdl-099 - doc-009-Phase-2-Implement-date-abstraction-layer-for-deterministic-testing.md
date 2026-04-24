@@ -1,11 +1,11 @@
 ---
 id: RDL-099
 title: '[doc-009 Phase 2] Implement date abstraction layer for deterministic testing'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-24 13:41'
-updated_date: '2026-04-24 15:14'
+updated_date: '2026-04-24 15:15'
 labels:
   - feature
   - test-fix
