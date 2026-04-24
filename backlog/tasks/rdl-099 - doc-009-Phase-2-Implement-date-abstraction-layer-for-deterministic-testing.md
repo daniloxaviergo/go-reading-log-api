@@ -3,9 +3,9 @@ id: RDL-099
 title: '[doc-009 Phase 2] Implement date abstraction layer for deterministic testing'
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-24 13:41'
-updated_date: '2026-04-24 14:45'
+updated_date: '2026-04-24 14:47'
 labels:
   - feature
   - test-fix
