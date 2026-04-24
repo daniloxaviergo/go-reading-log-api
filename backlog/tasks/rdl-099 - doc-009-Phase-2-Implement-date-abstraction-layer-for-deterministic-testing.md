@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-24 13:41'
-updated_date: '2026-04-24 14:47'
+updated_date: '2026-04-24 14:52'
 labels:
   - feature
   - test-fix
@@ -294,6 +294,31 @@ func SetTestDate(date time.Time) {
 - Add clock abstraction for more sophisticated testing scenarios
 - Implement time travel capabilities for integration tests
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - RDL-099
+
+### Status: In Progress
+
+I've analyzed the codebase and identified the current state:
+
+**Current Architecture:**
+1. `day_service.go` already has date abstraction with `GetTodayFunc`, `GetToday()`, `SetTestDate()` at lines 35-54
+2. All dashboard services (`speculate_service.go`, `faults_service.go`, `weekday_faults_service.go`, `mean_progress_service.go`) duplicate the same date calculation logic
+3. Tests use hardcoded dates that depend on when they run, causing non-deterministic results
+
+**Implementation Plan:**
+1. Create shared date abstraction at `internal/domain/dto/dashboard.go`
+2. Migrate all services to use the shared abstraction
+3. Update all tests to use `SetTestDate()` for deterministic results
+4. Fix index assertions in chart data generation tests
+
+**Key Decision:** I'll create a new shared module that follows the existing pattern but makes it reusable across all dashboard services. This maintains backward compatibility while centralizing the date logic.
+
+**Next Step:** Create the shared date abstraction file.
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
