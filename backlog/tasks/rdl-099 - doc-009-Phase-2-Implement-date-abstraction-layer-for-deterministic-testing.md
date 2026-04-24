@@ -28,7 +28,7 @@ Create date abstraction layer in internal/domain/dto/dashboard.go with GetTodayF
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 Date-dependent tests produce consistent results across different days
-- [ ] #2 SpeculateService tests use abstracted date function
+- [x] #2 SpeculateService tests use abstracted date function
 - [ ] #3 All 9 SpeculateService unit tests pass deterministically
 - [ ] #4 Test execution time remains under 30 seconds
 <!-- AC:END -->
