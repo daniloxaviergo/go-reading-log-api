@@ -5,9 +5,9 @@ title: >-
   tests
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-24 13:42'
-updated_date: '2026-04-24 15:23'
+updated_date: '2026-04-24 15:25'
 labels:
   - feature
   - test-fix
