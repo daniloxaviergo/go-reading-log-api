@@ -5,9 +5,9 @@ title: >-
   TestHelper
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-24 13:42'
-updated_date: '2026-04-24 18:15'
+updated_date: '2026-04-24 18:16'
 labels:
   - bug
   - test-fix
