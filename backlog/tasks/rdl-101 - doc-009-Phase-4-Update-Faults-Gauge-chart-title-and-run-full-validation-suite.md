@@ -3,11 +3,11 @@ id: RDL-101
 title: >-
   [doc-009 Phase 4] Update Faults Gauge chart title and run full validation
   suite
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-24 13:42'
-updated_date: '2026-04-24 17:37'
+updated_date: '2026-04-24 17:38'
 labels:
   - documentation
   - test-fix
