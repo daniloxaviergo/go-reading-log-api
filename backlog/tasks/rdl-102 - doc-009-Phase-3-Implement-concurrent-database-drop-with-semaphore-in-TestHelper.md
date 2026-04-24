@@ -31,7 +31,7 @@ Implement concurrent database cleanup in test/test_helper.go using goroutines an
 <!-- AC:BEGIN -->
 - [x] #1 Concurrent database drops complete without deadlocks
 - [x] #2 Maximum 5 concurrent drop operations enforced via semaphore
-- [ ] #3 All orphaned test databases are properly cleaned up
+- [x] #3 All orphaned test databases are properly cleaned up
 - [ ] #4 Error collection provides visibility into cleanup failures
 <!-- AC:END -->
 
