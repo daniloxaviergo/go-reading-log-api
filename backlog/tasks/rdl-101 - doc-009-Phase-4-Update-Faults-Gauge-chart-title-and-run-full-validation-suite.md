@@ -5,7 +5,7 @@ title: >-
   suite
 status: To Do
 assignee:
-  - workflow
+  - catarina
 created_date: '2026-04-24 13:42'
 updated_date: '2026-04-24 17:12'
 labels:
