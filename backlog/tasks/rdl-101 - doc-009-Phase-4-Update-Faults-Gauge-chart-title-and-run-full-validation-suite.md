@@ -5,9 +5,9 @@ title: >-
   suite
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-24 13:42'
-updated_date: '2026-04-24 17:38'
+updated_date: '2026-04-24 17:39'
 labels:
   - documentation
   - test-fix
