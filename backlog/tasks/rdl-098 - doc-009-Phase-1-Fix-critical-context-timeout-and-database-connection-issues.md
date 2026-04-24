@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-24 13:41'
-updated_date: '2026-04-24 14:25'
+updated_date: '2026-04-24 14:30'
 labels:
   - bug
   - test-fix
@@ -211,6 +211,63 @@ func SetTestDate(date time.Time) {
 - [ ] Confirm all acceptance criteria met
 - [ ] Update documentation in QWEN.md
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+# Implementation Progress - RDL-098
+
+## Status: In Progress
+
+### Phase 1: Context Timeout Fixes (P1) - IN PROGRESS
+
+**Issue:** `GetTestContext()` and `GetTestContextWithTimeout()` discard cancel functions, causing resource leaks.
+
+**Fix Applied:**
+1. Modified `GetTestContext()` to return `(context.Context, context.CancelFunc)`
+2. Modified `GetTestContextWithTimeout()` to return `(context.Context, context.CancelFunc)`
+3. Updated all callers in test files to capture and call the cancel function
+
+**Files Modified:**
+- `test/test_helper.go` - Fixed context functions
+- `test/test_helper_test.go` - Updated tests for new signature
+- All unit test files that use these functions
+
+### Phase 2: Database Availability Checks (P1) - NOT STARTED
+
+**Issue:** Integration tests hang when database is unavailable.
+
+**Fix Approach:**
+Implement `CheckDatabaseAvailability()` function that verifies connection before test execution.
+
+**Files to Modify:**
+- `test/test_helper.go` - Add `CheckDatabaseAvailability()` function
+
+### Phase 3: Date Abstraction (P2) - NOT STARTED
+
+**Issue:** `GetToday()` uses `time.Now()` directly, making tests non-deterministic.
+
+**Fix Approach:**
+Introduce `GetTodayFunc` variable for dependency injection with `SetTestDate()` helper.
+
+**Files to Modify:**
+- `internal/service/dashboard/day_service.go` - Add date abstraction layer
+- `internal/service/dashboard/speculate_service.go` - Update to use abstracted date function
+
+### Phase 4: Validation (P3) - NOT STARTED
+
+Run full test suite with `-race` flag and verify all acceptance criteria met.
+
+---
+
+## Next Steps
+
+1. ✅ Complete Phase 1 context timeout fixes
+2. ⏳ Proceed to Phase 2 database availability checks
+3. ⏳ Proceed to Phase 3 date abstraction layer
+4. ⏳ Run validation tests
+5. ⏳ Update documentation in QWEN.md
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
