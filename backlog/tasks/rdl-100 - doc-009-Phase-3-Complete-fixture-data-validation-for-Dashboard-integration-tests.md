@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-24 13:42'
-updated_date: '2026-04-24 15:27'
+updated_date: '2026-04-24 15:44'
 labels:
   - feature
   - test-fix
@@ -29,7 +29,7 @@ Implement FixtureValidator with comprehensive checks ensuring 7 weekday coverage
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Dashboard integration tests have complete fixture data covering all 7 weekdays
+- [x] #1 Dashboard integration tests have complete fixture data covering all 7 weekdays
 - [ ] #2 FixtureValidator catches missing or insufficient data before test execution
 - [ ] #3 All 3 Dashboard integration tests pass with valid fixtures
 - [ ] #4 Chart contains all 30 days of data for mean progress calculation
