@@ -5,9 +5,9 @@ title: >-
   suite
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-24 13:42'
-updated_date: '2026-04-24 17:20'
+updated_date: '2026-04-24 17:22'
 labels:
   - documentation
   - test-fix
