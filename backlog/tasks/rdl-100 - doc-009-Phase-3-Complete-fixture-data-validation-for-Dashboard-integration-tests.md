@@ -5,7 +5,7 @@ title: >-
   tests
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-24 13:42'
 updated_date: '2026-04-24 15:53'
 labels:
