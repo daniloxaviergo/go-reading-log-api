@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-24 13:41'
-updated_date: '2026-04-24 15:09'
+updated_date: '2026-04-24 15:10'
 labels:
   - feature
   - test-fix
@@ -27,7 +27,7 @@ Create date abstraction layer in internal/domain/dto/dashboard.go with GetTodayF
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Date-dependent tests produce consistent results across different days
+- [x] #1 Date-dependent tests produce consistent results across different days
 - [ ] #2 SpeculateService tests use abstracted date function
 - [ ] #3 All 9 SpeculateService unit tests pass deterministically
 - [ ] #4 Test execution time remains under 30 seconds
