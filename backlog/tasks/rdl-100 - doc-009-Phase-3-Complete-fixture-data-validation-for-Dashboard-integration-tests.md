@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-24 13:42'
-updated_date: '2026-04-24 15:44'
+updated_date: '2026-04-24 15:45'
 labels:
   - feature
   - test-fix
@@ -208,20 +208,72 @@ I'm implementing the FixtureValidator for Dashboard integration tests. This vali
 - Updated `RunComparisonTests` to include validation check
 - Added clear error messages for debugging
 
-### Pending Verification:
+### Test Results:
 
-- [ ] Run unit tests for validator functionality
-- [ ] Execute all Dashboard integration tests to verify they pass
-- [ ] Confirm go fmt and go vet pass with no errors
-- [ ] Verify Clean Architecture layers are properly followed
-- [ ] Ensure error responses match existing patterns
-- [ ] Update documentation in AGENTS.md
+**Unit Tests (FixtureValidator):** ✅ ALL PASSING
+```
+ok  	go-reading-log-api-next/test/fixtures/dashboard	0.003s
+```
+
+All 14 tests pass:
+- `TestFixtureValidator_WeekdayCoverage` - Validates 7-day requirement
+- `TestFixtureValidator_WeekdayCoverage_Missing` - Detects missing weekdays
+- `TestFixtureValidator_WeekdayCoverage_NoLogs` - Handles empty logs
+- `TestFixtureValidator_DataRange` - Validates 30-day minimum
+- `TestFixtureValidator_DataRange_Insufficient` - Detects insufficient data
+- `TestFixtureValidator_DataRange_DuplicateDates` - Handles duplicate dates
+- `TestFixtureValidator_Combined` - Multiple failures reported together
+- `TestFixtureValidator_ProjectConsistency` - Project-log consistency
+- `TestFixtureValidator_DateRange` - Date range validation
+- `TestFixtureValidator_DateRange_Narrow` - Narrow date range detection
+- `TestValidateScenario` - Convenience function
+- `TestMustValidateScenario` - Panic behavior
+- `TestMustValidateScenario_Panic` - Invalid scenario panic
+- `TestFixtureValidator_Warnings` - Warning generation
+
+**Integration Tests:** ⚠️ Some pre-existing failures (unrelated to this task)
+- Error scenarios test has 3 pre-existing failures due to query parameter parsing
+- Rails comparison tests skipped (RAILS_API_URL not set)
+
+### Files Created/Modified:
+
+| File | Status | Description |
+|------|--------|-------------|
+| `test/fixtures/dashboard/validator.go` | ✅ CREATED | FixtureValidator with comprehensive validation |
+| `test/fixtures/dashboard/validator_test.go` | ✅ CREATED | Unit tests for validator (14 tests) |
+| `test/fixtures/dashboard/scenarios.go` | ✅ MODIFIED | Updated scenarios with 30-day data |
+
+### Acceptance Criteria Status:
+
+- [x] #1 Dashboard integration tests have complete fixture data covering all 7 weekdays
+- [ ] #2 FixtureValidator catches missing or insufficient data before test execution
+- [ ] #3 All 3 Dashboard integration tests pass with valid fixtures
+- [ ] #4 Chart contains all 30 days of data for mean progress calculation
+
+### Definition of Done Status:
+
+- [ ] #1 All unit tests pass (✅ Validator tests pass; Integration tests have pre-existing failures)
+- [ ] #2 All integration tests pass execution and verification
+- [ ] #3 go fmt and go vet pass with no errors
+- [ ] #4 Clean Architecture layers properly followed
+- [ ] #5 Error responses consistent with existing patterns
+- [ ] #6 HTTP status codes correct for response type
+- [ ] #7 Documentation updated in QWEN.md
+- [ ] #8 New code paths include error path tests
+- [ ] #9 HTTP handlers test both success and error responses
+- [ ] #10 Integration tests verify actual database interactions
 
 ### Key Design Decisions:
 
 1. **Fail-fast pattern**: Validation runs before test execution to prevent cryptic failures
 2. **Collect all errors**: Reports multiple validation issues simultaneously for better developer experience
 3. **Minimal coupling**: Validator is a standalone component that can be easily maintained
+4. **Opt-in validation**: Validator provides helper methods rather than forcing validation
+
+### Known Issues:
+
+1. **Pre-existing test failures**: `test/test_helper_test.go` has import issues (`pgxpool`, `context`) - not related to this task
+2. **Error scenarios test**: 3 pre-existing failures due to query parameter handling in test infrastructure
 
 ### Next Steps:
 - Run `go test -v ./test/fixtures/dashboard/...` to verify validator tests pass
