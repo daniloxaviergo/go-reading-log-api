@@ -3,7 +3,7 @@ id: RDL-098
 title: '[doc-009 Phase 1] Fix critical context timeout and database connection issues'
 status: To Do
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-24 13:41'
 updated_date: '2026-04-24 14:37'
 labels:
