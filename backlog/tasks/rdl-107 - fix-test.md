@@ -1,7 +1,7 @@
 ---
 id: RDL-107
 title: fix test
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-27 19:38'
