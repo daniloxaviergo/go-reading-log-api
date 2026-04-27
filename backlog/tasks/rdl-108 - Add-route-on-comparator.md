@@ -172,7 +172,7 @@ DEBUG: Raw JSON: {"data":{"type":"dashboard_day","attributes":{"stats":{"previou
 - [x] #3 go fmt and go vet pass with no errors
 - [x] #4 Clean Architecture layers properly followed
 - [x] #5 Error responses consistent with existing patterns
-- [ ] #6 HTTP status codes correct for response type
+- [x] #6 HTTP status codes correct for response type
 - [ ] #7 Documentation updated in QWEN.md
 - [ ] #8 New code paths include error path tests
 - [ ] #9 HTTP handlers test both success and error responses
