@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - Thomas
 created_date: '2026-04-27 11:50'
-updated_date: '2026-04-27 13:58'
+updated_date: '2026-04-27 14:03'
 labels: []
 dependencies: []
 ---
@@ -577,21 +577,38 @@ go test -v ./...
 <!-- SECTION:NOTES:BEGIN -->
 ### Implementation Progress
 
-**Status**: In Progress - Starting implementation
+**Status**: Complete - All fixes implemented and verified
 
-**Root Causes Identified:**
-1. **Dashboard Day Calculation Issue**: The `progress_geral` calculation in `dashboard_handler.go` uses sum of log `end_page` values instead of project `Page` field from database
-2. **Test Timeout Issue**: `cleanupOrphanedDatabasesConcurrent` in `test_helper.go` creates a new connection pool for each goroutine, causing connection pool exhaustion
+**Changes Made:**
 
-**Plan:**
-1. Fix `Day` handler to calculate `progress_geral` using project `Page` field from database
-2. Refactor `cleanupOrphanedDatabasesConcurrent` to reuse a single connection pool for all DROP operations
-3. Update test scenario expected value for `progress_geral` to match correct calculation
+1. **Fixed `progress_geral` calculation in `internal/api/v1/handlers/dashboard_handler.go`**
+   - Changed from using sum of log `end_page` values to using project `Page` field from database
+   - Now correctly calculates: `(sum of project.page) / (sum of project.total_page) * 100`
+   - Added SQL query to fetch project Page field for each project
 
-**Next Steps:**
-- Modify `internal/api/v1/handlers/dashboard_handler.go` - Fix progress_geral calculation
-- Modify `test/test_helper.go` - Refactor cleanup to use single pool
-- Modify `test/fixtures/dashboard/scenarios.go` - Update expected value
+2. **Fixed connection pool exhaustion in `test/test_helper.go`**
+   - Refactored `cleanupOrphanedDatabasesConcurrent` to reuse the provided pool for all DROP operations
+   - Removed creation of new pools inside each goroutine (was causing connection exhaustion)
+   - Tests that were timing out now complete in < 1 second
+
+3. **Updated test scenario expected value in `test/fixtures/dashboard/scenarios.go`**
+   - Changed `ScenarioMultipleProjects` expected `progress_geral` from 12.5 to 41.667
+   - Correct calculation: (0 + 50 + 200) / (200 + 200 + 200) * 100 = 41.667
+
+**Test Results:**
+- ✅ `TestDashboardDayEndpoint_Integration` - PASS (progress_geral now 41.667)
+- ✅ `TestDashboardProjectsEndpoint_Integration` - PASS (no timeout, completes in 0.09s)
+- ✅ `TestErrorScenarios` - PASS (no timeout, completes in 0.51s)
+- ✅ `TestDashboardRepository_GetDailyStats_EmptyDate` - PASS (no timeout, completes in 0.07s)
+- ✅ `go fmt` - PASS (no formatting issues)
+- ✅ `go vet` - PASS (no vet errors)
+
+**Remaining Test Failures (Pre-existing, unrelated to this task):**
+- `TestDashboardYearlyTotal_Integration` - Pre-existing test expectation mismatch
+- `TestDashboardEndpoints_ErrorHandling/Last_Days_Invalid_Type` - Pre-existing JSON parsing issue
+- `TestErrorScenarios/Mean_Progress_-_Empty_Database` - Pre-existing nil check issue
+
+These failures existed before the changes and are outside the scope of this task.
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
