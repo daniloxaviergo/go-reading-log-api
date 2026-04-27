@@ -2,10 +2,9 @@
 id: RDL-103
 title: Fix test
 status: To Do
-assignee:
-  - catarina
+assignee: []
 created_date: '2026-04-27 10:52'
-updated_date: '2026-04-27 10:58'
+updated_date: '2026-04-27 11:17'
 labels: []
 dependencies: []
 ---
