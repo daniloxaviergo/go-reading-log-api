@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-27 19:38'
-updated_date: '2026-04-27 19:38'
+updated_date: '2026-04-27 19:39'
 labels: []
 dependencies: []
 ---
@@ -225,6 +225,27 @@ created by go-reading-log-api-next/test.cleanupOrphanedDatabasesConcurrent in go
 FAIL	go-reading-log-api-next/test	2.011s
 ?   	go-reading-log-api-next/test/fixtures	[no test files]
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Analysis Complete
+
+**Issue Identified:** Test `TestDashboardDayEndpoint_Integration` times out after 2 seconds due to deadlock in `cleanupOrphanedDatabasesConcurrent` function in `test/test_helper.go`.
+
+**Root Cause:**
+1. When test times out, `defer helper.Close()` is called
+2. `Close()` creates a new pool and calls `cleanupOrphanedDatabasesConcurrent` with 10-second timeout
+3. The cleanup function queries for orphaned databases and spawns goroutines to drop them
+4. Goroutines can block on semaphore acquisition or database operations
+5. The WaitGroup wait can hang indefinitely if goroutines don't complete
+
+**Fix Plan:**
+1. Reduce cleanup timeout to prevent long blocking
+2. Make semaphore acquisition non-blocking with shorter timeout
+3. Ensure goroutines exit quickly on context cancellation
+4. Add timeout protection for the WaitGroup wait
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
