@@ -3,9 +3,9 @@ id: RDL-104
 title: Fix test
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-27 11:50'
-updated_date: '2026-04-27 12:03'
+updated_date: '2026-04-27 12:09'
 labels: []
 dependencies: []
 ---
