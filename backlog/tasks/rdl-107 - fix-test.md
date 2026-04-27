@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-27 19:38'
-updated_date: '2026-04-27 19:46'
+updated_date: '2026-04-27 19:47'
 labels: []
 dependencies: []
 ---
@@ -248,6 +248,36 @@ The test was timing out because the cleanup process in `TestHelper.Close()` was 
 **Files Modified:**
 - `test/test_helper.go` - Reduced timeouts and fixed semaphore defer placement
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Fixed Test Timeout Issue in Integration Tests
+
+### What Was Done
+Fixed a test timeout issue in `TestDashboardDayEndpoint_Integration` that was causing tests to fail after 2 seconds. The root cause was a deadlock in the database cleanup process (`cleanupOrphanedDatabasesConcurrent` function) in `test/test_helper.go`.
+
+### Key Changes
+1. **Reduced cleanup timeout** in `cleanupOrphanedDatabasesConcurrent` from 10s to 5s
+2. **Fixed semaphore defer placement** - moved the defer statement outside the select case to ensure proper semaphore release
+3. **Reduced individual drop operation timeout** from 5s to 2s  
+4. **Reduced timeout in `TestHelper.Close`** from 10s to 3s for cleanup and 5s to 2s for database drop
+
+### Files Modified
+- `test/test_helper.go` - Modified `cleanupOrphanedDatabasesConcurrent` and `TestHelper.Close` methods
+
+### Testing
+- ✅ `TestDashboardDayEndpoint_Integration` now passes consistently (execution time: ~0.13s vs previous timeout at 2s)
+- ✅ All dashboard integration tests pass
+- ✅ go fmt and go vet pass with no errors
+- ✅ No new warnings or regressions introduced
+
+### Root Cause Analysis
+The test was timing out because the cleanup process in `TestHelper.Close()` was blocking indefinitely when trying to drop orphaned databases. The semaphore acquisition and WaitGroup wait could deadlock when the context timed out, causing the test to hang.
+
+### Notes for Reviewers
+This is a infrastructure/test fix that improves test reliability and execution time. No production code was changed.
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
