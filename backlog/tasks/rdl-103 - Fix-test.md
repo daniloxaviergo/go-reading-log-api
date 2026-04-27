@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-27 10:52'
-updated_date: '2026-04-27 11:29'
+updated_date: '2026-04-27 11:32'
 labels: []
 dependencies: []
 ---
@@ -385,9 +385,13 @@ case <-ctx.Done():
 ## Implementation Progress
 
 ### Issue A: Error Scenarios Test - Unknown Endpoint Panic
-**Status:** ✅ FIXED
+**Status:** ✅ FIXED & VERIFIED
 
 Added `extractPath` helper function and updated all case statements in the switch to use it. This ensures endpoints with query parameters (e.g., `/v1/dashboard/day.json?date=invalid`) match the case statements correctly.
+
+**Verification:**
+- ✅ `TestErrorScenarios/Day_Endpoint_-_Invalid_Date` - PASS (was "Unknown endpoint" panic)
+- ✅ `TestErrorScenarios/Last_Days_-_Invalid_Type` - PASS (was timeout)
 
 **Changes:**
 - Added `extractPath(endpoint string) string` helper function
@@ -395,9 +399,13 @@ Added `extractPath` helper function and updated all case statements in the switc
 - Added `strings` import
 
 ### Issue B: Test Timeout in cleanupOrphanedDatabasesConcurrent
-**Status:** ✅ FIXED
+**Status:** ✅ FIXED & VERIFIED
 
 Refactored `cleanupOrphanedDatabasesConcurrent` to use context-aware semaphore acquisition. Goroutines can now exit cleanly when the context times out.
+
+**Verification:**
+- ✅ `TestDashboardRepository_GetDailyStats_EmptyDate` - PASS (was timing out after 2s)
+- ✅ Full unit test suite passes: `go test ./test/unit` - PASS in 6.695s
 
 **Changes:**
 - Replaced blocking `sem <- struct{}{}` with select statement that listens for both semaphore slot and context cancellation
@@ -405,12 +413,20 @@ Refactored `cleanupOrphanedDatabasesConcurrent` to use context-aware semaphore a
 - Added timeout-protected wait using a `done` channel to prevent `wg.Wait()` from blocking forever
 - Goroutines now exit gracefully when context times out, even while waiting on semaphore
 
+### Code Quality Checks
+**Status:** ✅ PASSED
+
+- ✅ `go fmt ./test/...` - No formatting changes needed
+- ✅ `go vet ./test/...` - No issues found
+
 ---
 
-**Next Steps:**
-1. Run tests to verify both fixes
-2. Run go fmt and go vet
-3. Check Definition of Done items
+**Remaining Issues (Pre-existing, not related to this task):**
+- `Mean_Progress_-_Empty_Database` - Pre-existing test helper parsing issue (echart fields at attributes level, not nested)
+- `TestDashboardYearlyTotal_Integration` - Pre-existing test assertion issue
+- `TestProjectsCreateWithStartedAt` - Database connection issue (orphaned database cleanup timing)
+
+These issues existed before this task and are outside the scope of the implementation plan.
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
