@@ -54,9 +54,9 @@ No test fixes were needed. The codebase is already in a passing state. All Defin
 - [ ] #3 go fmt and go vet pass with no errors
 - [ ] #4 Clean Architecture layers properly followed
 - [ ] #5 Error responses consistent with existing patterns
-- [ ] #6 HTTP status codes correct for response type
-- [ ] #7 Documentation updated in QWEN.md
+- [x] #6 HTTP status codes correct for response type
+- [x] #7 Documentation updated in QWEN.md
 - [x] #8 New code paths include error path tests
 - [x] #9 HTTP handlers test both success and error responses
-- [ ] #10 Integration tests verify actual database interactions
+- [x] #10 Integration tests verify actual database interactions
 <!-- DOD:END -->
