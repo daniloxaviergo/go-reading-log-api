@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-27 10:52'
-updated_date: '2026-04-27 11:26'
+updated_date: '2026-04-27 11:29'
 labels: []
 dependencies: []
 ---
@@ -395,21 +395,22 @@ Added `extractPath` helper function and updated all case statements in the switc
 - Added `strings` import
 
 ### Issue B: Test Timeout in cleanupOrphanedDatabasesConcurrent
-**Status:** In Progress
+**Status:** ✅ FIXED
 
-The `cleanupOrphanedDatabasesConcurrent` function causes tests to hang because goroutines block indefinitely on the semaphore channel without respecting context cancellation.
+Refactored `cleanupOrphanedDatabasesConcurrent` to use context-aware semaphore acquisition. Goroutines can now exit cleanly when the context times out.
 
-**Plan:**
-1. Refactor to use select statements with context channels
-2. Add context-aware semaphore acquisition
-3. Ensure goroutines can exit cleanly when context times out
+**Changes:**
+- Replaced blocking `sem <- struct{}{}` with select statement that listens for both semaphore slot and context cancellation
+- Changed `dropCtx` to use parent context `ctx` instead of `context.Background()` for proper cancellation propagation
+- Added timeout-protected wait using a `done` channel to prevent `wg.Wait()` from blocking forever
+- Goroutines now exit gracefully when context times out, even while waiting on semaphore
 
 ---
 
 **Next Steps:**
-1. Fix test_helper.go - make cleanup context-aware
-2. Run tests to verify both fixes
-3. Run go fmt and go vet
+1. Run tests to verify both fixes
+2. Run go fmt and go vet
+3. Check Definition of Done items
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
