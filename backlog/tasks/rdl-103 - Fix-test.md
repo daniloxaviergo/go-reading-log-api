@@ -1,11 +1,11 @@
 ---
 id: RDL-103
 title: Fix test
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-27 10:52'
-updated_date: '2026-04-27 11:36'
+updated_date: '2026-04-27 11:37'
 labels: []
 dependencies: []
 ---
