@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-27 10:52'
-updated_date: '2026-04-27 11:22'
+updated_date: '2026-04-27 11:24'
 labels: []
 dependencies: []
 ---
@@ -378,6 +378,38 @@ case <-ctx.Done():
 - Ensure test output is clean with no panics or timeouts
 - Document the fix in the task description for future reference
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress
+
+### Issue A: Error Scenarios Test - Unknown Endpoint Panic
+**Status:** In Progress
+
+The `RunErrorScenarios` function uses exact string matching for endpoints. When tests use endpoints with query parameters (e.g., `/v1/dashboard/day.json?date=invalid`), they don't match the case statements (e.g., `/v1/dashboard/day.json`).
+
+**Plan:**
+1. Add helper function `extractPath(endpoint string) string` to extract path without query parameters
+2. Modify all case statements to use `extractPath(scenario.Endpoint)` instead of `scenario.Endpoint`
+
+### Issue B: Test Timeout in cleanupOrphanedDatabasesConcurrent
+**Status:** Pending
+
+The `cleanupOrphanedDatabasesConcurrent` function causes tests to hang because goroutines block indefinitely on the semaphore channel without respecting context cancellation.
+
+**Plan:**
+1. Refactor to use select statements with context channels
+2. Add a `done` channel to signal goroutines to exit when context cancels
+3. Wrap semaphore acquisition in a select statement
+
+---
+
+**Next Steps:**
+1. Fix error_scenarios_test.go - add extractPath helper
+2. Fix test_helper.go - make cleanup context-aware
+3. Run tests to verify fixes
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
