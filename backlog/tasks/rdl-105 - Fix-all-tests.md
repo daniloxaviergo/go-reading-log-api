@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-27 14:18'
-updated_date: '2026-04-27 14:25'
+updated_date: '2026-04-27 14:29'
 labels: []
 dependencies: []
 ---
@@ -218,6 +218,32 @@ If issues arise after deployment:
 - ✅ Code coverage maintained or improved
 - ✅ `go fmt` and `go vet` pass with no errors
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Investigation Complete - Issues Identified
+
+### Root Causes Found:
+
+1. **Dashboard Handler `Faults()` method** (P1):
+   - Currently uses inline gauge chart configuration with title "Faults Gauge"
+   - Should use `FaultsService.CreateGaugeChart()` which returns "Fault Percentage by Weekday"
+   - Location: `internal/api/v1/handlers/dashboard_handler.go:383-420`
+
+2. **Handler Tests Expect Wrong Title** (P1):
+   - `TestDashboardHandler_Faults` expects title "Faults Gauge" (line 283)
+   - Should expect "Fault Percentage by Weekday" to match service implementation
+
+3. **Dashboard Handler `Day()` method missing mock setup** (P1):
+   - Test `TestDashboardHandler_Day` panics because `GetProjectAggregates` is not mocked
+   - Handler calls `h.repo.GetProjectAggregates(ctx)` at line 79 but test doesn't set up this mock expectation
+
+### Next Steps:
+1. Refactor `Faults()` method to use `FaultsService`
+2. Update test expectations to match correct title
+3. Fix mock setup in `TestDashboardHandler_Day` to include `GetProjectAggregates` expectation
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
