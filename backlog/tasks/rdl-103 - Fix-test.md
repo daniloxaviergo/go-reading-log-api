@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - Catarina
 created_date: '2026-04-27 10:52'
-updated_date: '2026-04-27 11:17'
+updated_date: '2026-04-27 11:21'
 labels: []
 dependencies: []
 ---
@@ -243,6 +243,141 @@ created by github.com/jackc/pgx/v5/pgxpool.NewWithConfig in goroutine 73
 	/home/danilo/go/pkg/mod/github.com/jackc/pgx/v5@v5.9.1/pgxpool/pool.go:335 +0x43e
 FAIL	go-reading-log-api-next/test/unit	2.012s
 <!-- SECTION:DESCRIPTION:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+### 1. Technical Approach
+
+This task involves fixing two critical test failures that cause test timeouts and panics:
+
+**Issue A: Error Scenarios Test - Unknown Endpoint Panic**
+The `RunErrorScenarios` function in `error_scenarios_test.go` uses exact string matching for endpoints in its switch statement. When tests use endpoints with query parameters (e.g., `/v1/dashboard/day.json?date=invalid`), they don't match the case statements (e.g., `/v1/dashboard/day.json`), causing the test to panic with "Unknown endpoint".
+
+**Solution**: Modify the endpoint matching logic to extract the path portion (before query parameters) using `strings.Split(endpoint, "?")[0]` before comparison.
+
+**Issue B: Test Timeout in cleanupOrphanedDatabasesConcurrent**
+The `cleanupOrphanedDatabasesConcurrent` function in `test_helper.go` causes tests to hang indefinitely. The root cause is that goroutines can block indefinitely on the semaphore channel (`sem <- struct{}{}`) without respecting context cancellation. When the 10-second context times out, goroutines waiting on the semaphore never exit, causing `wg.Wait()` to block forever.
+
+**Solution**: Refactor `cleanupOrphanedDatabasesConcurrent` to use select statements with context channels, ensuring goroutines can exit cleanly when the context times out, even while waiting on the semaphore.
+
+### 2. Files to Modify
+
+**File 1: `/home/danilo/scripts/github/go-reading-log-api-next/test/integration/error_scenarios_test.go`**
+- **Location**: Lines 60-90 (switch statement in `RunErrorScenarios`)
+- **Changes**:
+  - Add helper function `extractPath(endpoint string) string` to extract path without query parameters
+  - Modify all case statements to use `extractPath(scenario.Endpoint)` instead of `scenario.Endpoint`
+  - This ensures endpoints like `/v1/dashboard/day.json?date=invalid` match the case `/v1/dashboard/day.json`
+
+**File 2: `/home/danilo/scripts/github/go-reading-log-api-next/test/test_helper.go`**
+- **Location**: Lines 505-560 (function `cleanupOrphanedDatabasesConcurrent`)
+- **Changes**:
+  - Refactor the goroutine launch loop to use select statements for context-aware semaphore acquisition
+  - Add a `done` channel to signal goroutines to exit when context cancels
+  - Wrap the semaphore acquisition in a select statement that listens for both semaphore slot and context cancellation
+  - Ensure proper cleanup even when goroutines exit early due to timeout
+  - Reduce timeout from 10 seconds to 5 seconds to prevent test blocking
+
+### 3. Dependencies
+
+**Prerequisites**:
+- No external dependencies required
+- Existing test infrastructure must be functional
+- PostgreSQL must be running for integration tests
+
+**Related Tasks**:
+- None - this is a standalone bug fix
+- This task unblocks all dashboard-related tests
+
+### 4. Code Patterns
+
+**Following Existing Patterns**:
+
+1. **Path Extraction Pattern** (new helper):
+```go
+func extractPath(endpoint string) string {
+    if idx := strings.Index(endpoint, "?"); idx != -1 {
+        return endpoint[:idx]
+    }
+    return endpoint
+}
+```
+
+2. **Context-Aware Semaphore Pattern** (for cleanup):
+```go
+select {
+case sem <- struct{}{}:
+    // Acquired semaphore slot
+    defer func() { <-sem }()
+    // Perform operation
+case <-ctx.Done():
+    // Context cancelled, exit gracefully
+    return
+}
+```
+
+3. **Error Handling Pattern**:
+- Continue processing other databases even if one fails
+- Aggregate errors using `errors.Join()` for visibility
+- Log errors but don't block test completion
+
+4. **Naming Conventions**:
+- Helper functions: `extractPath` (camelCase)
+- Test functions: `TestErrorScenarios` (PascalCase)
+- Variables: `toDrop`, `sem`, `wg` (camelCase)
+
+### 5. Testing Strategy
+
+**Unit Tests**:
+- No new unit tests required - this is a fix to existing test infrastructure
+- Verify `extractPath` helper works correctly with edge cases:
+  - `/v1/dashboard/day.json` → `/v1/dashboard/day.json`
+  - `/v1/dashboard/day.json?date=invalid` → `/v1/dashboard/day.json`
+  - `/v1/dashboard/day.json?date=invalid&type=test` → `/v1/dashboard/day.json`
+
+**Integration Tests**:
+- Run `go test -v ./test/integration -run TestErrorScenarios` to verify:
+  - `Day Endpoint - Invalid Date` test passes (no more "Unknown endpoint" panic)
+  - `Last Days - Invalid Type` test passes (no more timeout)
+  - All other error scenarios complete successfully
+
+**Regression Tests**:
+- Run full test suite: `go test ./...`
+- Verify no new timeouts or panics
+- Verify test execution time is reasonable (< 30 seconds for full suite)
+
+**Edge Cases to Cover**:
+1. Empty query string: `/v1/dashboard/day.json?`
+2. Multiple query parameters: `/v1/dashboard/last_days.json?type=99&days=5`
+3. No query parameters: `/v1/dashboard/projects.json`
+4. Cleanup with no orphaned databases
+5. Cleanup with many orphaned databases (> 100)
+
+### 6. Risks and Considerations
+
+**Known Issues**:
+- **Risk**: The current implementation may still have edge cases where goroutines don't exit cleanly
+- **Mitigation**: Add explicit timeout handling with select statements and ensure all goroutines have exit paths
+
+**Trade-offs**:
+- **Trade-off**: Reducing timeout from 10s to 5s may cause cleanup to be incomplete on slow systems
+- **Mitigation**: Accept that some orphaned databases may remain; they will be cleaned up on next test run
+
+**Deployment Considerations**:
+- No deployment changes required
+- This is a test infrastructure fix only
+- No impact on production code
+
+**Blocking Issues**:
+- None identified - this is a straightforward fix
+- If issues persist after implementation, consider simplifying the cleanup logic to sequential drops (slower but more reliable)
+
+**Additional Notes**:
+- After fixing, verify that `go fmt` and `go vet` pass with no errors
+- Ensure test output is clean with no panics or timeouts
+- Document the fix in the task description for future reference
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
