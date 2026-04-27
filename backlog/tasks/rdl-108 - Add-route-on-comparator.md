@@ -1,7 +1,7 @@
 ---
 id: RDL-108
 title: Add route on comparator
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-27 23:33'
