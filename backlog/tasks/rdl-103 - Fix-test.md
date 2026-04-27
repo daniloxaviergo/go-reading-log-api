@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-27 10:52'
-updated_date: '2026-04-27 11:24'
+updated_date: '2026-04-27 11:26'
 labels: []
 dependencies: []
 ---
@@ -385,30 +385,31 @@ case <-ctx.Done():
 ## Implementation Progress
 
 ### Issue A: Error Scenarios Test - Unknown Endpoint Panic
-**Status:** In Progress
+**Status:** ✅ FIXED
 
-The `RunErrorScenarios` function uses exact string matching for endpoints. When tests use endpoints with query parameters (e.g., `/v1/dashboard/day.json?date=invalid`), they don't match the case statements (e.g., `/v1/dashboard/day.json`).
+Added `extractPath` helper function and updated all case statements in the switch to use it. This ensures endpoints with query parameters (e.g., `/v1/dashboard/day.json?date=invalid`) match the case statements correctly.
 
-**Plan:**
-1. Add helper function `extractPath(endpoint string) string` to extract path without query parameters
-2. Modify all case statements to use `extractPath(scenario.Endpoint)` instead of `scenario.Endpoint`
+**Changes:**
+- Added `extractPath(endpoint string) string` helper function
+- Modified all 8 case statements to use `extractPath(scenario.Endpoint)`
+- Added `strings` import
 
 ### Issue B: Test Timeout in cleanupOrphanedDatabasesConcurrent
-**Status:** Pending
+**Status:** In Progress
 
 The `cleanupOrphanedDatabasesConcurrent` function causes tests to hang because goroutines block indefinitely on the semaphore channel without respecting context cancellation.
 
 **Plan:**
 1. Refactor to use select statements with context channels
-2. Add a `done` channel to signal goroutines to exit when context cancels
-3. Wrap semaphore acquisition in a select statement
+2. Add context-aware semaphore acquisition
+3. Ensure goroutines can exit cleanly when context times out
 
 ---
 
 **Next Steps:**
-1. Fix error_scenarios_test.go - add extractPath helper
-2. Fix test_helper.go - make cleanup context-aware
-3. Run tests to verify fixes
+1. Fix test_helper.go - make cleanup context-aware
+2. Run tests to verify both fixes
+3. Run go fmt and go vet
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
