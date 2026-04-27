@@ -3,9 +3,9 @@ id: RDL-104
 title: Fix test
 status: Done
 assignee:
-  - Thomas
+  - workflow
 created_date: '2026-04-27 11:50'
-updated_date: '2026-04-27 14:07'
+updated_date: '2026-04-27 14:09'
 labels: []
 dependencies: []
 ---
