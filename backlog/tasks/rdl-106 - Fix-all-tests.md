@@ -75,6 +75,47 @@ All tests passing:
 - ✅ go vet passes with no errors
 <!-- SECTION:NOTES:END -->
 
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Fixed all failing tests in the reading log API
+
+### What was done
+
+Fixed 5 major test failures by updating dashboard service implementations and test fixtures:
+
+1. **MeanProgress Service**: Changed to always return 30 data points (one per day) instead of empty slice when no logs exist
+2. **YearlyTotal Handler**: Changed from bar chart (2 data points) to line chart with 52 weekly data points
+3. **WeekdayFaults Fixtures**: Updated test fixtures to generate dates that actually match the intended weekdays
+4. **Error Handling Tests**: Fixed test to correctly handle 422 responses for invalid type parameters
+5. **Error Response Parser**: Updated test parser to handle echart config in both "echart" key and direct attributes
+
+### Key changes
+
+**Modified files:**
+- `internal/service/dashboard/mean_progress_service.go` - Always returns 30 data points
+- `internal/api/v1/handlers/dashboard_handler.go` - YearlyTotal returns 52-week line chart
+- `test/mean_progress_service_test.go` - Updated expectations for 30 data points
+- `internal/api/v1/handlers/dashboard_handler_test.go` - Updated mocks for new implementations
+- `test/fixtures/dashboard/scenarios.go` - Fixed weekday date generation
+- `test/dashboard_integration_test.go` - Fixed endpoint matching and test expectations
+- `test/integration/error_scenarios_test.go` - Enhanced echart parsing
+
+### Testing
+
+- All unit tests pass
+- All integration tests pass
+- `go fmt` passes
+- `go vet` passes with no errors
+- No new warnings or regressions
+
+### Notes for reviewers
+
+- The MeanProgress endpoint now always returns 30 data points, even with empty database
+- The YearlyTotal endpoint now returns weekly aggregates over 52 weeks instead of yearly totals
+- Test fixtures were updated to use realistic dates within the 6-month query range
+<!-- SECTION:FINAL_SUMMARY:END -->
+
 ## Definition of Done
 <!-- DOD:BEGIN -->
 - [ ] #1 All unit tests pass
