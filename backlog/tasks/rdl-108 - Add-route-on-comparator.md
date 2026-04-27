@@ -3,7 +3,7 @@ id: RDL-108
 title: Add route on comparator
 status: To Do
 assignee:
-  - workflow
+  - catarina
 created_date: '2026-04-27 23:33'
 updated_date: '2026-04-27 23:33'
 labels: []
