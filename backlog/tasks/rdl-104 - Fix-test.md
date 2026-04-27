@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - Thomas
 created_date: '2026-04-27 11:50'
-updated_date: '2026-04-27 13:54'
+updated_date: '2026-04-27 13:58'
 labels: []
 dependencies: []
 ---
@@ -571,6 +571,28 @@ go test -v ./...
 - [ ] Documentation updated in QWEN.md (not applicable for test fixes)
 - [x] Integration tests verify actual database interactions
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+### Implementation Progress
+
+**Status**: In Progress - Starting implementation
+
+**Root Causes Identified:**
+1. **Dashboard Day Calculation Issue**: The `progress_geral` calculation in `dashboard_handler.go` uses sum of log `end_page` values instead of project `Page` field from database
+2. **Test Timeout Issue**: `cleanupOrphanedDatabasesConcurrent` in `test_helper.go` creates a new connection pool for each goroutine, causing connection pool exhaustion
+
+**Plan:**
+1. Fix `Day` handler to calculate `progress_geral` using project `Page` field from database
+2. Refactor `cleanupOrphanedDatabasesConcurrent` to reuse a single connection pool for all DROP operations
+3. Update test scenario expected value for `progress_geral` to match correct calculation
+
+**Next Steps:**
+- Modify `internal/api/v1/handlers/dashboard_handler.go` - Fix progress_geral calculation
+- Modify `test/test_helper.go` - Refactor cleanup to use single pool
+- Modify `test/fixtures/dashboard/scenarios.go` - Update expected value
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
