@@ -2,10 +2,9 @@
 id: RDL-104
 title: Fix test
 status: To Do
-assignee:
-  - next-task
+assignee: []
 created_date: '2026-04-27 11:50'
-updated_date: '2026-04-27 12:10'
+updated_date: '2026-04-27 13:54'
 labels: []
 dependencies: []
 ---
