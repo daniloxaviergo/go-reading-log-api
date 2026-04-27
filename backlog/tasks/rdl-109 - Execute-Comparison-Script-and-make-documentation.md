@@ -2,8 +2,10 @@
 id: RDL-109
 title: Execute Comparison Script and make documentation
 status: To Do
-assignee: []
+assignee:
+  - workflow
 created_date: '2026-04-27 23:50'
+updated_date: '2026-04-27 23:50'
 labels: []
 dependencies: []
 ---
