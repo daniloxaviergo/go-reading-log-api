@@ -18,7 +18,7 @@ Fix all tests
 ## Implementation Plan
 
 <!-- SECTION:PLAN:BEGIN -->
-This task involves fixing all failing tests across the Go Reading Log API codebase. The approach will be systematic:
+This task involves fixing all failing tests across the Go Reading Log API codebase.
 <!-- SECTION:PLAN:END -->
 
 ## Definition of Done
