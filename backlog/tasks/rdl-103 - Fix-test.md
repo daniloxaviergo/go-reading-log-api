@@ -2,9 +2,10 @@
 id: RDL-103
 title: Fix test
 status: To Do
-assignee: []
+assignee:
+  - workflow
 created_date: '2026-04-27 10:52'
-updated_date: '2026-04-27 10:57'
+updated_date: '2026-04-27 10:58'
 labels: []
 dependencies: []
 ---
