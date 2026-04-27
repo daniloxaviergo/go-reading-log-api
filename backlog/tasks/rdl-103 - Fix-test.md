@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-27 10:52'
-updated_date: '2026-04-27 11:34'
+updated_date: '2026-04-27 11:36'
 labels: []
 dependencies: []
 ---
@@ -428,6 +428,55 @@ Refactored `cleanupOrphanedDatabasesConcurrent` to use context-aware semaphore a
 
 These issues existed before this task and are outside the scope of the implementation plan.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Test Infrastructure Bug Fixes - RDL-103
+
+### What Was Done
+Fixed two critical test infrastructure bugs that caused test timeouts and panics:
+
+1. **Unknown Endpoint Panic in Error Scenarios Tests**
+   - Problem: Tests with query parameters (e.g., `/v1/dashboard/day.json?date=invalid`) didn't match case statements, causing "Unknown endpoint" panic
+   - Solution: Added `extractPath()` helper to strip query parameters before endpoint matching
+
+2. **Test Timeout in Database Cleanup**
+   - Problem: `cleanupOrphanedDatabasesConcurrent` goroutines blocked indefinitely on semaphore channel, causing `wg.Wait()` to hang forever when context timed out
+   - Solution: Made semaphore acquisition context-aware using select statements, allowing goroutines to exit cleanly on timeout
+
+### Key Changes
+
+**File: `test/integration/error_scenarios_test.go`**
+- Added `extractPath(endpoint string) string` helper function
+- Modified all 8 case statements in `RunErrorScenarios` to use `extractPath(scenario.Endpoint)`
+- Added `strings` import
+
+**File: `test/test_helper.go`**
+- Refactored `cleanupOrphanedDatabasesConcurrent` to use select statements for context-aware semaphore acquisition
+- Changed `dropCtx` to use parent context `ctx` instead of `context.Background()` for proper cancellation propagation
+- Added timeout-protected wait using a `done` channel to prevent `wg.Wait()` from blocking forever
+
+### Tests Run
+- ✅ `go test -v ./test/integration -run TestErrorScenarios` - Fixed tests now pass
+- ✅ `go test -v ./test/unit -run TestDashboardRepository_GetDailyStats_EmptyDate` - No longer times out
+- ✅ `go test ./test/unit` - Full unit test suite passes (6.695s)
+- ✅ `go fmt ./test/...` - No formatting changes needed
+- ✅ `go vet ./test/...` - No issues found
+- ✅ `go build ./cmd/server.go` - Build succeeds with no warnings
+
+### Verification Results
+- `TestErrorScenarios/Day_Endpoint_-_Invalid_Date` - PASS (was "Unknown endpoint" panic)
+- `TestErrorScenarios/Last_Days_-_Invalid_Type` - PASS (was timeout after 2s)
+- `TestDashboardRepository_GetDailyStats_EmptyDate` - PASS (was timeout after 2s)
+
+### Risks/Follow-ups
+- Pre-existing test failures remain (outside scope):
+  - `Mean_Progress_-_Empty_Database` - Test helper parsing issue
+  - `TestDashboardYearlyTotal_Integration` - Test assertion issue
+  - `TestProjectsCreateWithStartedAt` - Database connection timing issue
+- These issues existed before this task and require separate investigation
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
