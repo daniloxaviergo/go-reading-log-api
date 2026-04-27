@@ -3,7 +3,7 @@ id: RDL-105
 title: Fix all tests
 status: To Do
 assignee:
-  - workflow
+  - thomas
 created_date: '2026-04-27 14:18'
 updated_date: '2026-04-27 14:25'
 labels: []
