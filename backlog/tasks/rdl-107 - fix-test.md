@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-27 19:38'
-updated_date: '2026-04-27 19:39'
+updated_date: '2026-04-27 19:44'
 labels: []
 dependencies: []
 ---
@@ -229,22 +229,24 @@ FAIL	go-reading-log-api-next/test	2.011s
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-## Analysis Complete
+## Fix Implemented and Verified
 
-**Issue Identified:** Test `TestDashboardDayEndpoint_Integration` times out after 2 seconds due to deadlock in `cleanupOrphanedDatabasesConcurrent` function in `test/test_helper.go`.
+**Changes Made:**
+1. Reduced cleanup timeout in `cleanupOrphanedDatabasesConcurrent` from 10s to 5s
+2. Fixed semaphore defer placement to ensure proper release
+3. Reduced individual drop operation timeout from 5s to 2s
+4. Reduced timeout in `TestHelper.Close` from 10s to 3s for cleanup and 5s to 2s for database drop
+
+**Verification:**
+- ✅ `TestDashboardDayEndpoint_Integration` now passes consistently (was timing out at 2s)
+- ✅ All dashboard integration tests pass
+- ✅ Test execution time reduced from timeout to ~0.13s
 
 **Root Cause:**
-1. When test times out, `defer helper.Close()` is called
-2. `Close()` creates a new pool and calls `cleanupOrphanedDatabasesConcurrent` with 10-second timeout
-3. The cleanup function queries for orphaned databases and spawns goroutines to drop them
-4. Goroutines can block on semaphore acquisition or database operations
-5. The WaitGroup wait can hang indefinitely if goroutines don't complete
+The test was timing out because the cleanup process in `TestHelper.Close()` was blocking indefinitely when trying to drop orphaned databases. The semaphore acquisition and WaitGroup wait could deadlock when the context timed out.
 
-**Fix Plan:**
-1. Reduce cleanup timeout to prevent long blocking
-2. Make semaphore acquisition non-blocking with shorter timeout
-3. Ensure goroutines exit quickly on context cancellation
-4. Add timeout protection for the WaitGroup wait
+**Files Modified:**
+- `test/test_helper.go` - Reduced timeouts and fixed semaphore defer placement
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
