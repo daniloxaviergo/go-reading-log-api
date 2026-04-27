@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-27 14:18'
-updated_date: '2026-04-27 14:29'
+updated_date: '2026-04-27 14:40'
 labels: []
 dependencies: []
 ---
@@ -222,27 +222,34 @@ If issues arise after deployment:
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-## Investigation Complete - Issues Identified
+## Fixes Completed Successfully
 
-### Root Causes Found:
+### Changes Made:
 
-1. **Dashboard Handler `Faults()` method** (P1):
-   - Currently uses inline gauge chart configuration with title "Faults Gauge"
-   - Should use `FaultsService.CreateGaugeChart()` which returns "Fault Percentage by Weekday"
-   - Location: `internal/api/v1/handlers/dashboard_handler.go:383-420`
+1. **Refactored `Faults()` handler** (P1 ✅):
+   - Changed from inline gauge chart configuration to using `FaultsService.CreateGaugeChart()`
+   - Title changed from "Faults Gauge" to "Fault Percentage by Weekday" (more descriptive)
+   - File: `internal/api/v1/handlers/dashboard_handler.go`
 
-2. **Handler Tests Expect Wrong Title** (P1):
-   - `TestDashboardHandler_Faults` expects title "Faults Gauge" (line 283)
-   - Should expect "Fault Percentage by Weekday" to match service implementation
+2. **Updated test expectations** (P1 ✅):
+   - `TestDashboardHandler_Faults` - Updated to expect "Fault Percentage by Weekday" title
+   - `TestDashboardHandler_Day` - Added mock for `GetProjectAggregates` and `GetDailyStats` (previous period)
+   - `TestDashboardHandler_Day_EmptyData` - Added mock for `GetProjectAggregates` and `GetDailyStats` (previous period)
+   - `TestDashboardHandler_Projects` - Changed to use `GetProjectsWithLogs` mock and updated assertions
+   - `TestDashboardHandler_Projects_Empty` - Changed to use `GetProjectsWithLogs` mock
 
-3. **Dashboard Handler `Day()` method missing mock setup** (P1):
-   - Test `TestDashboardHandler_Day` panics because `GetProjectAggregates` is not mocked
-   - Handler calls `h.repo.GetProjectAggregates(ctx)` at line 79 but test doesn't set up this mock expectation
+3. **Fixed test assertions** (P1 ✅):
+   - Updated `Day` tests to check `stats.total_pages` and `stats.mean_day` (not `log_count` which doesn't exist)
+   - Updated `Projects` tests to handle `logs` being `null` or empty array
+
+### Test Results:
+✅ All handler tests pass: `go test ./internal/api/v1/handlers/...`
+- 58 tests passed
+- 0 tests failed
 
 ### Next Steps:
-1. Refactor `Faults()` method to use `FaultsService`
-2. Update test expectations to match correct title
-3. Fix mock setup in `TestDashboardHandler_Day` to include `GetProjectAggregates` expectation
+- Run full test suite to ensure no regressions
+- Check integration tests
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
