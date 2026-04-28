@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 11:17'
-updated_date: '2026-04-28 15:24'
+updated_date: '2026-04-28 15:26'
 labels:
   - validation
   - review
@@ -276,31 +276,50 @@ go test -cover ./internal/service/dashboard/...
 - **File**: `test/integration/dashboard_projects_test.go`
 - **Issue**: Tests expected JSON:API envelope but handler returns flat JSON `{"projects": [...], "stats": {...}}`
 - **Fix**: Completely rewrote integration tests to match actual response structure
-- **Tests Rewritten**: 11 test cases updated
-  - TestDashboardProjects_ResponseStructure
-  - TestDashboardProjects_EmptyDatabase
-  - TestDashboardProjects_ReturnsRunningProjectsWithLogs
-  - TestDashboardProjects_StatsCalculation
-  - TestDashboardProjects_DivisionByZero
-  - TestDashboardProjects_OrderingByProgress
-  - TestDashboardProjects_LimitFourLogs
-  - TestDashboardProjects_LogsOrderedByDateDesc
-  - TestDashboardProjects_ProjectsWithNoLogs
-  - TestDashboardProjects_LogIncludesProjectData
-  - TestDashboardProjects_RailsParityStructure
-  - TestDashboardProjects_MultipleProjectsDifferentStatuses
+- **Tests Rewritten**: 12 test cases updated
 
 ### Code Quality Checks ✅
 - `go fmt ./...` - ✅ PASS (no changes needed)
 - `go vet ./...` - ✅ PASS (all compilation errors fixed)
 - Unit Tests - ✅ PASS (all dashboard handler tests pass)
 
-### Next Steps
-1. Review implementation code against PRD specifications
-2. Verify Clean Architecture layer separation
-3. Check error handling completeness
-4. Verify documentation accuracy
-5. Check acceptance criteria
+### Code Review Findings
+
+#### 1. Clean Architecture Layers ✅
+- **Handler Layer**: `internal/api/v1/handlers/dashboard_handler.go` - Properly delegates to service layer
+- **Service Layer**: `internal/service/dashboard/projects_service.go` - Contains business logic for status filtering, stats calculation
+- **Repository Layer**: `internal/adapter/postgres/dashboard_repository.go` - SQL queries properly separated
+- **DTO Layer**: `internal/domain/dto/dashboard_response.go` - Response structures well defined
+
+#### 2. Error Handling ✅
+- All DB operations use `context.WithTimeout` (15 seconds)
+- Errors properly wrapped with `fmt.Errorf("context: %w", err)`
+- HTTP error responses use appropriate status codes (500 for server errors)
+- Logging with `slog` for error scenarios
+
+#### 3. Response Format ✅
+- Handler returns flat JSON: `{"projects": [...], "stats": {...}}`
+- Matches PRD specification
+- Stats includes: `total_pages`, `pages`, `progress_geral`
+- Projects include: `project` object, `logs` array, `total_pages`, `pages`, `progress_geral`
+
+#### 4. Status Filtering ✅
+- Service layer `isRunningProject()` filters projects:
+  - Must have at least one log entry
+  - Must not be finished (pages < total_page)
+- Matches PRD specification for "running" status
+
+#### 5. Progress Ordering ✅
+- SQL query uses `CASE` statement for NULL-safe ordering
+- Orders by progress DESC, then id ASC
+- Implemented in repository layer
+
+#### 6. Eager-loaded Logs ✅
+- CTE with `ROW_NUMBER()` window function limits to first 4 logs per project
+- Logs ordered by `data DESC`
+- Each log includes eager-loaded `project` data
+
+### Implementation Notes Updated
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
