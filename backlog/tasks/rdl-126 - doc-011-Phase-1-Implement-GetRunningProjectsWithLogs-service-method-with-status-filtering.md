@@ -5,9 +5,9 @@ title: >-
   status filtering
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-28 11:16'
-updated_date: '2026-04-28 12:40'
+updated_date: '2026-04-28 12:41'
 labels:
   - feature
   - backend
