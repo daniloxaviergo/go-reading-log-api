@@ -1,11 +1,11 @@
 ---
 id: RDL-111
 title: '[doc-10 Phase 1] Update StatsData DTO with new fields'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-28 00:28'
-updated_date: '2026-04-28 01:30'
+updated_date: '2026-04-28 01:31'
 labels:
   - dto
   - phase-1
