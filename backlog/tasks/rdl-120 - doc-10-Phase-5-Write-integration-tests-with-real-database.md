@@ -26,7 +26,7 @@ Create integration tests in dashboard_integration_test.go using TestHelper for d
 <!-- AC:BEGIN -->
 - [x] #1 Integration tests pass with real database
 - [x] #2 All new fields tested with fixtures
-- [ ] #3 Test coverage >= 80% for new code
+- [x] #3 Test coverage >= 80% for new code
 <!-- AC:END -->
 
 ## Implementation Plan
