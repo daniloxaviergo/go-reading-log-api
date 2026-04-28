@@ -2,8 +2,10 @@
 id: RDL-119
 title: '[doc-10 Phase 4] Update DTO validation for null values'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-28 00:30'
+updated_date: '2026-04-28 04:32'
 labels:
   - validation
   - phase-4
