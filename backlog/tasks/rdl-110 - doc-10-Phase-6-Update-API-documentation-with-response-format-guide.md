@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:27'
-updated_date: '2026-04-28 00:57'
+updated_date: '2026-04-28 00:58'
 labels:
   - documentation
   - phase-6
@@ -278,6 +278,70 @@ grep -E "^###|^####" docs/dashboard-api-reference.md
 - All documentation aligns with PRD doc-010 specifications
 - Rails-parity fields vs Go extensions clearly distinguished
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Updated API documentation to reflect new flat JSON response structure for the Dashboard Day endpoint and documented Go API extensions.
+
+## What Was Done
+
+### Documentation Updates
+1. **Updated `docs/dashboard-api-reference.md`**:
+   - Changed response format from JSON:API envelope to flat `stats` object for `/v1/dashboard/day.json`
+   - Added documentation for 4 new Rails-parity fields: `max_day`, `mean_geral`, `per_mean_day`, `per_spec_mean_day`
+   - Documented null handling rules for ratio fields (`per_pages`, `per_mean_day`, `per_spec_mean_day`)
+   - Added Go extension fields with clear labeling (`progress_geral`, `total_pages`, `pages`, `count_pages`, `speculate_pages`)
+   - Added dedicated "Null Handling" section with examples
+   - Updated calculation formulas documentation
+
+2. **Created `docs/api-response-format-guide.md`**:
+   - Comparison table: Rails API vs Go API response structures
+   - Detailed documentation of 5 Go-specific extensions
+   - Migration guide for API consumers
+   - Deprecation timeline considerations
+   - Best practices for handling extension fields
+
+3. **Created `docs/rails-calculation-reference.md`**:
+   - Rails V1::MeanLog algorithm documentation with Go implementation examples
+   - Rails V1::MaxLog algorithm documentation
+   - Mean Geral calculation formula
+   - Ratio calculation formulas with null handling
+   - Weekday mapping and timezone considerations
+   - Testing guidelines with example test cases
+
+## Key Changes
+
+| File | Action | Lines |
+|------|--------|-------|
+| `docs/dashboard-api-reference.md` | Modified | ~1000 lines updated |
+| `docs/api-response-format-guide.md` | Created | ~350 lines |
+| `docs/rails-calculation-reference.md` | Created | ~450 lines |
+
+## Testing & Validation
+
+- ✅ All 19 JSON examples validated as valid JSON
+- ✅ `go fmt ./...` - no changes needed
+- ✅ `go vet ./...` - no errors
+- ✅ Unit tests pass (pre-existing integration test database issue unrelated to documentation)
+- ✅ All 3 acceptance criteria verified and checked
+
+## Notes for Reviewers
+
+- This is a **documentation-only task** - no code changes were made
+- Documentation aligns with PRD doc-010 specifications
+- Rails-parity fields vs Go extensions are clearly distinguished throughout
+- All JSON examples have been validated programmatically
+- Cross-references added between documentation files for easy navigation
+
+## Follow-up Considerations
+
+- Documentation may need updates if implementation deviates from PRD specifications
+- Frontend team should review for usability as API consumers
+- Consider adding OpenAPI/Swagger specification in future
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
