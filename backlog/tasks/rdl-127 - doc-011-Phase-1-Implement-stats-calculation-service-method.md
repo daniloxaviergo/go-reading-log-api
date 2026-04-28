@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 11:16'
-updated_date: '2026-04-28 12:48'
+updated_date: '2026-04-28 12:57'
 labels:
   - feature
   - backend
@@ -28,7 +28,7 @@ Add CalculateStats() method to projects_service.go that computes stats object: t
 - [ ] #2 stats.pages equals sum of all project page values
 - [ ] #3 stats.progress_geral calculated as round((pages/total_pages)*100, 3)
 - [ ] #4 Zero projects returns stats with all values at 0
-- [ ] #5 Division by zero returns 0.0 for progress_geral
+- [x] #5 Division by zero returns 0.0 for progress_geral
 <!-- AC:END -->
 
 ## Implementation Plan
