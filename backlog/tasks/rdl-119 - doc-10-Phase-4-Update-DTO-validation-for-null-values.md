@@ -1,7 +1,7 @@
 ---
 id: RDL-119
 title: '[doc-10 Phase 4] Update DTO validation for null values'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-28 00:30'
