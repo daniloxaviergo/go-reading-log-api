@@ -25,9 +25,9 @@ Create test/integration/dashboard_projects_test.go with integration tests for GE
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [ ] #1 Test endpoint returns 200 OK with correct structure
-- [x] #2 Test only running projects included in response
-- [ ] #3 Test stats calculation matches expected values
-- [x] #4 Test projects ordered by progress descending
+- [ ] #2 Test only running projects included in response
+- [x] #3 Test stats calculation matches expected values
+- [ ] #4 Test projects ordered by progress descending
 - [ ] #5 Test each project includes first 4 logs ordered by date DESC
 - [ ] #6 Test Rails parity validation with identical data
 <!-- AC:END -->
