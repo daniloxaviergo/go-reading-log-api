@@ -25,7 +25,7 @@ Create unit tests in dashboard_service_test.go with fixed test data to verify me
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 Unit tests use fixed test data
-- [ ] #2 All calculation tests pass with expected values
+- [x] #2 All calculation tests pass with expected values
 - [ ] #3 Tests verify Rails parity
 <!-- AC:END -->
 
