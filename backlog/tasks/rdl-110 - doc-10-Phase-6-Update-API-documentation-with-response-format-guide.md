@@ -24,7 +24,7 @@ Update API documentation to reflect new flat JSON response structure. Document G
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 API docs updated with new response format
+- [x] #1 API docs updated with new response format
 - [ ] #2 Go API extensions documented
 - [ ] #3 Example responses included
 <!-- AC:END -->
