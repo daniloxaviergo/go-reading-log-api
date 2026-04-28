@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:28'
-updated_date: '2026-04-28 01:37'
+updated_date: '2026-04-28 01:40'
 labels:
   - handler
   - phase-1
@@ -299,6 +299,45 @@ The implementation will modify the `Day()` handler in `dashboard_handler.go` to 
 | NFC-DASH-002 (3 Decimal Precision) | Use existing `RoundToThreeDecimals()` method |
 | NFC-DASH-004 (Test Coverage) | Write unit + integration tests with ≥80% coverage |
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress
+
+### Current Status: In Progress
+
+### Phase 1: Understanding the Codebase ✓
+- Reviewed task details and acceptance criteria
+- Examined current Day() handler implementation
+- Reviewed StatsData DTO structure (has all required fields)
+- Reviewed repository interface and implementation
+- Reviewed existing tests
+
+### Phase 2: Implementation Steps
+
+#### Step 1: Modify Day() handler to return flat JSON ✓
+- [x] Remove JSON:API envelope wrapper
+- [x] Change Content-Type from `application/vnd.api+json` to `application/json`
+- [x] Return StatsData directly with `stats` key at root level
+
+#### Step 2: Fix per_pages null handling
+- [ ] Change logic: when `previous_week_pages` = 0, return `null` instead of hardcoded 133.333
+
+#### Step 3: Add repository methods for new calculations
+- [ ] Add `GetMaxByWeekday(ctx, date)` method
+- [ ] Add `GetOverallMean(ctx, date)` method
+- [ ] Add `GetPreviousPeriodMean(ctx, date)` method
+- [ ] Add `GetPreviousPeriodSpecMean(ctx, date)` method
+
+#### Step 4: Update tests
+- [ ] Update TestDashboardHandler_Day to expect flat JSON
+- [ ] Update TestDashboardHandler_Day_EmptyData to expect flat JSON
+- [ ] Add TestDashboardHandler_Day_NullPerPages test
+
+### Blockers: None
+### Next Steps: Implement handler changes
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
