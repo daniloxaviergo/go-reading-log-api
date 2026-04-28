@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 11:17'
-updated_date: '2026-04-28 14:35'
+updated_date: '2026-04-28 14:37'
 labels:
   - testing
   - backend
@@ -277,8 +277,48 @@ func TestComponent_Integration(t *testing.T) {
 - PostgreSQL container started successfully
 - Docker is available and working
 
-## Step 2: Running Tests
-Now executing the full test suite to verify no regressions.
+## Step 2: Running Tests ❌
+**Test Execution Results:**
+- Total packages tested: 18
+- **FAILURES DETECTED**
+
+### Test Failures Summary:
+
+#### 1. Integration Test Failures (test/integration)
+**File:** `test/integration/dashboard_projects_test.go`
+**Failing Tests:**
+- `TestDashboardProjects_ResponseStructure` - Data should be a map[string]interface{}
+- `TestDashboardProjects_EmptyDatabase` - Data should be a map[string]interface{}
+- `TestDashboardProjects_ReturnsAllProjectsWithLogs` - Data should be a map[string]interface{}
+- `TestDashboardProjects_StatsCalculation` - Data should be a map[string]interface{}
+- `TestDashboardProjects_OrderingByProgress` - Data should be a map[string]interface{}
+- `TestDashboardProjects_LimitFourLogs` - Data should be a map[string]interface{}
+- `TestDashboardProjects_LogsOrderedByDateDesc` - Data should be a map[string]interface{}
+- `TestDashboardProjects_ProjectsWithNoLogs` - Data should be a map[string]interface{}
+- `TestDashboardProjects_LogIncludesProjectData` - Data should be a map[string]interface{}
+- `TestDashboardProjects_RailsParityStructure` - Data should be a map[string]interface{}
+- `TestDashboardProjects_MultipleProjectsDifferentStatuses` - Data should be a map[string]interface{}
+
+**Root Cause:** The tests expect JSON:API envelope format but the `Projects` handler returns plain JSON `{"projects": ..., "stats": ...}`
+
+#### 2. Dashboard Integration Test Failures (test)
+**File:** `test/dashboard_integration_test.go`
+**Failing Tests:**
+- `TestDashboardProjectsEndpoint_Integration` - progress_geral mismatch: got 0.000000, expected 41.667000
+
+**Root Cause:** The mock service returns empty projects, so progress calculation fails
+
+### Coverage Results:
+- `internal/api/v1/handlers`: 69.6%
+- `internal/service/dashboard`: 12.9% (LOW)
+- `test/integration`: 35.1%
+- **Overall Coverage:** Below 85% target
+
+### Next Steps:
+1. Fix integration tests to match actual response format
+2. Update mock service to return proper test data
+3. Re-run tests to verify fixes
+4. Generate coverage report
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
