@@ -5,7 +5,7 @@ title: >-
   JOIN
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-28 11:16'
 updated_date: '2026-04-28 13:05'
 labels:
