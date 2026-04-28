@@ -3,9 +3,9 @@ id: RDL-130
 title: '[doc-011 Phase 3] Create unit tests for projects service layer'
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-28 11:17'
-updated_date: '2026-04-28 14:19'
+updated_date: '2026-04-28 14:20'
 labels:
   - testing
   - backend
