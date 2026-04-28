@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:30'
-updated_date: '2026-04-28 04:46'
+updated_date: '2026-04-28 04:47'
 labels:
   - validation
   - phase-4
@@ -335,6 +335,76 @@ go test ./test/unit/...
 - ✅ DOD8: New code paths include error path tests
 - ✅ DOD9: Tests verify both success and error responses
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Completed comprehensive test coverage for StatsData null validation in the DTO layer. No production code changes were required as the validation logic was already correctly implemented in RDL-118.
+
+## What Was Done
+
+### Test Enhancements (test/unit/dashboard_response_test.go)
+Added 4 new test functions with 18 total test cases:
+
+1. **TestStatsData_RatioFields_NullValidation** - 10 test cases covering:
+   - All ratio fields nil
+   - Individual ratio field null scenarios (PerPages, PerMeanDay, PerSpecMeanDay)
+   - All ratio fields with valid values
+   - Negative value validation (error paths) for each ratio field
+
+2. **TestStatsData_AllNullRatioFields_Validation** - Acceptance criteria verification:
+   - Validates no error when all ratio fields are nil
+   - Verifies JSON serialization omits nil fields
+
+3. **TestStatsData_MixedNullAndValue_RatioFields** - 7 test cases for:
+   - Mixed null/value combinations
+   - Edge cases with partial null scenarios
+   - Error path verification
+
+4. **TestStatsData_RatioFields_JSONSerialization** - JSON serialization:
+   - Verifies nil fields are omitted (omitempty)
+   - Verifies non-nil fields are properly serialized
+
+### Documentation (QWEN.md)
+Added comprehensive "StatsData Null Validation Behavior" section covering:
+- Nullable ratio fields overview
+- Validation rules and logic
+- Valid and invalid null scenarios
+- Service layer integration notes
+- Test coverage summary
+- Example API response with null values
+- References to related tasks (RDL-111, RDL-118, RDL-119)
+
+## Key Changes
+
+**Files Modified:**
+- `test/unit/dashboard_response_test.go` - Added 4 new test functions
+- `QWEN.md` - Added null validation documentation section
+
+**Files Not Modified (as expected):**
+- `internal/domain/dto/dashboard_response.go` - Validation logic already correct
+- `internal/service/dashboard/day_service.go` - Null handling from RDL-118
+- `internal/api/v1/handlers/dashboard_handler.go` - Already handles null correctly
+
+## Testing
+
+- All new tests pass: `go test -v ./test/unit/dashboard_response_test.go -run "TestStatsData_RatioFields|TestStatsData_AllNullRatioFields|TestStatsData_MixedNullAndValue"`
+- All unit tests pass: `go test ./test/unit/...`
+- Code quality checks pass: `go fmt` and `go vet`
+
+## Acceptance Criteria Met
+
+✅ AC1: Validate() accepts null for ratio fields
+✅ AC2: Tests cover all null scenarios
+✅ AC3: No validation errors for valid null values
+
+## Risks/Follow-ups
+
+- **Risk**: None - No production code changes, low risk
+- **Follow-up**: None required - Task complete
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
