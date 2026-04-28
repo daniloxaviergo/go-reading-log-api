@@ -3,7 +3,7 @@ id: RDL-117
 title: '[doc-10 Phase 3] Create unit tests with fixed test data'
 status: To Do
 assignee:
-  - workflow
+  - thomas
 created_date: '2026-04-28 00:29'
 updated_date: '2026-04-28 03:59'
 labels:
