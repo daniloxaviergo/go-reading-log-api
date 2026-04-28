@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:31'
-updated_date: '2026-04-28 06:23'
+updated_date: '2026-04-28 06:29'
 labels:
   - documentation
   - phase-6
@@ -24,7 +24,7 @@ Create docs/rails-calculation-reference.md documenting Rails V1::MeanLog, V1::Ma
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 rails-calculation-reference.md created
+- [x] #1 rails-calculation-reference.md created
 - [ ] #2 V1::MeanLog algorithm documented
 - [ ] #3 V1::MaxLog algorithm documented
 <!-- AC:END -->
