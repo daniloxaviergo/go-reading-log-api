@@ -25,7 +25,7 @@ Create docs/rails-calculation-reference.md documenting Rails V1::MeanLog, V1::Ma
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 rails-calculation-reference.md created
-- [ ] #2 V1::MeanLog algorithm documented
+- [x] #2 V1::MeanLog algorithm documented
 - [ ] #3 V1::MaxLog algorithm documented
 <!-- AC:END -->
 
