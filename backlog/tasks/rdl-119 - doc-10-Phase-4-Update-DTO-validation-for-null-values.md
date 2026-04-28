@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:30'
-updated_date: '2026-04-28 04:45'
+updated_date: '2026-04-28 04:46'
 labels:
   - validation
   - phase-4
@@ -307,8 +307,11 @@ go test ./test/unit/...
 - `go fmt` and `go vet` pass ✅
 - All unit tests pass ✅
 
-### Phase 3: Documentation (In Progress)
-- Need to update QWEN.md with null validation behavior documentation
+### Phase 3: Documentation ✅
+- Updated QWEN.md with comprehensive null validation behavior documentation
+- Added section covering nullable fields, validation rules, valid/invalid scenarios
+- Added service layer integration notes and test coverage summary
+- Added example API response showing null values
 
 ### Test Coverage Summary
 - **Total new test cases**: 18 test cases across 4 new test functions
@@ -318,6 +321,19 @@ go test ./test/unit/...
   - Mixed null/value combinations
   - Negative value validation (error paths)
   - JSON serialization of null values
+
+### Acceptance Criteria Status
+- ✅ AC1: Validate() accepts null for ratio fields
+- ✅ AC2: Tests cover all null scenarios
+- ✅ AC3: No validation errors for valid null values
+
+### Definition of Done Status
+- ✅ DOD1: All unit tests pass
+- ✅ DOD3: go fmt and go vet pass with no errors
+- ✅ DOD4: Clean Architecture layers properly followed (DTO validation in domain layer)
+- ✅ DOD7: Documentation updated in QWEN.md
+- ✅ DOD8: New code paths include error path tests
+- ✅ DOD9: Tests verify both success and error responses
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
