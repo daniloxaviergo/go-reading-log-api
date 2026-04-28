@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:28'
-updated_date: '2026-04-28 01:48'
+updated_date: '2026-04-28 01:54'
 labels:
   - handler
   - phase-1
@@ -344,6 +344,60 @@ The implementation will modify the `Day()` handler in `dashboard_handler.go` to 
 ### Blockers: None
 ### Next Steps: Mark acceptance criteria as met, finalize task
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## PR: Modify Day handler to return flat JSON structure
+
+### What was done
+Modified the `Day()` handler in `dashboard_handler.go` to return flat JSON structure with `stats` key at root level instead of JSON:API envelope. This change aligns the API response format with Rails parity requirements specified in PRD doc-010.
+
+### Key changes
+
+**Handler Layer (`internal/api/v1/handlers/dashboard_handler.go`):**
+- Removed JSON:API envelope wrapper (`data`, `type`, `id`, `attributes`)
+- Changed Content-Type from `application/vnd.api+json` to `application/json`
+- Return `StatsData` directly wrapped in `{ "stats": {...} }` structure
+- Fixed `per_pages` null handling: now returns `null` instead of hardcoded 133.333 when previous period has 0 pages
+- Added calls to new repository methods for `max_day`, `mean_geral`, `per_mean_day`, `per_spec_mean_day` calculations
+
+**Repository Interface (`internal/repository/dashboard_repository.go`):**
+- Added `GetMaxByWeekday(ctx, date)` - returns max pages for target weekday
+- Added `GetOverallMean(ctx, date)` - calculates overall mean across all weekdays
+- Added `GetPreviousPeriodMean(ctx, date)` - returns mean for same weekday 7 days prior
+- Added `GetPreviousPeriodSpecMean(ctx, date)` - returns speculative mean for same weekday 7 days prior
+
+**Repository Implementation (`internal/adapter/postgres/dashboard_repository.go`):**
+- Implemented all 4 new repository methods with efficient SQL queries
+- Used proper context timeout (15 seconds)
+- Followed existing error handling patterns
+
+**Test Updates:**
+- Updated `TestDashboardHandler_Day` to expect flat JSON structure
+- Updated `TestDashboardHandler_Day_EmptyData` to expect flat JSON structure
+- Added `TestDashboardHandler_Day_NullPerPages` to verify null handling
+- Updated mock repositories in unit tests to implement new interface methods
+- Updated integration test fixture expectations to match new null per_pages behavior
+
+### Testing
+- All unit tests pass: `go test ./test/unit/...`
+- All handler tests pass: `go test ./internal/api/v1/handlers/...`
+- `go fmt` passes with no errors
+- `go vet` passes with no errors
+- Application builds successfully: `go build ./cmd/server.go`
+
+### Acceptance Criteria Met
+- ✅ Response format is flat JSON with stats key at root level
+- ✅ No JSON:API envelope present in response
+- ✅ Content-Type is application/json
+
+### Notes for Reviewers
+- This is a breaking change for clients expecting JSON:API envelope format
+- The change is intentional per PRD doc-010 for Rails parity
+- Frontend team should verify compatibility
+- Null handling for `per_pages`, `per_mean_day`, `per_spec_mean_day` follows Go best practices (nil pointers serialize to JSON null)
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
