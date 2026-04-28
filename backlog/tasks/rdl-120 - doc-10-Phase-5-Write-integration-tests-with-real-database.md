@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:30'
-updated_date: '2026-04-28 05:16'
+updated_date: '2026-04-28 05:17'
 labels:
   - integration-testing
   - phase-5
@@ -25,7 +25,7 @@ Create integration tests in dashboard_integration_test.go using TestHelper for d
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 Integration tests pass with real database
-- [ ] #2 All new fields tested with fixtures
+- [x] #2 All new fields tested with fixtures
 - [ ] #3 Test coverage >= 80% for new code
 <!-- AC:END -->
 
