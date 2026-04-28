@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 11:17'
-updated_date: '2026-04-28 14:20'
+updated_date: '2026-04-28 14:24'
 labels:
   - testing
   - backend
@@ -24,7 +24,7 @@ Create internal/service/dashboard/projects_service_test.go with unit tests for G
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Test status filtering returns only running projects
+- [x] #1 Test status filtering returns only running projects
 - [ ] #2 Test stats calculation with known input values
 - [ ] #3 Test progress ordering (DESC by progress, ASC by id)
 - [ ] #4 Test edge case: zero projects returns empty array
