@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 11:16'
-updated_date: '2026-04-28 12:08'
+updated_date: '2026-04-28 12:10'
 labels:
   - feature
   - backend
@@ -304,6 +304,21 @@ t.Run("repository error", func(t *testing.T) {
 - ✅ #4 Projects ordered by progress DESC, then id ASC → Sort in service layer
 - ✅ #5 Division by zero handled returning 0.0 → Check `totalPage <= 0` before division
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Starting implementation of GetRunningProjectsWithLogs service method.
+
+**Implementation Plan:**
+1. Add `GetRunningProjectsWithLogs()` to DashboardRepository interface
+2. Implement the repository method in PostgreSQL adapter
+3. Implement the service method in ProjectsService
+4. Create unit tests for the new method
+5. Run tests and verify acceptance criteria
+
+**Step 1: Adding repository interface method** - IN PROGRESS
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
