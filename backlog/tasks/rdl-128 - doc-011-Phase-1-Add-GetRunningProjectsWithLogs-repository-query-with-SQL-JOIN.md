@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 11:16'
-updated_date: '2026-04-28 13:05'
+updated_date: '2026-04-28 13:08'
 labels:
   - feature
   - backend
@@ -258,6 +258,36 @@ defer cancel()
 5. **Performance Test**: Verify query execution time meets targets (< 50ms)
 6. **Code Review**: Ensure Clean Architecture compliance and code quality
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress
+
+### Status: In Progress
+
+**Phase 1: Research Complete**
+- Reviewed current implementation in `internal/adapter/postgres/dashboard_repository.go`
+- Current `GetRunningProjectsWithLogs` uses N+1 queries (gets projects, then calls `GetProjectLogs` for each)
+- Identified the DTO structure in `internal/domain/dto/dashboard_response.go`
+- Reviewed service layer in `internal/service/dashboard/projects_service.go`
+
+**Phase 2: Implementation - Starting**
+- Task: Replace current implementation with single SQL JOIN query using CTE and window functions
+- Requirements:
+  1. SQL query joins projects with logs table
+  2. Logs limited to first 4 per project ordered by data DESC
+  3. Progress ordering via SQL CASE statement
+  4. NULL values handled with COALESCE
+  5. Query returns all required project and log fields
+
+**Next Steps:**
+1. Implement new SQL query in `GetRunningProjectsWithLogs`
+2. Test query in PostgreSQL
+3. Run unit tests
+4. Run integration tests
+5. Check acceptance criteria
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
