@@ -26,7 +26,7 @@ Add GetMaxByWeekday() repository method in dashboard_repository.go to query maxi
 <!-- AC:BEGIN -->
 - [x] #1 GetMaxByWeekday() method implemented in adapter
 - [x] #2 Interface method added to repository contract
-- [ ] #3 Returns maximum pages for target weekday
+- [x] #3 Returns maximum pages for target weekday
 <!-- AC:END -->
 
 ## Implementation Plan
