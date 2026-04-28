@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:29'
-updated_date: '2026-04-28 03:14'
+updated_date: '2026-04-28 03:22'
 labels:
   - calculation
   - phase-3
@@ -195,6 +195,53 @@ The current `mean_day` calculation uses a simple average (`total_pages / log_cou
 - If issues arise, revert to previous calculation using `LogCount`
 - Keep old code in comments for reference during transition
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress
+
+### ✅ Completed Steps
+
+1. **Added GetMeanByWeekday method to DashboardRepository interface**
+   - File: `internal/repository/dashboard_repository.go`
+   - Added method signature with proper documentation
+
+2. **Implemented GetMeanByWeekday in PostgreSQL adapter**
+   - File: `internal/adapter/postgres/dashboard_repository.go`
+   - Algorithm: V1::MeanLog (total_pages / count_reads where count_reads = floor((log_data - begin_data) / 7 days))
+   - Returns nil for no data or zero intervals (consistent with GetMaxByWeekday)
+   - Rounds to 3 decimal places
+
+3. **Updated DashboardHandler to use new method**
+   - File: `internal/api/v1/handlers/dashboard_handler.go`
+   - Replaced simple average calculation with GetMeanByWeekday call
+   - Properly handles nil return values
+
+4. **Updated mock repositories**
+   - File: `test/testutil/mock_dashboard_repository.go` - Added GetMeanByWeekday mock
+   - File: `internal/api/v1/handlers/dashboard_handler_test.go` - Added GetMeanByWeekday mock and updated test expectations
+   - File: `test/unit/day_service_test.go` - Added GetMeanByWeekday mock
+   - File: `test/unit/weekday_faults_service_test.go` - Added GetMeanByWeekday mock
+
+5. **Build and vet checks**
+   - ✅ `go build ./...` - Success
+   - ✅ `go vet ./...` - Success (1 pre-existing unrelated error in benchmark test)
+
+### 🔄 Next Steps
+
+1. Run unit tests to verify implementation
+2. Run integration tests with actual database
+3. Verify acceptance criteria
+4. Update final summary
+5. Mark task as Done
+
+### Notes
+
+- Implementation follows Clean Architecture patterns
+- Algorithm matches Rails V1::MeanLog exactly as documented in `docs/rails-calculation-reference.md`
+- Edge cases handled: empty logs, zero intervals, NULL values
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
