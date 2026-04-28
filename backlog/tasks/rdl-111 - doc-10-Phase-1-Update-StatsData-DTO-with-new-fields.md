@@ -26,7 +26,7 @@ Add new fields to StatsData struct in dashboard_response.go: MaxDay, MeanGeral, 
 <!-- AC:BEGIN -->
 - [x] #1 StatsData struct includes MaxDay, MeanGeral, PerMeanDay, PerSpecMeanDay fields
 - [x] #2 Validate() method accepts null values for ratio fields
-- [ ] #3 DTO compiles without errors
+- [x] #3 DTO compiles without errors
 <!-- AC:END -->
 
 ## Implementation Plan
