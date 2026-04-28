@@ -2,8 +2,10 @@
 id: RDL-121
 title: '[doc-10 Phase 5] Create Rails API comparison test'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-28 00:30'
+updated_date: '2026-04-28 05:20'
 labels:
   - comparison-testing
   - phase-5
