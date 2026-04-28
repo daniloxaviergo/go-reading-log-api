@@ -2,8 +2,10 @@
 id: RDL-118
 title: '[doc-10 Phase 4] Implement null handling for ratio fields'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-28 00:30'
+updated_date: '2026-04-28 04:09'
 labels:
   - null-handling
   - phase-4
