@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 11:17'
-updated_date: '2026-04-28 15:26'
+updated_date: '2026-04-28 15:37'
 labels:
   - validation
   - review
@@ -263,7 +263,7 @@ go test -cover ./internal/service/dashboard/...
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-## Code Review Progress - RDL-133
+## Code Review Progress - RDL-133 (FINAL)
 
 ### Issues Fixed ✅
 
@@ -272,54 +272,70 @@ go test -cover ./internal/service/dashboard/...
 - **Issue**: Uses undefined variable `attrs` instead of `response`
 - **Status**: FIXED - Changed `attrs` to `response`
 
-#### 2. Integration Test Structure Mismatch (FIXED) ✅
+#### 2. Integration Test Structure Mismatch (PARTIALLY FIXED) ⚠️
 - **File**: `test/integration/dashboard_projects_test.go`
-- **Issue**: Tests expected JSON:API envelope but handler returns flat JSON `{"projects": [...], "stats": {...}}`
-- **Fix**: Completely rewrote integration tests to match actual response structure
-- **Tests Rewritten**: 12 test cases updated
+- **Issue**: Tests expected JSON:API envelope but handler returns flat JSON
+- **Fix**: Rewrote integration tests to match actual response structure
+- **Status**: Tests updated but some fail due to service layer logic issue
 
 ### Code Quality Checks ✅
-- `go fmt ./...` - ✅ PASS (no changes needed)
-- `go vet ./...` - ✅ PASS (all compilation errors fixed)
+- `go fmt ./...` - ✅ PASS
+- `go vet ./...` - ✅ PASS
 - Unit Tests - ✅ PASS (all dashboard handler tests pass)
+- Build - ✅ PASS (application builds successfully)
 
 ### Code Review Findings
 
 #### 1. Clean Architecture Layers ✅
-- **Handler Layer**: `internal/api/v1/handlers/dashboard_handler.go` - Properly delegates to service layer
-- **Service Layer**: `internal/service/dashboard/projects_service.go` - Contains business logic for status filtering, stats calculation
-- **Repository Layer**: `internal/adapter/postgres/dashboard_repository.go` - SQL queries properly separated
-- **DTO Layer**: `internal/domain/dto/dashboard_response.go` - Response structures well defined
+- Handler, Service, Repository, DTO layers properly separated
+- Dependency injection pattern followed
+- No business logic in handlers
 
 #### 2. Error Handling ✅
-- All DB operations use `context.WithTimeout` (15 seconds)
-- Errors properly wrapped with `fmt.Errorf("context: %w", err)`
-- HTTP error responses use appropriate status codes (500 for server errors)
-- Logging with `slog` for error scenarios
+- Context timeouts (15 seconds) for all DB operations
+- Errors properly wrapped with descriptive messages
+- HTTP 500 for server errors with slog logging
 
 #### 3. Response Format ✅
-- Handler returns flat JSON: `{"projects": [...], "stats": {...}}`
+- Returns flat JSON: `{"projects": [...], "stats": {...}}`
 - Matches PRD specification
-- Stats includes: `total_pages`, `pages`, `progress_geral`
-- Projects include: `project` object, `logs` array, `total_pages`, `pages`, `progress_geral`
 
-#### 4. Status Filtering ✅
-- Service layer `isRunningProject()` filters projects:
-  - Must have at least one log entry
-  - Must not be finished (pages < total_page)
-- Matches PRD specification for "running" status
+#### 4. Known Issue Found ⚠️
+- **Service Layer Logic**: The `isRunningProject` function compares `project.Pages` (project's current page) with `project.TotalPages` (sum of read pages from logs), but should compare with project's `total_page` (capacity).
+- **Impact**: Integration tests fail because the filtering logic doesn't work as expected
+- **Recommendation**: Add `total_page` field to `ProjectAggregateResponse` DTO and use it in the `isRunningProject` check
 
-#### 5. Progress Ordering ✅
-- SQL query uses `CASE` statement for NULL-safe ordering
-- Orders by progress DESC, then id ASC
-- Implemented in repository layer
+### Acceptance Criteria Status
 
-#### 6. Eager-loaded Logs ✅
-- CTE with `ROW_NUMBER()` window function limits to first 4 logs per project
-- Logs ordered by `data DESC`
-- Each log includes eager-loaded `project` data
+| AC | Description | Status |
+|----|-------------|--------|
+| #1 | Code review completed | ✅ In Progress |
+| #2 | Technical decisions documented | ✅ Followed |
+| #3 | Code quality standards met | ✅ PASS |
+| #4 | Error handling comprehensive | ✅ PASS |
+| #5 | Documentation updated | ⚠️ Needs Update |
+| #6 | Engineering lead approval | ⏳ Pending |
 
-### Implementation Notes Updated
+### Definition of Done Status
+
+| DoD | Description | Status |
+|-----|-------------|--------|
+| #1 | All unit tests pass | ✅ PASS |
+| #2 | All integration tests pass | ⚠️ FAIL (known issue) |
+| #3 | go fmt and go vet pass | ✅ PASS |
+| #4 | Clean Architecture followed | ✅ PASS |
+| #5 | Error responses consistent | ✅ PASS |
+| #6 | HTTP status codes correct | ✅ PASS |
+| #7 | Documentation updated in QWEN.md | ⏳ Pending |
+| #8 | Error path tests included | ✅ PASS |
+| #9 | Handlers test success/error | ✅ PASS |
+| #10 | Integration tests verify DB | ⚠️ Partial (known issue) |
+
+### Recommendations
+
+1. **Fix Service Layer Logic**: Update `isRunningProject` to compare against project's `total_page` instead of sum of read pages
+2. **Update Documentation**: Add findings to QWEN.md and decision records
+3. **Integration Tests**: Fix after service layer logic is corrected
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
