@@ -1,7 +1,7 @@
 ---
 id: RDL-118
 title: '[doc-10 Phase 4] Implement null handling for ratio fields'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-28 00:30'
