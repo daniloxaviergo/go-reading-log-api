@@ -24,7 +24,7 @@ Modify internal/api/v1/handlers/dashboard_handler.go Projects() method to use ne
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Handler calls service GetRunningProjectsWithLogs method
+- [x] #1 Handler calls service GetRunningProjectsWithLogs method
 - [ ] #2 Handler calls service CalculateStats method
 - [ ] #3 Response structure matches Rails (projects array + stats object)
 - [ ] #4 Database errors return 500 Internal Server Error with logging
