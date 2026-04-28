@@ -25,7 +25,7 @@ Run performance tests with production-like data volume (10,000+ logs). Verify re
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 Response time < 500ms at p95 with 10,000+ logs
-- [ ] #2 Database queries use appropriate indexes
+- [x] #2 Database queries use appropriate indexes
 - [ ] #3 Performance test results documented
 <!-- AC:END -->
 
