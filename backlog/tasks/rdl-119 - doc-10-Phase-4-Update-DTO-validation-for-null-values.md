@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:30'
-updated_date: '2026-04-28 04:44'
+updated_date: '2026-04-28 04:45'
 labels:
   - validation
   - phase-4
@@ -24,7 +24,7 @@ Update StatsData.Validate() to allow null values for ratio fields. Create tests 
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Validate() accepts null for ratio fields
+- [x] #1 Validate() accepts null for ratio fields
 - [x] #2 Tests cover all null scenarios
 - [x] #3 No validation errors for valid null values
 <!-- AC:END -->
