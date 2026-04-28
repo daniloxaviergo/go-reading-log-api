@@ -3,7 +3,7 @@ id: RDL-109
 title: Execute Comparison Script and make documentation
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-27 23:50'
 updated_date: '2026-04-28 00:05'
 labels: []
