@@ -25,8 +25,8 @@ Update StatsData.Validate() to allow null values for ratio fields. Create tests 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [ ] #1 Validate() accepts null for ratio fields
-- [ ] #2 Tests cover all null scenarios
-- [x] #3 No validation errors for valid null values
+- [x] #2 Tests cover all null scenarios
+- [ ] #3 No validation errors for valid null values
 <!-- AC:END -->
 
 ## Implementation Plan
