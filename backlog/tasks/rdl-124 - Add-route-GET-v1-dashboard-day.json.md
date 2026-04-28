@@ -3,7 +3,7 @@ id: RDL-124
 title: Add route GET /v1/dashboard/day.json
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-28 10:27'
 updated_date: '2026-04-28 10:45'
 labels: []
