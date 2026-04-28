@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:31'
-updated_date: '2026-04-28 06:31'
+updated_date: '2026-04-28 06:32'
 labels:
   - documentation
   - phase-6
@@ -220,6 +220,64 @@ step-by-step calculation
 *Plan created: 2026-04-28*
 *Based on codebase state as of: 2026-04-28*
 <!-- SECTION:PLAN:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Updated `docs/rails-calculation-reference.md` to accurately reflect the actual Go implementation behavior for V1::MeanLog and V1::MaxLog algorithms.
+
+## What Was Done
+
+1. **Fixed Critical Documentation Discrepancy**: Updated edge case behavior documentation to correctly state that Go implementation returns `nil` (not `0.0`) for edge cases like empty logs or zero 7-day intervals.
+
+2. **Updated V1::MeanLog Algorithm Documentation**:
+   - Corrected edge case behavior: `return nil` instead of `return 0.0`
+   - Updated Go implementation example to match actual `GetMeanByWeekday` method in `internal/adapter/postgres/dashboard_repository.go`
+   - Fixed SQL query to use `COALESCE` and proper NULL handling
+   - Added example calculation showing NULL return for zero intervals
+
+3. **Updated V1::MaxLog Algorithm Documentation**:
+   - Corrected edge case behavior: `return nil` instead of `return 0.0`
+   - Updated Go implementation to use pointer return type `(*float64, error)`
+   - Fixed SQL query documentation to show NULL return when no logs exist
+
+4. **Enhanced Null Handling Rules Section**:
+   - Updated tables to clarify which fields return `nil` vs `0.0`
+   - Added `mean_day` and `max_day` to "When to Return Null" table
+   - Updated JSON serialization examples to show `null` values
+   - Added helper function examples (`Float64Ptr`, `NullFloat64`)
+
+5. **Added New Section - Per-Project vs Global Calculations**:
+   - Documented `GetProjectWeekdayMean` (per-project weekday mean)
+   - Documented `GetMeanByWeekday` (global weekday mean - V1::MeanLog)
+   - Explained when each is used in the DayService
+
+## Key Changes
+
+| File | Change |
+|------|--------|
+| `docs/rails-calculation-reference.md` | Complete rewrite to fix edge case behavior documentation (nil vs 0.0), update code examples, add per-project vs global calculations section |
+
+## Testing
+
+- All unit tests pass: `go test ./...`
+- All integration tests pass
+- `go fmt ./...` - no errors
+- `go vet ./...` - no errors
+- Build successful: `go build -o server ./cmd`
+
+## Notes for Reviewers
+
+This is a documentation-only change that fixes critical inaccuracies in the calculation reference documentation. The previous documentation incorrectly stated that edge cases return `0.0`, but the actual Go implementation returns `nil` using pointer types (`*float64`). This discrepancy could have confused developers implementing new features.
+
+The updated documentation now accurately reflects:
+- When to return `nil` vs `0.0`
+- Proper pointer type usage in Go
+- JSON serialization behavior (`null` vs `0`)
+- Differences between per-project and global calculations
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
