@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:29'
-updated_date: '2026-04-28 02:13'
+updated_date: '2026-04-28 02:26'
 labels:
   - repository
   - phase-2
@@ -242,6 +242,51 @@ if err != nil {
 | #9 Handler tests success/error responses | ✅ Done | Already in handler tests |
 | #10 Integration tests verify DB interactions | ❌ Pending | Add integration tests |
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - COMPLETE
+
+### Completed Tasks
+
+1. **Unit Tests Added** (`test/unit/dashboard_repository_test.go`)
+   - `TestDashboardRepository_GetMaxByWeekday` - Tests with data for target weekday
+   - `TestDashboardRepository_GetMaxByWeekday_EmptyWeekday` - Tests with no data for weekday
+   - `TestDashboardRepository_GetMaxByWeekday_MultipleProjects` - Tests across multiple projects
+   - `TestDashboardRepository_GetMaxByWeekday_ZeroPages` - Tests with zero pages read
+   - `TestDashboardRepository_GetMaxByWeekday_InvalidData` - Tests edge case handling
+   - `TestDashboardRepository_GetMaxByWeekday_EmptyDatabase` - Tests empty database
+   - `TestDashboardRepository_GetMaxByWeekday_SingleEntry` - Tests single log entry
+
+2. **Integration Tests Added** (`test/integration/dashboard_maxbyweekday_integration_test.go`)
+   - `TestDashboardRepository_GetMaxByWeekday_Integration` - Full database interactions with subtests
+   - `TestDashboardRepository_GetMaxByWeekday_Performance` - Performance test with 1000+ logs
+   - `TestDashboardRepository_GetMaxByWeekday_LargePageNumbers` - Large page number handling
+
+3. **Documentation Updated** (`QWEN.md`)
+   - Added `max_day` field documentation to Calculated Fields section
+   - Added Dashboard Repository Methods section with method table
+   - Added detailed GetMaxByWeekday implementation documentation
+
+4. **Test Utilities Added** (`test/testutil/helpers.go`)
+   - Created shared helper functions (FloatPtr, IntPtr, Int64Ptr, BoolPtr, StringPtr)
+   - Fixed duplicate function errors in existing test files
+
+### Test Results
+- All 7 unit tests pass
+- All 3 integration tests pass (4 subtests included)
+- go fmt completed successfully
+- go vet passes for all modified files
+
+### Files Modified
+- `test/unit/dashboard_repository_test.go` - Added 7 unit tests
+- `test/integration/dashboard_maxbyweekday_integration_test.go` - Created new file with 3 integration tests
+- `QWEN.md` - Added documentation for GetMaxByWeekday method and max_day field
+- `test/testutil/helpers.go` - Created new file with shared test helpers
+- `test/unit/project_calculations_test.go` - Updated to use shared helpers
+- `test/unit/dashboard_response_test.go` - Updated to use shared helpers
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
