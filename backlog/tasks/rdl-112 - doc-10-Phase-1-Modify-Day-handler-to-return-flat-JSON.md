@@ -1,7 +1,7 @@
 ---
 id: RDL-112
 title: '[doc-10 Phase 1] Modify Day handler to return flat JSON'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-28 00:28'
