@@ -4,8 +4,10 @@ title: >-
   [doc-011 Phase 1] Add GetRunningProjectsWithLogs repository query with SQL
   JOIN
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-28 11:16'
+updated_date: '2026-04-28 13:00'
 labels:
   - feature
   - backend
