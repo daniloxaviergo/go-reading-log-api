@@ -1,7 +1,7 @@
 ---
 id: RDL-124
 title: Add route GET /v1/dashboard/day.json
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-28 10:27'
