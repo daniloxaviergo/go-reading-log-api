@@ -26,7 +26,7 @@ Build comparison test that queries both Go and Rails APIs with same parameters a
 <!-- AC:BEGIN -->
 - [x] #1 Comparison test queries both APIs
 - [x] #2 All fields match between Go and Rails responses
-- [ ] #3 Test documents any discrepancies
+- [x] #3 Test documents any discrepancies
 <!-- AC:END -->
 
 ## Implementation Plan
