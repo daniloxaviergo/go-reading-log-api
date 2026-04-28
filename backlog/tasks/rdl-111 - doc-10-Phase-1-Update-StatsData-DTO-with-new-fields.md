@@ -3,7 +3,7 @@ id: RDL-111
 title: '[doc-10 Phase 1] Update StatsData DTO with new fields'
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-28 00:28'
 updated_date: '2026-04-28 01:32'
 labels:
