@@ -2,8 +2,10 @@
 id: RDL-129
 title: '[doc-011 Phase 2] Update DashboardHandler Projects method to use service layer'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-28 11:16'
+updated_date: '2026-04-28 13:15'
 labels:
   - feature
   - backend
