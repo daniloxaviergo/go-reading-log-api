@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:27'
-updated_date: '2026-04-28 00:56'
+updated_date: '2026-04-28 00:57'
 labels:
   - documentation
   - phase-6
@@ -26,7 +26,7 @@ Update API documentation to reflect new flat JSON response structure. Document G
 <!-- AC:BEGIN -->
 - [x] #1 API docs updated with new response format
 - [x] #2 Go API extensions documented
-- [ ] #3 Example responses included
+- [x] #3 Example responses included
 <!-- AC:END -->
 
 ## Implementation Plan
