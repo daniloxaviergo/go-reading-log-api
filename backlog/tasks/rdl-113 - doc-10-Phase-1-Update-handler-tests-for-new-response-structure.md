@@ -3,9 +3,9 @@ id: RDL-113
 title: '[doc-10 Phase 1] Update handler tests for new response structure'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-28 00:29'
-updated_date: '2026-04-28 02:05'
+updated_date: '2026-04-28 02:06'
 labels:
   - testing
   - phase-1
