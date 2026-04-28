@@ -1,7 +1,7 @@
 ---
 id: RDL-114
 title: '[doc-10 Phase 2] Implement MaxDay field and repository method'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-28 00:29'
