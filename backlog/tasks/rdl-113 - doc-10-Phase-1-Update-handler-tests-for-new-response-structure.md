@@ -24,7 +24,7 @@ Update dashboard_handler_test.go test expectations to validate new flat JSON str
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 All handler tests pass with new response format
+- [x] #1 All handler tests pass with new response format
 - [ ] #2 Test assertions validate stats object structure
 <!-- AC:END -->
 
