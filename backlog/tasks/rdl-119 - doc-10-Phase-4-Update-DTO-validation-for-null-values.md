@@ -3,9 +3,9 @@ id: RDL-119
 title: '[doc-10 Phase 4] Update DTO validation for null values'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-28 00:30'
-updated_date: '2026-04-28 04:47'
+updated_date: '2026-04-28 04:48'
 labels:
   - validation
   - phase-4
