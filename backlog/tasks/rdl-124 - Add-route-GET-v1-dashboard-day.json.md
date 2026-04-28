@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 10:27'
-updated_date: '2026-04-28 10:43'
+updated_date: '2026-04-28 10:44'
 labels: []
 dependencies: []
 ---
@@ -234,7 +234,7 @@ go test -v ./internal/api/v1/handlers/... -run TestDashboardHandler
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 All unit tests pass
+- [x] #1 All unit tests pass
 - [ ] #2 All integration tests pass execution and verification
 - [x] #3 go fmt and go vet pass with no errors
 - [ ] #4 Clean Architecture layers properly followed
