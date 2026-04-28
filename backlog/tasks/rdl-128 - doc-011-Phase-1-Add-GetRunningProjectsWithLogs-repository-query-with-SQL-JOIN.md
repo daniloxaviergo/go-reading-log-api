@@ -29,7 +29,7 @@ Update internal/adapter/postgres/dashboard_repository.go with GetRunningProjects
 - [ ] #1 SQL query joins projects with logs table
 - [ ] #2 Logs limited to first 4 per project ordered by data DESC
 - [ ] #3 Progress ordering implemented via SQL CASE statement
-- [ ] #4 NULL values handled with COALESCE
+- [x] #4 NULL values handled with COALESCE
 - [ ] #5 Query returns all required project and log fields
 <!-- AC:END -->
 
