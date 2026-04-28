@@ -26,7 +26,7 @@ Add repository methods to fetch previous period mean and speculated mean. Implem
 <!-- AC:BEGIN -->
 - [ ] #1 GetPreviousPeriodMean() method implemented
 - [ ] #2 Speculated mean calculation logic added
-- [ ] #3 Ratio fields computed correctly
+- [x] #3 Ratio fields computed correctly
 <!-- AC:END -->
 
 ## Implementation Plan
