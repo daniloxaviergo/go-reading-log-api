@@ -1,7 +1,7 @@
 ---
 id: RDL-129
 title: '[doc-011 Phase 2] Update DashboardHandler Projects method to use service layer'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-28 11:16'
