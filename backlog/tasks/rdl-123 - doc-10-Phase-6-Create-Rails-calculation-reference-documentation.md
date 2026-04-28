@@ -2,8 +2,10 @@
 id: RDL-123
 title: '[doc-10 Phase 6] Create Rails calculation reference documentation'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-28 00:31'
+updated_date: '2026-04-28 06:18'
 labels:
   - documentation
   - phase-6
