@@ -25,7 +25,7 @@ Build comparison test that queries both Go and Rails APIs with same parameters a
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 Comparison test queries both APIs
-- [ ] #2 All fields match between Go and Rails responses
+- [x] #2 All fields match between Go and Rails responses
 - [ ] #3 Test documents any discrepancies
 <!-- AC:END -->
 
