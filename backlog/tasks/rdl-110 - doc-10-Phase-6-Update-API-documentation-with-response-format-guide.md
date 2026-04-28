@@ -3,7 +3,7 @@ id: RDL-110
 title: '[doc-10 Phase 6] Update API documentation with response format guide'
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-28 00:27'
 updated_date: '2026-04-28 00:59'
 labels:
