@@ -4,8 +4,10 @@ title: >-
   [doc-011 Phase 1] Implement GetRunningProjectsWithLogs service method with
   status filtering
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-28 11:16'
+updated_date: '2026-04-28 12:01'
 labels:
   - feature
   - backend
