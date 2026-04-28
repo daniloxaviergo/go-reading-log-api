@@ -1,7 +1,7 @@
 ---
 id: RDL-109
 title: Execute Comparison Script and make documentation
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-27 23:50'
