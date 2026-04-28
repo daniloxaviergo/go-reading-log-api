@@ -3,9 +3,9 @@ id: RDL-110
 title: '[doc-10 Phase 6] Update API documentation with response format guide'
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-28 00:27'
-updated_date: '2026-04-28 00:38'
+updated_date: '2026-04-28 00:39'
 labels:
   - documentation
   - phase-6
