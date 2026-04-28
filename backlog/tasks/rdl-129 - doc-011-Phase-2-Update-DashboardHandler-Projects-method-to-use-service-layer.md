@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 11:16'
-updated_date: '2026-04-28 14:10'
+updated_date: '2026-04-28 14:11'
 labels:
   - feature
   - backend
@@ -25,7 +25,7 @@ Modify internal/api/v1/handlers/dashboard_handler.go Projects() method to use ne
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 Handler calls service GetRunningProjectsWithLogs method
-- [ ] #2 Handler calls service CalculateStats method
+- [x] #2 Handler calls service CalculateStats method
 - [ ] #3 Response structure matches Rails (projects array + stats object)
 - [ ] #4 Database errors return 500 Internal Server Error with logging
 - [ ] #5 Empty data returns 200 OK with empty arrays
