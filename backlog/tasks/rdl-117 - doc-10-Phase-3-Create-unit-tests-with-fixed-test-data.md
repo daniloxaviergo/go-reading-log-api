@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:29'
-updated_date: '2026-04-28 04:05'
+updated_date: '2026-04-28 04:06'
 labels:
   - testing
   - phase-3
@@ -26,7 +26,7 @@ Create unit tests in dashboard_service_test.go with fixed test data to verify me
 <!-- AC:BEGIN -->
 - [x] #1 Unit tests use fixed test data
 - [x] #2 All calculation tests pass with expected values
-- [ ] #3 Tests verify Rails parity
+- [x] #3 Tests verify Rails parity
 <!-- AC:END -->
 
 ## Implementation Plan
