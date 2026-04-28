@@ -3,9 +3,9 @@ id: RDL-125
 title: '[doc-011 Phase 3] Create integration tests for dashboard projects endpoint'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-28 11:15'
-updated_date: '2026-04-28 12:00'
+updated_date: '2026-04-28 12:01'
 labels:
   - testing
   - backend
