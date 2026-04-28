@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:29'
-updated_date: '2026-04-28 04:07'
+updated_date: '2026-04-28 04:08'
 labels:
   - testing
   - phase-3
@@ -371,6 +371,70 @@ Added comprehensive unit tests with fixed test data:
 
 Total: 20+ test cases, all passing ✅
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Created comprehensive unit tests with fixed test data for `DayService` to verify deterministic calculations and rounding behavior.
+
+## What Was Done
+
+Added 7 new test functions to `test/unit/day_service_test.go` with fixed, deterministic test data:
+
+1. **TestDayService_CalculateMeanDay_RailsParity** - Main test with fixed date 2026-04-21 (Tuesday), testing 3 projects with known weekday means
+2. **TestDayService_CalculateMeanDay_RailsParity_SingleProject** - Single project edge case with rounding verification
+3. **TestDayService_CalculateMeanDay_MultipleWeekdays** - Tests across Monday, Wednesday, and Sunday to verify correct weekday identification
+4. **TestDayService_CalculateMeanDay_EdgeCases** - 7 sub-tests covering: no logs, single entry, zero pages, large counts, float precision, empty aggregates, repository errors
+5. **TestDayService_CalculateWeeklyStats_FixedData** - Full integration test verifying all fields with fixed data
+6. **TestDayService_CalculateWeeklyStats_FixedData_Comprehensive** - Tests non-standard prediction percentage and rounding
+7. **TestDayService_CalculateWeeklyStats_FixedData_EdgeCases** - Edge cases for zero previous week, both weeks zero, equal weeks
+
+## Key Changes
+
+**Files Modified:**
+- `test/unit/day_service_test.go` - Added ~350 lines of test code with 20+ test cases
+
+**Test Data Characteristics:**
+- Fixed date: 2026-04-21 (Tuesday, weekday=2)
+- Deterministic project means: 12.5, 8.75, 15.0 for multi-project tests
+- Rounding verification: 7.123456 → 7.123, 157.142857 → 157.143
+- Edge case coverage: zero values, empty aggregates, large page counts (10000+), repository errors
+
+## Testing
+
+**Tests Run:**
+```bash
+go test -v ./test/unit/... -run TestDayService
+go fmt ./test/unit/...
+go vet ./test/unit/...
+```
+
+**Results:**
+- All 20+ test cases PASS
+- go fmt: No changes needed
+- go vet: No errors
+
+## Notes for Reviewers
+
+- Tests use date injection pattern (`SetTestDate` / `GetTodayFunc`) for deterministic testing
+- Mock repository returns fixed values to ensure reproducible test results
+- Float comparisons use `assert.InDelta(t, expected, actual, 0.001)` for 3-decimal rounding verification
+- Algorithm difference documented in test comments: Go uses AVG approach vs Rails' 7-day interval counting
+- Error paths included in edge case tests (repository error test case)
+
+## Algorithm Documentation
+
+The tests verify the Go implementation which uses:
+- `mean_day = AVG(project_weekday_means)` for all projects
+- 3-decimal rounding via `math.Round(value * 1000) / 1000`
+
+This differs from Rails V1::MeanLog which uses:
+- `mean = total_pages / count_7day_intervals`
+
+Tests document this difference and verify Go behavior is consistent and correct.
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
