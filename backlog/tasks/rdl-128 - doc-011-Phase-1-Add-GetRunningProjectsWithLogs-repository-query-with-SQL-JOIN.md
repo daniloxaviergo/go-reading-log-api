@@ -5,7 +5,7 @@ title: >-
   JOIN
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-28 11:16'
 updated_date: '2026-04-28 13:15'
 labels:
