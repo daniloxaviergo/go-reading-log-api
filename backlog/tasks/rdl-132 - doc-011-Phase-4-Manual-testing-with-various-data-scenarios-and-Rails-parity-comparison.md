@@ -4,8 +4,10 @@ title: >-
   [doc-011 Phase 4] Manual testing with various data scenarios and Rails parity
   comparison
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-28 11:17'
+updated_date: '2026-04-28 15:00'
 labels:
   - validation
   - backend
