@@ -1,11 +1,11 @@
 ---
 id: RDL-115
 title: '[doc-10 Phase 2] Implement PerMeanDay and PerSpecMeanDay fields'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-28 00:29'
-updated_date: '2026-04-28 03:07'
+updated_date: '2026-04-28 03:08'
 labels:
   - repository
   - phase-2
