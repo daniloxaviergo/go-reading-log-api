@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:30'
-updated_date: '2026-04-28 04:30'
+updated_date: '2026-04-28 04:31'
 labels:
   - null-handling
   - phase-4
@@ -253,6 +253,62 @@ go test -cover ./test/unit/day_service_test.go
    ```
 5. Compare with Rails API response for same data
 <!-- SECTION:PLAN:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Implemented null handling for ratio fields (`per_pages`, `per_mean_day`, `per_spec_mean_day`) to match Rails API behavior. The change ensures these fields return `null` instead of `0.0` when denominators are zero.
+
+## What Was Done
+
+### Core Implementation Changes
+
+1. **`internal/service/dashboard/day_service.go`**
+   - Modified `CalculatePerPagesRatio()` to return `*float64` instead of `float64`
+   - Returns `nil` when `previousWeekPages == 0` (previously returned `0.0`)
+   - Updated `CalculateWeeklyStats()` to handle the new return type directly
+
+2. **`test/unit/day_service_test.go`**
+   - Updated "zero previous week pages" test to expect `nil` instead of `0.0`
+   - Updated "empty aggregates" test to expect `nil` instead of `0.0`
+   - Refactored `TestDayService_CalculatePerPagesRatio` to test nullable return behavior
+   - Updated `TestDayService_CalculateWeeklyStats_FixedData_EdgeCases` to expect `nil` for zero cases
+   - Added `ptrToFloat64()` helper function for test assertions
+
+3. **`test/integration/dashboard_day_permean_integration_test.go`**
+   - Added `TestDashboardHandler_Day_PerPages_NullHandling` with 3 test cases:
+     - `NoPreviousWeekData_ReturnsNull` - verifies null when no previous week data
+     - `LogsOnMatchingDates_ReturnsRatio` - verifies ratio calculation when both periods have data
+     - `EmptyDatabase_ReturnsNull` - verifies null for empty database
+
+## Key Changes
+
+- **per_pages**: Now returns `null` (nil pointer) when `previous_week_pages = 0`, matching Rails API behavior
+- **per_mean_day** and **per_spec_mean_day**: Already had null handling in handler layer (verified)
+- JSON serialization: Go's `encoding/json` automatically converts `nil` pointers to `null`
+
+## Testing
+
+- All unit tests pass: `go test ./test/unit/...`
+- All integration tests pass: `go test ./test/integration/...`
+- `go fmt ./...` - code formatted
+- `go vet ./...` - no issues
+- Build succeeds: `go build ./cmd/...`
+
+## Acceptance Criteria Met
+
+- ✅ AC1: per_pages returns null when previous_week_pages = 0
+- ✅ AC2: Ratio fields return null when denominator = 0
+- ✅ AC3: JSON serialization handles null correctly
+
+## Notes for Reviewers
+
+- This is a bug fix that aligns Go API behavior with Rails API
+- No breaking changes for clients that properly handle both `0.0` and `null`
+- Frontend should already handle `null` for other ratio fields (per_mean_day, per_spec_mean_day)
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
