@@ -3,7 +3,7 @@ id: RDL-125
 title: '[doc-011 Phase 3] Create integration tests for dashboard projects endpoint'
 status: To Do
 assignee:
-  - workflow
+  - catarina
 created_date: '2026-04-28 11:15'
 updated_date: '2026-04-28 11:22'
 labels:
