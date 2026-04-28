@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:30'
-updated_date: '2026-04-28 05:45'
+updated_date: '2026-04-28 05:46'
 labels:
   - comparison-testing
   - phase-5
@@ -283,6 +283,54 @@ go test -v ./test/integration/... -run ".*Comparison.*"
 - Verify all acceptance criteria are met
 - Check Definition of Done items
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Rails API Comparison Test Implementation
+
+### What Was Done
+Created comprehensive Rails API comparison tests for the projects and logs endpoints to verify feature parity between the Go API and legacy Rails API during the migration.
+
+### Key Changes
+1. **New Test File Created**: `test/integration/projects_rails_comparison_test.go`
+   - Tests for `GET /v1/projects.json` (index endpoint)
+   - Tests for `GET /v1/projects/:id.json` (show endpoint)
+   - Tests for `GET /v1/projects/:id/logs.json` (logs index endpoint)
+   - Additional tests for JSON:API compliance and error responses
+
+2. **Test Features**:
+   - HTTP-based comparison querying both APIs
+   - Graceful skipping when `RAILS_API_URL` is not set
+   - Tolerance handling for floating-point fields (±0.01)
+   - 1-day tolerance for `days_unreading` (timezone differences)
+   - Multiple test scenarios: empty database, single project, multiple projects, custom dates
+
+3. **Configuration Updates**:
+   - Added `RAILS_API_URL` placeholder to `.env.test`
+   - Added `compare-responses` target to Makefile
+   - Updated Makefile help section
+
+### Test Coverage
+- Empty database scenarios
+- Single and multiple projects with varying log counts
+- Log limit validation (max 4 logs)
+- JSON:API envelope structure verification
+- Error response consistency (404)
+- Calculated fields: progress, status, logs_count, days_unreading, median_day, finished_at
+
+### Testing
+- All tests compile successfully
+- `go fmt` and `go vet` pass with no errors
+- Tests skip gracefully when Rails API is unavailable
+- Ready for execution: `RAILS_API_URL=http://localhost:3001 make compare-responses`
+
+### Notes for Reviewers
+- Tests follow existing patterns from `rails_comparison_test.go` (dashboard endpoints)
+- Uses existing `IntegrationTestContext` and `SetupTestDB()` infrastructure
+- Clean Architecture layers properly followed (test layer)
+- No changes to production code - test-only addition
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
