@@ -26,10 +26,10 @@ Create internal/service/dashboard/projects_service.go with GetRunningProjectsWit
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 GetRunningProjectsWithLogs returns only projects with status='running'
+- [x] #1 GetRunningProjectsWithLogs returns only projects with status='running'
 - [ ] #2 Status calculation uses 7-day threshold for running status
-- [ ] #3 Progress calculated as (page/total_page)*100
-- [x] #4 Projects ordered by progress DESC, then id ASC
+- [x] #3 Progress calculated as (page/total_page)*100
+- [ ] #4 Projects ordered by progress DESC, then id ASC
 - [ ] #5 Division by zero handled returning 0.0
 <!-- AC:END -->
 
