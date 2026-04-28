@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:30'
-updated_date: '2026-04-28 05:25'
+updated_date: '2026-04-28 05:42'
 labels:
   - comparison-testing
   - phase-5
@@ -231,6 +231,58 @@ go test -v ./test/integration/... -run ".*Comparison.*"
 - Add visual diff report generation for failed comparisons
 - Extend to cover POST/PUT endpoints in Phase 2 (when log creation is implemented)
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress
+
+### Completed Tasks:
+
+1. **Created Rails Comparison Test File** (`test/integration/projects_rails_comparison_test.go`)
+   - Implemented comparison tests for projects index endpoint (`GET /v1/projects.json`)
+   - Implemented comparison tests for projects show endpoint (`GET /v1/projects/:id.json`)
+   - Implemented comparison tests for logs index endpoint (`GET /v1/projects/:id/logs.json`)
+   - Added test data setup functions:
+     - `setupEmptyDatabase` - Tests with no projects
+     - `setupSingleProject` - Tests with one project and logs
+     - `setupMultipleProjects` - Tests with multiple projects and varying log counts
+     - `setupProjectWithCustomDates` - Tests with specific date values
+
+2. **Implemented Response Validation Functions**
+   - `validateProjectsIndex` - Compares projects list responses with tolerance for:
+     - Floating-point fields (progress, median_day): ±0.01
+     - days_unreading: ±1 day (timezone differences)
+     - All other fields: Exact match
+   - `validateProjectsShow` - Compares single project responses
+   - `validateLogsIndex` - Compares logs list responses (limited to 4)
+
+3. **Added JSON Parsing Helpers**
+   - `parseProjectsJSONAPIEnvelope` - Parses JSON:API envelope responses
+   - `extractProjectsDataArray` - Extracts data arrays from envelopes
+   - `extractProjectsSingleObject` - Extracts single objects from envelopes
+
+4. **Added Additional Test Cases**
+   - `TestRailsComparisonJSONAPICompliance` - Verifies JSON:API format consistency
+   - `TestRailsComparisonErrorResponses` - Verifies error response consistency (404)
+
+5. **Updated Configuration Files**
+   - Added `RAILS_API_URL` placeholder to `.env.test`
+   - Added `compare-responses` target to Makefile
+   - Updated help section in Makefile
+
+### Test Results:
+- All tests compile successfully
+- `go vet` passes with no errors
+- `go fmt` applied successfully
+- Tests skip gracefully when `RAILS_API_URL` is not set
+- Ready for execution with Rails API running
+
+### Next Steps:
+- Run tests with Rails API: `RAILS_API_URL=http://localhost:3001 make compare-responses`
+- Verify all acceptance criteria are met
+- Check Definition of Done items
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
