@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 11:16'
-updated_date: '2026-04-28 12:38'
+updated_date: '2026-04-28 12:39'
 labels:
   - feature
   - backend
@@ -344,6 +344,73 @@ t.Run("repository error", func(t *testing.T) {
 - No linting errors
 - No build errors
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Implemented `GetRunningProjectsWithLogs()` service method that filters projects by "running" status with progress calculation and ordering.
+
+## What Was Done
+
+1. **Repository Interface** (`internal/repository/dashboard_repository.go`)
+   - Added `GetRunningProjectsWithLogs(ctx context.Context) ([]*dto.ProjectWithLogs, error)` to DashboardRepository interface
+
+2. **PostgreSQL Adapter** (`internal/adapter/postgres/dashboard_repository.go`)
+   - Implemented `GetRunningProjectsWithLogs()` SQL query that joins projects with logs
+   - Fetches all projects with eager-loaded logs (first 4 per project)
+   - Returns projects ordered by id ASC
+
+3. **Service Layer** (`internal/service/dashboard/projects_service.go`)
+   - Implemented `GetRunningProjectsWithLogs()` method
+   - Filters projects by "running" status (has logs AND not finished)
+   - Calculates progress as (pages/total_pages)*100
+   - Handles division by zero (returns 0.0)
+   - Orders by progress DESC, then id ASC
+
+4. **Unit Tests** (`internal/service/dashboard/projects_service_test.go`)
+   - Created 17 test cases covering:
+     - Normal case with multiple running projects
+     - Ordering by progress DESC
+     - Ordering by id ASC when progress is equal
+     - Empty results
+     - Repository error handling
+     - Filtering out finished projects
+     - Filtering out projects without logs
+     - Division by zero handling
+     - Float rounding to 3 decimals
+
+## Key Changes
+
+- New repository method: `GetRunningProjectsWithLogs()`
+- New service method: `ProjectsService.GetRunningProjectsWithLogs()`
+- New helper methods: `calculateProgress()`, `isRunningProject()`
+- Updated mock repositories in test files to implement new interface method
+
+## Tests Run
+
+- All unit tests pass (17 test cases in projects_service_test.go)
+- All integration tests pass
+- `go build ./...` - No errors
+- `go vet ./...` - No errors
+- `go fmt ./...` - No changes needed
+
+## Acceptance Criteria Met
+
+1. ✅ Returns only projects with status='running' (filtered by isRunningProject)
+2. ✅ Status calculation uses activity-based filtering (has logs AND not finished)
+3. ✅ Progress calculated as (page/total_page)*100
+4. ✅ Projects ordered by progress DESC, then id ASC
+5. ✅ Division by zero handled returning 0.0
+
+## Notes for Reviewers
+
+- Status filtering uses a simplified approach (has logs AND not finished) instead of full CalculateStatus() to maintain simplicity in Phase 1
+- The 7-day threshold for "running" status can be enhanced in future iterations
+- All code follows Clean Architecture patterns
+- Error handling follows existing patterns with proper error wrapping
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
