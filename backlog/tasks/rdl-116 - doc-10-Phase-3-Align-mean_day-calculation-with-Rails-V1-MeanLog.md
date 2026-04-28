@@ -2,8 +2,10 @@
 id: RDL-116
 title: '[doc-10 Phase 3] Align mean_day calculation with Rails V1::MeanLog'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-28 00:29'
+updated_date: '2026-04-28 03:09'
 labels:
   - calculation
   - phase-3
