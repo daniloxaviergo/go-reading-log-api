@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:29'
-updated_date: '2026-04-28 02:26'
+updated_date: '2026-04-28 02:27'
 labels:
   - repository
   - phase-2
@@ -24,7 +24,7 @@ Add GetMaxByWeekday() repository method in dashboard_repository.go to query maxi
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 GetMaxByWeekday() method implemented in adapter
+- [x] #1 GetMaxByWeekday() method implemented in adapter
 - [x] #2 Interface method added to repository contract
 - [ ] #3 Returns maximum pages for target weekday
 <!-- AC:END -->
