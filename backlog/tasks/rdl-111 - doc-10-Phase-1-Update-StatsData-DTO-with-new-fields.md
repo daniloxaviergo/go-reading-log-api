@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:28'
-updated_date: '2026-04-28 01:26'
+updated_date: '2026-04-28 01:27'
 labels:
   - dto
   - phase-1
@@ -25,7 +25,7 @@ Add new fields to StatsData struct in dashboard_response.go: MaxDay, MeanGeral, 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 StatsData struct includes MaxDay, MeanGeral, PerMeanDay, PerSpecMeanDay fields
-- [ ] #2 Validate() method accepts null values for ratio fields
+- [x] #2 Validate() method accepts null values for ratio fields
 - [ ] #3 DTO compiles without errors
 <!-- AC:END -->
 
