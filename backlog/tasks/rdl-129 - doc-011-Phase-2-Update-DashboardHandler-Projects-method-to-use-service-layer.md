@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 11:16'
-updated_date: '2026-04-28 13:23'
+updated_date: '2026-04-28 14:10'
 labels:
   - feature
   - backend
@@ -262,38 +262,67 @@ func (h *DashboardHandler) Projects(w http.ResponseWriter, r *http.Request) {
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-**Implementation Started - 2026-04-28**
+**Implementation Completed - 2026-04-28**
 
-## Current Status
-Researching codebase to understand current state before implementation.
+## Summary
+Successfully refactored the `DashboardHandler.Projects()` method to use the service layer instead of direct repository calls.
 
-## Findings
-1. **Current DashboardHandler.Projects()** method:
-   - Uses direct repository calls (h.repo.GetProjectsWithLogs)
-   - Returns JSON:API envelope with flat logs array
-   - Uses fmt.Printf for error logging
-   - Does NOT use ProjectsService
+## Changes Made
 
-2. **ProjectsService** already exists with:
-   - `GetRunningProjectsWithLogs(ctx)` - Returns filtered projects with logs
-   - `CalculateStats(ctx)` - Returns aggregate statistics
-   - Properly implemented in `internal/service/dashboard/projects_service.go`
+### 1. Modified Files
+- **internal/api/v1/handlers/dashboard_handler.go**
+  - Added `ProjectsService` field to `DashboardHandler` struct
+  - Updated `NewDashboardHandler()` to accept `ProjectsServiceInterface`
+  - Refactored `Projects()` method to call service layer
+  - Changed response format from JSON:API envelope to Rails structure `{ "projects": [...], "stats": {...} }`
+  - Replaced `fmt.Printf` with `slog` for structured logging
 
-3. **Files to modify:**
-   - `internal/api/v1/handlers/dashboard_handler.go` - Add ProjectsService field, refactor Projects() method
-   - `cmd/server.go` - Update NewDashboardHandler() call to pass ProjectsService
-   - `internal/api/v1/routes.go` - Verify route registration
+- **internal/api/v1/routes.go**
+  - Updated `SetupRoutes()` to accept `ProjectsServiceInterface`
+  - Added route registration for `/v1/dashboard/projects.json`
 
-4. **Response structure change:**
-   - Current: JSON:API envelope with flat logs array
-   - Target: Rails structure `{ "projects": [...], "stats": {...} }`
+- **cmd/server.go**
+  - Added `ProjectsService` instantiation
+  - Updated `NewDashboardHandler()` call to pass `ProjectsService`
+
+- **internal/service/dashboard/projects_service.go**
+  - Added `ProjectsServiceInterface` for testability
+  - Added `PgxPoolInterface` for database pool abstraction
+
+- **test/integration/dashboard_mock_test.go** (NEW)
+  - Created shared `MockProjectsService` for integration tests
+
+### 2. Test Files Updated
+Updated all test files to use the new `ProjectsServiceInterface`:
+- internal/api/v1/handlers/dashboard_handler_test.go
+- internal/api/v1/handlers/dashboard_handler_projects_test.go (NEW)
+- internal/api/v1/routes_test.go
+- test/unit/dashboard_handler_test.go
+- test/integration/*.go files
+- test/performance/dashboard_benchmark_test.go
+
+### 3. Acceptance Criteria Status
+✅ #1 Handler calls service GetRunningProjectsWithLogs method
+✅ #2 Handler calls service CalculateStats method
+✅ #3 Response structure matches Rails (projects array + stats object)
+✅ #4 Database errors return 500 Internal Server Error with logging
+✅ #5 Empty data returns 200 OK with empty arrays
+
+### 4. Definition of Done Status
+✅ #1 All unit tests pass
+✅ #2 go fmt and go vet pass with no errors
+✅ #3 Clean Architecture layers properly followed
+✅ #4 Error responses consistent with existing patterns
+✅ #5 HTTP status codes correct for response type
+
+## Testing
+- All unit tests pass: `go test ./internal/api/v1/handlers/...`
+- Code formatted: `go fmt ./...`
+- No vet errors: `go vet ./...`
 
 ## Next Steps
-1. Update DashboardHandler struct to include ProjectsService
-2. Refactor Projects() method to use service layer
-3. Update cmd/server.go to inject ProjectsService
-4. Add unit tests for the new handler method
-5. Run tests and verify acceptance criteria
+- Run integration tests to verify database interactions
+- Mark task as Done after integration tests pass
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
