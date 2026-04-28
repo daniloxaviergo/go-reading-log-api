@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 11:16'
-updated_date: '2026-04-28 13:08'
+updated_date: '2026-04-28 13:12'
 labels:
   - feature
   - backend
@@ -264,29 +264,44 @@ defer cancel()
 <!-- SECTION:NOTES:BEGIN -->
 ## Implementation Progress
 
-### Status: In Progress
+### Status: In Progress - Implementation Complete
 
-**Phase 1: Research Complete**
+**Phase 1: Research Complete** ✅
 - Reviewed current implementation in `internal/adapter/postgres/dashboard_repository.go`
-- Current `GetRunningProjectsWithLogs` uses N+1 queries (gets projects, then calls `GetProjectLogs` for each)
 - Identified the DTO structure in `internal/domain/dto/dashboard_response.go`
 - Reviewed service layer in `internal/service/dashboard/projects_service.go`
 
-**Phase 2: Implementation - Starting**
-- Task: Replace current implementation with single SQL JOIN query using CTE and window functions
-- Requirements:
-  1. SQL query joins projects with logs table
-  2. Logs limited to first 4 per project ordered by data DESC
-  3. Progress ordering via SQL CASE statement
-  4. NULL values handled with COALESCE
-  5. Query returns all required project and log fields
+**Phase 2: Implementation Complete** ✅
+- Replaced `GetRunningProjectsWithLogs` with single SQL JOIN query using CTE and window functions
+- Added `database/sql` import for `sql.Null*` types
+- Code formatted with `go fmt` and passes `go vet`
+
+**Implementation Details:**
+1. **SQL Query with CTE**: Uses `log_ranked` CTE with `ROW_NUMBER()` window function to partition logs by project and order by date DESC
+2. **First 4 Logs Limit**: `lr.rn <= 4` condition limits to first 4 logs per project
+3. **Progress Ordering**: SQL `CASE` statement handles NULL/zero total_page: `CASE WHEN p.total_page = 0 THEN 0 ELSE p.page::float / p.total_page::float END DESC`
+4. **NULL Handling**: `COALESCE` used for all aggregate functions (`SUM`, `COUNT`)
+5. **All Fields Returned**: Project fields (id, name, total_page, page) and log fields (id, project_id, data, start_page, end_page, note)
+
+**Phase 3: Testing Complete** ✅
+- All unit tests pass: `go test ./internal/service/dashboard/...`
+- All integration tests pass: `go test ./test/integration/...`
+- All tests pass: `go test ./...`
+- Code formatted: `go fmt ./...`
+- Vet passes: `go vet ./...`
+
+**Acceptance Criteria Status:**
+- [x] #1 SQL query joins projects with logs table
+- [x] #2 Logs limited to first 4 per project ordered by data DESC
+- [x] #3 Progress ordering implemented via SQL CASE statement
+- [x] #4 NULL values handled with COALESCE
+- [x] #5 Query returns all required project and log fields
 
 **Next Steps:**
-1. Implement new SQL query in `GetRunningProjectsWithLogs`
-2. Test query in PostgreSQL
-3. Run unit tests
-4. Run integration tests
-5. Check acceptance criteria
+1. Mark acceptance criteria as checked
+2. Verify Definition of Done items
+3. Write final summary
+4. Mark task as Done
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
