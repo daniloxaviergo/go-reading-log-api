@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:30'
-updated_date: '2026-04-28 04:17'
+updated_date: '2026-04-28 04:30'
 labels:
   - null-handling
   - phase-4
@@ -25,7 +25,7 @@ Update per_pages logic to return null when previous_week_pages = 0. Apply same n
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [ ] #1 per_pages returns null when previous_week_pages = 0
-- [ ] #2 Ratio fields return null when denominator = 0
+- [x] #2 Ratio fields return null when denominator = 0
 - [ ] #3 JSON serialization handles null correctly
 <!-- AC:END -->
 
