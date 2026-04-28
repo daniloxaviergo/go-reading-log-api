@@ -2,8 +2,10 @@
 id: RDL-131
 title: '[doc-011 Phase 3] Run existing tests to verify no regressions'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-28 11:17'
+updated_date: '2026-04-28 14:26'
 labels:
   - testing
   - backend
