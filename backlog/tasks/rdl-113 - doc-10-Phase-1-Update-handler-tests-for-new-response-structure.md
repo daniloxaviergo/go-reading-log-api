@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:29'
-updated_date: '2026-04-28 02:02'
+updated_date: '2026-04-28 02:03'
 labels:
   - testing
   - phase-1
@@ -25,7 +25,7 @@ Update dashboard_handler_test.go test expectations to validate new flat JSON str
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 All handler tests pass with new response format
-- [ ] #2 Test assertions validate stats object structure
+- [x] #2 Test assertions validate stats object structure
 <!-- AC:END -->
 
 ## Implementation Plan
