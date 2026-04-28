@@ -26,7 +26,7 @@ Create docs/rails-calculation-reference.md documenting Rails V1::MeanLog, V1::Ma
 <!-- AC:BEGIN -->
 - [x] #1 rails-calculation-reference.md created
 - [x] #2 V1::MeanLog algorithm documented
-- [ ] #3 V1::MaxLog algorithm documented
+- [x] #3 V1::MaxLog algorithm documented
 <!-- AC:END -->
 
 ## Implementation Plan
