@@ -5,7 +5,7 @@ title: >-
   status filtering
 status: To Do
 assignee:
-  - book
+  - workflow
 created_date: '2026-04-28 11:16'
 updated_date: '2026-04-28 12:01'
 labels:
