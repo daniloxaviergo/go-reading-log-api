@@ -1,7 +1,7 @@
 ---
 id: RDL-113
 title: '[doc-10 Phase 1] Update handler tests for new response structure'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-28 00:29'
