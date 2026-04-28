@@ -1,11 +1,11 @@
 ---
 id: RDL-120
 title: '[doc-10 Phase 5] Write integration tests with real database'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-28 00:30'
-updated_date: '2026-04-28 05:19'
+updated_date: '2026-04-28 05:20'
 labels:
   - integration-testing
   - phase-5
