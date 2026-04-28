@@ -3,11 +3,11 @@ id: RDL-128
 title: >-
   [doc-011 Phase 1] Add GetRunningProjectsWithLogs repository query with SQL
   JOIN
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-28 11:16'
-updated_date: '2026-04-28 13:14'
+updated_date: '2026-04-28 13:15'
 labels:
   - feature
   - backend
