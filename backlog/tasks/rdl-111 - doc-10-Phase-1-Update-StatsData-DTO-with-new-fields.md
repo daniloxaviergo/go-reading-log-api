@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:28'
-updated_date: '2026-04-28 01:28'
+updated_date: '2026-04-28 01:29'
 labels:
   - dto
   - phase-1
@@ -181,7 +181,7 @@ This task focuses on Phase 1 of the Dashboard Day Endpoint Alignment (doc-010). 
 - [x] #5 Error responses consistent with existing patterns
 - [x] #6 HTTP status codes correct for response type
 - [ ] #7 Documentation updated in QWEN.md
-- [ ] #8 New code paths include error path tests
+- [x] #8 New code paths include error path tests
 - [ ] #9 HTTP handlers test both success and error responses
 - [ ] #10 Integration tests verify actual database interactions
 <!-- DOD:END -->
