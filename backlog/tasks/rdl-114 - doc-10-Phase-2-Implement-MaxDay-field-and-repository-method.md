@@ -2,8 +2,10 @@
 id: RDL-114
 title: '[doc-10 Phase 2] Implement MaxDay field and repository method'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-28 00:29'
+updated_date: '2026-04-28 02:06'
 labels:
   - repository
   - phase-2
