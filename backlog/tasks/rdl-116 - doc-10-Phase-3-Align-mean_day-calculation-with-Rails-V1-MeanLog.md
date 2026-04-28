@@ -1,7 +1,7 @@
 ---
 id: RDL-116
 title: '[doc-10 Phase 3] Align mean_day calculation with Rails V1::MeanLog'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-28 00:29'
