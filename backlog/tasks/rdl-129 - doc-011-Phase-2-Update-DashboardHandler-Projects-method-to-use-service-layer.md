@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 11:16'
-updated_date: '2026-04-28 14:12'
+updated_date: '2026-04-28 14:13'
 labels:
   - feature
   - backend
@@ -324,6 +324,45 @@ Updated all test files to use the new `ProjectsServiceInterface`:
 - Run integration tests to verify database interactions
 - Mark task as Done after integration tests pass
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+Successfully refactored the `DashboardHandler.Projects()` method to use the service layer instead of direct repository calls, following Clean Architecture principles.
+
+## What Was Done
+1. **Refactored DashboardHandler.Projects()** to call service layer methods:
+   - `projectsService.GetRunningProjectsWithLogs(ctx)` - Returns filtered running projects with logs
+   - `projectsService.CalculateStats(ctx)` - Returns aggregate statistics
+
+2. **Changed response format** from JSON:API envelope to Rails-matching structure:
+   - Old: `{ "data": { "attributes": { "logs": [...] } } }`
+   - New: `{ "projects": [...], "stats": {...} }`
+
+3. **Added structured logging** using `slog` instead of `fmt.Printf`
+
+4. **Implemented dependency injection** for `ProjectsServiceInterface` to enable testability
+
+## Key Changes
+- **internal/api/v1/handlers/dashboard_handler.go**: Added `ProjectsService` field, refactored `Projects()` method
+- **internal/api/v1/routes.go**: Updated `SetupRoutes()` to accept `ProjectsServiceInterface`, added route registration
+- **cmd/server.go**: Added `ProjectsService` instantiation and injection
+- **internal/service/dashboard/projects_service.go**: Added `ProjectsServiceInterface` for testability
+- **test/integration/dashboard_mock_test.go**: Created shared mock for integration tests
+- **internal/api/v1/handlers/dashboard_handler_projects_test.go**: Added comprehensive unit tests
+
+## Tests Run
+- All unit tests pass: `go test ./internal/api/v1/handlers/...`
+- Code formatted: `go fmt ./...`
+- No vet errors: `go vet ./...`
+- Added 5 new unit tests covering success, empty data, and error scenarios
+
+## Notes for Reviewers
+- Response format change may affect any existing clients using this endpoint (endpoint was not previously exposed in production)
+- All error handling follows existing patterns (500 Internal Server Error with structured logging)
+- Clean Architecture layers properly followed (Handler → Service → Repository)
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
