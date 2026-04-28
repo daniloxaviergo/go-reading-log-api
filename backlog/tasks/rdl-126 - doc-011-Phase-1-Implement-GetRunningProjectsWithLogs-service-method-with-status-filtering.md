@@ -5,9 +5,9 @@ title: >-
   status filtering
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-28 11:16'
-updated_date: '2026-04-28 12:07'
+updated_date: '2026-04-28 12:08'
 labels:
   - feature
   - backend
