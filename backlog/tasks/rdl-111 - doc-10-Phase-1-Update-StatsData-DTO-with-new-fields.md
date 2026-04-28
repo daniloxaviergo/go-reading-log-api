@@ -2,8 +2,10 @@
 id: RDL-111
 title: '[doc-10 Phase 1] Update StatsData DTO with new fields'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-28 00:28'
+updated_date: '2026-04-28 00:59'
 labels:
   - dto
   - phase-1
