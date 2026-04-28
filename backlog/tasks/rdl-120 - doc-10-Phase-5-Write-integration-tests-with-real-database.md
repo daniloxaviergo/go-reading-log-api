@@ -3,7 +3,7 @@ id: RDL-120
 title: '[doc-10 Phase 5] Write integration tests with real database'
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-28 00:30'
 updated_date: '2026-04-28 05:20'
 labels:
