@@ -3,11 +3,11 @@ id: RDL-126
 title: >-
   [doc-011 Phase 1] Implement GetRunningProjectsWithLogs service method with
   status filtering
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-28 11:16'
-updated_date: '2026-04-28 12:39'
+updated_date: '2026-04-28 12:40'
 labels:
   - feature
   - backend
