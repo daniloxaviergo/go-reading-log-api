@@ -24,7 +24,7 @@ Create integration tests in dashboard_integration_test.go using TestHelper for d
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Integration tests pass with real database
+- [x] #1 Integration tests pass with real database
 - [ ] #2 All new fields tested with fixtures
 - [ ] #3 Test coverage >= 80% for new code
 <!-- AC:END -->
