@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 10:27'
-updated_date: '2026-04-28 10:34'
+updated_date: '2026-04-28 10:38'
 labels: []
 dependencies: []
 ---
@@ -197,21 +197,38 @@ go test -v ./internal/api/v1/handlers/... -run TestDashboardHandler
   - `cmd/server.go` - Add dependency injection for dashboard
   - `internal/api/v1/routes.go` - Register the route
 
-### Step 2: Modify cmd/server.go (In Progress)
-- Add import for `service` package
-- Create `userConfigService` instance using `service.LoadDashboardConfig()`
-- Create `dashboardRepo` instance using `postgres.NewDashboardRepositoryImpl(dbPool)`
-- Create `dashboardHandler` instance and pass to route setup
+### Step 2: Modify cmd/server.go ✅
+- Added import for `service` package
+- Created `userConfigService` instance using `service.LoadDashboardConfig()`
+- Created `dashboardRepo` instance using `postgres.NewDashboardRepositoryImpl(dbPool)`
+- Updated `api.SetupRoutes` call to pass dashboard dependencies
 
-### Step 3: Modify internal/api/v1/routes.go (Pending)
-- Register route: `r.HandleFunc("/v1/dashboard/day.json", dashboardHandler.Day).Methods("GET")`
+### Step 3: Modify internal/api/v1/routes.go ✅
+- Added import for `service` package
+- Updated `SetupRoutes` function signature to accept dashboard dependencies
+- Registered route: `r.HandleFunc("/v1/dashboard/day.json", dashboardHandler.Day).Methods("GET")`
 
-### Step 4: Run Tests (Pending)
-- Run unit tests
-- Run integration tests
-- Verify `go fmt` and `go vet`
+### Step 4: Update Tests ✅
+- Updated `routes_test.go` to pass new dashboard dependencies
+- Added `MockDashboardRepository` with all required methods
+- Added imports for `time` and `dto` packages
 
-### Step 5: Verify Acceptance Criteria (Pending)
+### Step 5: Build and Verify ✅
+- `go build` - Success ✅
+- `go fmt` - Success ✅
+- `go vet` - Success ✅
+- Unit tests pass:
+  - `TestSetupRoutes` ✅
+  - `TestSetupRoutes_Routes` ✅
+  - `TestSetupRoutes_MiddlewareChain` ✅
+  - `TestDashboardHandler_Day` ✅
+  - All other dashboard handler tests ✅
+
+### Step 6: Run All Tests (Pending)
+- Run full test suite
+- Verify integration tests
+
+### Step 7: Verify Acceptance Criteria (Pending)
 - Check all DoD items
 - Update final summary
 - Mark task as Done
