@@ -1,7 +1,7 @@
 ---
 id: RDL-123
 title: '[doc-10 Phase 6] Create Rails calculation reference documentation'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-04-28 00:31'
