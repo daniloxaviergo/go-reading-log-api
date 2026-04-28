@@ -24,7 +24,7 @@ Add CalculateStats() method to projects_service.go that computes stats object: t
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 stats.total_pages equals sum of all project total_page values
+- [x] #1 stats.total_pages equals sum of all project total_page values
 - [ ] #2 stats.pages equals sum of all project page values
 - [ ] #3 stats.progress_geral calculated as round((pages/total_pages)*100, 3)
 - [ ] #4 Zero projects returns stats with all values at 0
