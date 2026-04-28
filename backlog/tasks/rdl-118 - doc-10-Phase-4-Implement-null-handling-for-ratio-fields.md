@@ -3,7 +3,7 @@ id: RDL-118
 title: '[doc-10 Phase 4] Implement null handling for ratio fields'
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-04-28 00:30'
 updated_date: '2026-04-28 04:32'
 labels:
