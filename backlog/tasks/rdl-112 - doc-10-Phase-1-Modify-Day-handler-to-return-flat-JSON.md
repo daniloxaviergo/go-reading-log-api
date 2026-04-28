@@ -25,7 +25,7 @@ Update Day() method in dashboard_handler.go to return flat JSON structure with s
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [ ] #1 Response format is flat JSON with stats key
-- [ ] #2 No JSON:API envelope present in response
+- [x] #2 No JSON:API envelope present in response
 - [ ] #3 Content-type remains application/json
 <!-- AC:END -->
 
