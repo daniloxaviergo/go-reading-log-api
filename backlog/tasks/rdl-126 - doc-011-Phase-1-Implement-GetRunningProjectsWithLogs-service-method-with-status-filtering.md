@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 11:16'
-updated_date: '2026-04-28 12:10'
+updated_date: '2026-04-28 12:19'
 labels:
   - feature
   - backend
@@ -308,16 +308,37 @@ t.Run("repository error", func(t *testing.T) {
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-Starting implementation of GetRunningProjectsWithLogs service method.
+## Implementation Progress
 
-**Implementation Plan:**
-1. Add `GetRunningProjectsWithLogs()` to DashboardRepository interface
-2. Implement the repository method in PostgreSQL adapter
-3. Implement the service method in ProjectsService
-4. Create unit tests for the new method
-5. Run tests and verify acceptance criteria
+### Completed Steps:
 
-**Step 1: Adding repository interface method** - IN PROGRESS
+1. ✅ **Repository Interface** - Added `GetRunningProjectsWithLogs()` to `DashboardRepository` interface
+   - File: `internal/repository/dashboard_repository.go`
+
+2. ✅ **PostgreSQL Adapter** - Implemented `GetRunningProjectsWithLogs()` in `DashboardRepositoryImpl`
+   - File: `internal/adapter/postgres/dashboard_repository.go`
+   - Fetches all projects with eager-loaded logs (first 4 per project)
+   - Returns projects ordered by id ASC
+
+3. ✅ **Service Layer** - Implemented `GetRunningProjectsWithLogs()` in `ProjectsService`
+   - File: `internal/service/dashboard/projects_service.go`
+   - Filters projects by "running" status (has logs AND not finished)
+   - Calculates progress as (pages/total_pages)*100
+   - Handles division by zero (returns 0.0)
+   - Orders by progress DESC, then id ASC
+
+### Next Steps:
+
+4. **Unit Tests** - Create comprehensive unit tests for the new service method
+   - Test normal case with running projects
+   - Test division by zero handling
+   - Test ordering (equal progress by id ASC)
+   - Test empty results
+   - Test repository error handling
+
+5. **Build and Test** - Run `go build` and `go test` to verify implementation
+
+6. **Verify Acceptance Criteria** - Check all 5 acceptance criteria are met
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
