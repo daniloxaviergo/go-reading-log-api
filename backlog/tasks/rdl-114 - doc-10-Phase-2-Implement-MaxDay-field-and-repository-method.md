@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:29'
-updated_date: '2026-04-28 02:29'
+updated_date: '2026-04-28 02:30'
 labels:
   - repository
   - phase-2
@@ -287,6 +287,60 @@ if err != nil {
 - `test/unit/project_calculations_test.go` - Updated to use shared helpers
 - `test/unit/dashboard_response_test.go` - Updated to use shared helpers
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Implemented comprehensive test coverage and documentation for the `GetMaxByWeekday` repository method.
+
+## What Was Done
+
+1. **Unit Tests** (`test/unit/dashboard_repository_test.go`)
+   - Added 7 unit tests covering all scenarios:
+     - `TestDashboardRepository_GetMaxByWeekday` - Basic functionality with data
+     - `TestDashboardRepository_GetMaxByWeekday_EmptyWeekday` - No data for weekday
+     - `TestDashboardRepository_GetMaxByWeekday_MultipleProjects` - Across multiple projects
+     - `TestDashboardRepository_GetMaxByWeekday_ZeroPages` - Zero pages read
+     - `TestDashboardRepository_GetMaxByWeekday_InvalidData` - Edge case handling
+     - `TestDashboardRepository_GetMaxByWeekday_EmptyDatabase` - Empty database
+     - `TestDashboardRepository_GetMaxByWeekday_SingleEntry` - Single log entry
+
+2. **Integration Tests** (`test/integration/dashboard_maxbyweekday_integration_test.go`)
+   - Created new file with 3 integration tests:
+     - `TestDashboardRepository_GetMaxByWeekday_Integration` - Full DB interactions with subtests
+     - `TestDashboardRepository_GetMaxByWeekday_Performance` - 1000+ logs performance test
+     - `TestDashboardRepository_GetMaxByWeekday_LargePageNumbers` - Large page number handling
+
+3. **Documentation** (`QWEN.md`)
+   - Added `max_day` field to Calculated Fields section
+   - Added Dashboard Repository Methods section with method table
+   - Added detailed GetMaxByWeekday implementation documentation with SQL query pattern
+
+4. **Test Utilities** (`test/testutil/helpers.go`)
+   - Created shared helper functions (FloatPtr, IntPtr, etc.)
+   - Fixed duplicate function errors in existing test files
+
+## Key Changes
+
+- **Files Created**: `test/integration/dashboard_maxbyweekday_integration_test.go`, `test/testutil/helpers.go`
+- **Files Modified**: `test/unit/dashboard_repository_test.go`, `test/unit/project_calculations_test.go`, `test/unit/dashboard_response_test.go`, `QWEN.md`
+
+## Tests Run
+
+- All 7 unit tests pass
+- All 3 integration tests pass (4 subtests included)
+- `go fmt` completed successfully
+- `go vet` passes for all modified files
+
+## Notes for Reviewers
+
+- Implementation follows existing Clean Architecture patterns
+- Tests cover edge cases including empty data, multiple projects, and large numbers
+- Performance test verifies query completes in under 100ms with 1000+ logs
+- No schema changes required - implementation was already in production code
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
