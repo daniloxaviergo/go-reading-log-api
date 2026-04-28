@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 11:16'
-updated_date: '2026-04-28 13:21'
+updated_date: '2026-04-28 13:23'
 labels:
   - feature
   - backend
@@ -258,6 +258,43 @@ func (h *DashboardHandler) Projects(w http.ResponseWriter, r *http.Request) {
 - Maintain existing test infrastructure patterns (mock repositories, TestHelper)
 - Ensure all acceptance criteria from task RDL-129 are met
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+**Implementation Started - 2026-04-28**
+
+## Current Status
+Researching codebase to understand current state before implementation.
+
+## Findings
+1. **Current DashboardHandler.Projects()** method:
+   - Uses direct repository calls (h.repo.GetProjectsWithLogs)
+   - Returns JSON:API envelope with flat logs array
+   - Uses fmt.Printf for error logging
+   - Does NOT use ProjectsService
+
+2. **ProjectsService** already exists with:
+   - `GetRunningProjectsWithLogs(ctx)` - Returns filtered projects with logs
+   - `CalculateStats(ctx)` - Returns aggregate statistics
+   - Properly implemented in `internal/service/dashboard/projects_service.go`
+
+3. **Files to modify:**
+   - `internal/api/v1/handlers/dashboard_handler.go` - Add ProjectsService field, refactor Projects() method
+   - `cmd/server.go` - Update NewDashboardHandler() call to pass ProjectsService
+   - `internal/api/v1/routes.go` - Verify route registration
+
+4. **Response structure change:**
+   - Current: JSON:API envelope with flat logs array
+   - Target: Rails structure `{ "projects": [...], "stats": {...} }`
+
+## Next Steps
+1. Update DashboardHandler struct to include ProjectsService
+2. Refactor Projects() method to use service layer
+3. Update cmd/server.go to inject ProjectsService
+4. Add unit tests for the new handler method
+5. Run tests and verify acceptance criteria
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
