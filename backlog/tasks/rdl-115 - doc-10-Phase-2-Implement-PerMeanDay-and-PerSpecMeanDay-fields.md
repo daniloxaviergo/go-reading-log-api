@@ -3,7 +3,7 @@ id: RDL-115
 title: '[doc-10 Phase 2] Implement PerMeanDay and PerSpecMeanDay fields'
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-28 00:29'
 updated_date: '2026-04-28 02:38'
 labels:
