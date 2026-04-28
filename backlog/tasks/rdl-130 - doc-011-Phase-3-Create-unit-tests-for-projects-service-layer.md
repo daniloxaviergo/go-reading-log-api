@@ -27,7 +27,7 @@ Create internal/service/dashboard/projects_service_test.go with unit tests for G
 - [x] #1 Test status filtering returns only running projects
 - [ ] #2 Test stats calculation with known input values
 - [ ] #3 Test progress ordering (DESC by progress, ASC by id)
-- [ ] #4 Test edge case: zero projects returns empty array
+- [x] #4 Test edge case: zero projects returns empty array
 - [ ] #5 Test edge case: division by zero returns 0.0
 - [ ] #6 Test coverage > 85% for service layer
 <!-- AC:END -->
