@@ -289,6 +289,54 @@ func TestProjectsService_CalculateStats(t *testing.T) {
 Task is complete and ready to be marked as Done.
 <!-- SECTION:NOTES:END -->
 
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Implemented `CalculateStats()` method in `ProjectsService` to compute aggregate statistics across all projects.
+
+## What Was Done
+
+- Added `CalculateStats(ctx context.Context) (*dto.StatsData, error)` method to `internal/service/dashboard/projects_service.go`
+- Method calculates:
+  - `total_pages`: Sum of all project `total_page` values from projects table
+  - `pages`: Sum of all project `page` values from projects table  
+  - `progress_geral`: Round((pages/total_pages)*100, 3) with division-by-zero protection
+- Handles edge cases: zero projects returns all zeros, division by zero returns 0.0
+
+## Key Changes
+
+**Files Modified:**
+- `internal/service/dashboard/projects_service.go`: Added `CalculateStats()` method (45 lines)
+- `internal/service/dashboard/projects_service_test.go`: Added unit tests (7 test cases)
+
+**Test Coverage:**
+- Normal case - multiple projects
+- Zero projects (edge case)
+- Division by zero (edge case)
+- Single project
+- Float rounding to 3 decimals
+- Zero pages with valid total
+- Repository error handling
+
+## Testing
+
+All tests pass:
+- `go test ./internal/service/dashboard/...` - PASS
+- `go fmt ./...` - PASS
+- `go vet ./...` - PASS
+- `go build ./...` - PASS
+
+## Notes for Reviewers
+
+- Follows existing Clean Architecture patterns (service layer)
+- Uses existing `calculateProgress()` helper for consistency
+- Error handling follows existing patterns with `fmt.Errorf()` wrapping
+- No breaking changes to existing API
+- Ready for integration with dashboard endpoints
+<!-- SECTION:FINAL_SUMMARY:END -->
+
 ## Definition of Done
 <!-- DOD:BEGIN -->
 - [ ] #1 All unit tests pass
