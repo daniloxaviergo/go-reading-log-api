@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 11:16'
-updated_date: '2026-04-28 12:46'
+updated_date: '2026-04-28 12:48'
 labels:
   - feature
   - backend
@@ -234,6 +234,31 @@ func TestProjectsService_CalculateStats(t *testing.T) {
 - ✅ #4: Zero projects returns stats with all values at 0
 - ✅ #5: Division by zero returns 0.0 for `progress_geral`
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress
+
+### Step 1: Implementation Started
+- Reviewed existing codebase structure
+- Analyzed `ProjectsService`, `StatsData` DTO, and `DashboardRepository`
+- Identified existing patterns for error handling, rounding, and division-by-zero protection
+
+### Step 2: Implementation in Progress
+- Adding `CalculateStats()` method to `projects_service.go`
+- Method will:
+  1. Fetch all projects using `repo.GetProjectAggregates()`
+  2. Sum all `TotalPage` values for `total_pages`
+  3. Sum all `Pages` values for `pages`
+  4. Calculate `progress_geral` = round((pages/total_pages)*100, 3)
+  5. Handle edge cases (zero projects, division by zero)
+
+### Next Steps
+- Write unit tests in `projects_service_test.go`
+- Run tests and verify acceptance criteria
+- Check off acceptance criteria as they pass
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
