@@ -3,7 +3,7 @@ id: RDL-127
 title: '[doc-011 Phase 1] Implement stats calculation service method'
 status: To Do
 assignee:
-  - book
+  - workflow
 created_date: '2026-04-28 11:16'
 updated_date: '2026-04-28 12:41'
 labels:
