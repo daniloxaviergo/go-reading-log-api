@@ -3,9 +3,9 @@ id: RDL-114
 title: '[doc-10 Phase 2] Implement MaxDay field and repository method'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-04-28 00:29'
-updated_date: '2026-04-28 02:30'
+updated_date: '2026-04-28 02:31'
 labels:
   - repository
   - phase-2
