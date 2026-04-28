@@ -319,6 +319,79 @@ go test -cover ./internal/service/dashboard/projects_service_test.go 2>&1 | grep
 - Mark task as complete after final verification
 <!-- SECTION:NOTES:END -->
 
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Created comprehensive unit tests for the ProjectsService layer, specifically for `GetRunningProjectsWithLogs` and `CalculateStats` methods. Verified and enhanced existing test coverage to meet the 85% target.
+
+## What Was Done
+
+1. **Verified existing test suite** - All existing tests pass
+2. **Added missing test case** - Added "project not found - skip and continue" test for `CalculateStats` to cover the `pgx.ErrNoRows` error path
+3. **Achieved coverage targets**:
+   - `GetRunningProjectsWithLogs`: 100% coverage
+   - `CalculateStats`: 95.7% coverage
+   - `calculateProgress`: 100% coverage
+   - `isRunningProject`: 100% coverage
+
+## Key Changes
+
+**File Modified:** `internal/service/dashboard/projects_service_test.go`
+- Added test case for `pgx.ErrNoRows` scenario in `CalculateStats` method
+- Test verifies that when a project is not found in the database, the service skips it and continues processing other projects
+
+## Test Coverage Details
+
+### GetRunningProjectsWithLogs Tests
+- Normal case with multiple running projects
+- Ordering by progress DESC
+- Ordering by id ASC when progress is equal
+- Empty results (no running projects)
+- Repository error handling
+- Status filtering (finished projects, projects without logs)
+- Division by zero handling
+- Float rounding to 3 decimals
+- Single project case
+
+### CalculateStats Tests
+- Normal case with multiple projects
+- Zero projects returns all zeros
+- Division by zero returns 0.0
+- Single project case
+- Float rounding to 3 decimals
+- Zero pages with valid total
+- Repository error handling
+- Project not found (pgx.ErrNoRows) - skip and continue
+
+### Helper Method Tests
+- `calculateProgress`: 7 test cases covering all edge cases
+- `isRunningProject`: 5 test cases covering all status scenarios
+
+## Tests Run
+
+```bash
+go test -v ./internal/service/dashboard/...  # All tests PASS
+go test -cover ./internal/service/dashboard/...  # Coverage verified
+go fmt ./internal/service/dashboard/...  # PASSED
+go vet ./internal/service/dashboard/...  # PASSED
+```
+
+## Acceptance Criteria Met
+
+- [x] #1 Test status filtering returns only running projects
+- [x] #2 Test stats calculation with known input values
+- [x] #3 Test progress ordering (DESC by progress, ASC by id)
+- [x] #4 Test edge case: zero projects returns empty array
+- [x] #5 Test edge case: division by zero returns 0.0
+- [x] #6 Test coverage > 85% for service layer (achieved 95.7%-100%)
+
+## Risks/Follow-ups
+
+No risks identified. All tests pass and coverage exceeds the 85% target for the tested methods.
+<!-- SECTION:FINAL_SUMMARY:END -->
+
 ## Definition of Done
 <!-- DOD:BEGIN -->
 - [ ] #1 All unit tests pass
