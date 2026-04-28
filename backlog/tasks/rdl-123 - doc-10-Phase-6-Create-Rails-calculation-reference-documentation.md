@@ -229,7 +229,7 @@ step-by-step calculation
 - [x] #4 Clean Architecture layers properly followed
 - [x] #5 Error responses consistent with existing patterns
 - [x] #6 HTTP status codes correct for response type
-- [ ] #7 Documentation updated in QWEN.md
+- [x] #7 Documentation updated in QWEN.md
 - [ ] #8 New code paths include error path tests
 - [ ] #9 HTTP handlers test both success and error responses
 - [ ] #10 Integration tests verify actual database interactions
