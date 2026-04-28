@@ -5,9 +5,9 @@ title: >-
   comparison
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-04-28 11:17'
-updated_date: '2026-04-28 15:00'
+updated_date: '2026-04-28 15:03'
 labels:
   - validation
   - backend
