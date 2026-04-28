@@ -2,8 +2,10 @@
 id: RDL-122
 title: '[doc-10 Phase 5] Verify performance meets NFC-DASH-001'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-04-28 00:30'
+updated_date: '2026-04-28 05:47'
 labels:
   - performance
   - phase-5
