@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-04-28 00:29'
-updated_date: '2026-04-28 03:06'
+updated_date: '2026-04-28 03:07'
 labels:
   - repository
   - phase-2
@@ -435,6 +435,54 @@ Build: Success
 - Created: `test/integration/dashboard_day_permean_integration_test.go`
 - Modified: `QWEN.md`
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Added comprehensive test coverage for PerMeanDay and PerSpecMeanDay ratio calculations in the Dashboard API.
+
+## What Was Done
+
+### Test Files Created
+1. **test/unit/dashboard_handler_test.go** - 11 unit tests covering:
+   - PerMeanDay calculation with data, null handling, zero protection
+   - PerSpecMeanDay calculation with data, null handling, zero protection  
+   - Ratio calculations (greater than 1, less than 1)
+   - 3 decimal place rounding verification
+   - Combined ratio tests
+
+2. **test/testutil/mock_dashboard_repository.go** - Full mock implementation of DashboardRepository interface for unit testing
+
+3. **test/integration/dashboard_day_permean_integration_test.go** - 7 integration tests covering:
+   - Full database interactions for per_mean_day calculations
+   - Full database interactions for per_spec_mean_day calculations
+   - Empty database scenarios
+   - Multiple weekday scenarios
+
+### Documentation Updated
+- **QWEN.md** - Added detailed documentation for per_mean_day and per_spec_mean_day fields including formulas, edge cases, and example responses
+
+## Key Changes
+- All ratio calculations follow existing Clean Architecture patterns
+- Nullable return types (*float64) used consistently
+- Division by zero protection implemented
+- 3 decimal place rounding applied
+- Tests cover success and error paths
+
+## Tests Run
+- Unit tests: 11/11 passed
+- Integration tests: 7/7 passed
+- go fmt: Pass
+- go vet: Pass
+- Build: Success
+
+## Notes for Reviewers
+- Core implementation was already complete; this task added test coverage
+- No schema changes required
+- No breaking changes to existing API
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
