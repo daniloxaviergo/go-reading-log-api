@@ -2,8 +2,10 @@
 id: RDL-134
 title: Refactor the Go implementation for the `/v1/dashboard/projects.json`
 status: To Do
-assignee: []
+assignee:
+  - Thomas
 created_date: '2026-04-29 21:42'
+updated_date: '2026-04-29 21:42'
 labels: []
 dependencies: []
 ---
