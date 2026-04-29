@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - Thomas
 created_date: '2026-04-29 21:42'
-updated_date: '2026-04-29 21:42'
+updated_date: '2026-04-29 21:45'
 labels: []
 dependencies: []
 ---
@@ -105,6 +105,36 @@ Step 6: Verification.
 - Review the generated JSON structure against the Rails example provided below.
 - Confirm that the root is "data", items have "attributes", and "stats" matches exactly.
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress
+
+### Analysis Phase (Complete)
+- Reviewed task requirements for `/v1/dashboard/projects.json` endpoint refactoring
+- Analyzed current Go implementation in `dashboard_handler.go`
+- Reviewed Rails response structure expectations from task description
+- Identified key changes needed:
+  1. Root object: `{ "projects": [...] }` → `{ "data": [...] }`
+  2. JSON:API format with `id`, `type`, `attributes` wrapper
+  3. Kebab-case field naming
+  4. Remove nested `project` and `logs` objects
+  5. Stats object cleanup (remove unnecessary fields)
+  6. ID as string type
+
+### Implementation Plan
+1. Create new DTO for JSON:API dashboard projects response
+2. Update `DashboardHandler.Projects` method to use new structure
+3. Update service layer to return flattened project data
+4. Update tests to match new response structure
+5. Run tests and verify acceptance criteria
+
+### Next Steps
+- Create new DTO structures for JSON:API format
+- Modify handler to return correct structure
+- Update tests
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
