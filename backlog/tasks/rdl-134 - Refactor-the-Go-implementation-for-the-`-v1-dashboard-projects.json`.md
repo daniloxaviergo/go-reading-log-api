@@ -3,7 +3,7 @@ id: RDL-134
 title: Refactor the Go implementation for the `/v1/dashboard/projects.json`
 status: Done
 assignee:
-  - workflow
+  - catarina
 created_date: '2026-04-29 21:42'
 updated_date: '2026-04-29 22:09'
 labels: []
