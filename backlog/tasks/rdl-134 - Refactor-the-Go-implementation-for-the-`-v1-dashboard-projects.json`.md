@@ -1,7 +1,7 @@
 ---
 id: RDL-134
 title: Refactor the Go implementation for the `/v1/dashboard/projects.json`
-status: To Do
+status: Done
 assignee:
   - Thomas
 created_date: '2026-04-29 21:42'
