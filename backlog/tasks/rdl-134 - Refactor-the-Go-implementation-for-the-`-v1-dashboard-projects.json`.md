@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - Thomas
 created_date: '2026-04-29 21:42'
-updated_date: '2026-04-29 21:45'
+updated_date: '2026-04-29 21:51'
 labels: []
 dependencies: []
 ---
@@ -123,17 +123,38 @@ Step 6: Verification.
   5. Stats object cleanup (remove unnecessary fields)
   6. ID as string type
 
-### Implementation Plan
-1. Create new DTO for JSON:API dashboard projects response
-2. Update `DashboardHandler.Projects` method to use new structure
-3. Update service layer to return flattened project data
-4. Update tests to match new response structure
-5. Run tests and verify acceptance criteria
+### Implementation Phase (Complete)
+1. ✅ Created new DTO structures in `dashboard_response.go`:
+   - `DashboardProjectsResponse` - Root response with `data` and `stats`
+   - `DashboardProjectItem` - JSON:API format item with `id`, `type`, `attributes`
+   - `DashboardProjectAttributes` - Flattened attributes with kebab-case fields
+   - `DashboardStats` - Simplified stats (only `progress_geral`, `total_pages`, `pages`)
+
+2. ✅ Updated service layer in `projects_service.go`:
+   - Added `GetDashboardProjects()` method to interface
+   - Implemented method to return JSON:API format response
+   - Calculates `started-at` from earliest log date
+   - Calculates `days-unreading` from latest log date
+   - Sets `status` to "stopped" as default
+
+3. ✅ Updated handler in `dashboard_handler.go`:
+   - Modified `Projects()` method to use new `GetDashboardProjects()` service method
+   - Returns JSON:API format response
+
+4. ✅ Updated tests in `dashboard_handler_projects_test.go`:
+   - Rewrote tests to use new JSON:API format
+   - Added tests for success, empty data, service error, and null started-at cases
+   - All tests pass
+
+### Test Results
+- ✅ All unit tests pass
+- ✅ go fmt passes
+- ✅ go vet passes
+- ✅ No compilation errors
 
 ### Next Steps
-- Create new DTO structures for JSON:API format
-- Modify handler to return correct structure
-- Update tests
+- Run integration tests
+- Verify all DoD items are satisfied
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
