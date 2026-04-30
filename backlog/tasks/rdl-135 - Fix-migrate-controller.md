@@ -1,7 +1,7 @@
 ---
 id: RDL-135
 title: Fix migrate controller
-status: To Do
+status: Done
 assignee:
   - Thomas
 created_date: '2026-04-30 10:35'
