@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - Thomas
 created_date: '2026-04-30 10:35'
-updated_date: '2026-04-30 10:48'
+updated_date: '2026-04-30 10:49'
 labels: []
 dependencies: []
 ---
@@ -84,6 +84,52 @@ Where:
 
 The Go implementation now matches this behavior exactly.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Fixed the filtering and ordering logic in the dashboard projects controller to match the Rails implementation.
+
+## What Was Done
+
+### 1. Fixed Repository Query (`internal/adapter/postgres/dashboard_repository.go`)
+- Added `WHERE p.page != p.total_page` filter to match Rails `only_status(:running)` scope
+- Added `MAX(lr.data) DESC` as secondary ordering to match Rails `order('logs.data DESC')`
+- Updated documentation to reflect Rails-equivalent behavior
+
+### 2. Simplified Service Layer (`internal/service/dashboard/projects_service.go`)
+- Removed redundant `isRunningProject()` method - filtering now done in SQL
+- Updated sorting logic to sort by progress DESC, latest log date DESC, then project ID ASC
+- Updated comments to clarify filtering is done at repository level
+
+### 3. Updated Tests (`internal/service/dashboard/projects_service_test.go`)
+- Removed `TestProjectsService_isRunningProject` test (method no longer exists)
+- Updated `TestProjectsService_GetRunningProjectsWithLogs_Filtering` to reflect new behavior
+
+## Key Changes
+
+| File | Change |
+|------|--------|
+| `internal/adapter/postgres/dashboard_repository.go` | Added filter and secondary ordering to SQL query |
+| `internal/service/dashboard/projects_service.go` | Removed redundant filtering, simplified logic |
+| `internal/service/dashboard/projects_service_test.go` | Updated tests to match new behavior |
+
+## Testing
+
+- ✅ All unit tests pass (`go test ./internal/...`)
+- ✅ `go fmt` passes with no errors
+- ✅ `go vet` passes with no errors
+- ✅ Build succeeds (`go build ./cmd/server.go`)
+
+## Rails Behavior Matched
+
+The Go implementation now correctly matches the Rails controller:
+- `only_status(:running)` → Filters by `page != total_page`
+- `order_progress` → Orders by `page::float / total_page::float DESC`
+- `order('logs.data DESC')` → Secondary order by `MAX(logs.data) DESC`
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
