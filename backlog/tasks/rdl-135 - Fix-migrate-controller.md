@@ -2,8 +2,10 @@
 id: RDL-135
 title: Fix migrate controller
 status: To Do
-assignee: []
+assignee:
+  - Thomas
 created_date: '2026-04-30 10:35'
+updated_date: '2026-04-30 10:36'
 labels: []
 dependencies: []
 ---
