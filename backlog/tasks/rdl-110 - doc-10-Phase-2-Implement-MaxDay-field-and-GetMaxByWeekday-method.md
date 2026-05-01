@@ -1,9 +1,10 @@
 ---
 id: RDL-110
 title: '[doc-10 Phase 2] Implement MaxDay field and GetMaxByWeekday() method'
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-04-28 00:27'
+updated_date: '2026-05-01 14:56'
 labels:
   - repository
   - phase-2
