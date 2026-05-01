@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:02'
-updated_date: '2026-05-01 15:42'
+updated_date: '2026-05-01 15:46'
 labels:
   - bugfix
   - testing
@@ -237,48 +237,69 @@ t.Run("No reading activity", func(t *testing.T) {
 
 **Date:** 2026-05-01
 
-**Current State:**
-- Reviewed task requirements and acceptance criteria
-- Identified prerequisite RDL-139 is NOT completed (SQL query still counts logs instead of zero-page days)
-- Current `GetFaultsByDateRange` implementation counts log entries, not days with zero pages
+### Completed Tasks
 
-### Implementation Plan
+**Phase 1: Test Fixture Update ✅**
+- [x] Analyzed current test structure and fixtures
+- [x] Added `ScenarioFaultsChartCorrect()` to `test/fixtures/dashboard/scenarios.go`
+- [x] Created 30-day period with explicit reading days vs fault days
+  - 15 reading days (Jan 1, 3, 5, ..., 29)
+  - 15 fault days (Jan 2, 4, 6, ..., 30)
+  - Expected faults: 15 out of 30 days = 50%
+- [x] Documented expected fault count (15 faults = 50% of 30 days)
 
-**Phase 1: Test Fixture Update (In Progress)**
-- [x] Analyze current test structure and fixtures
-- [ ] Add `ScenarioFaultsChartCorrect()` to `test/fixtures/dashboard/scenarios.go`
-- [ ] Create 30-day period with explicit reading days vs fault days
-- [ ] Document expected fault count (15 faults = 50% of 30 days)
+**Phase 2: Integration Test Update ✅**
+- [x] Updated `TestDashboardFaultsChart_Integration` to use new scenario
+- [x] Added fault percentage assertion (50% expected)
+- [x] Added documentation about RDL-139 prerequisite
+- [x] Test now properly validates correct behavior after SQL fix
 
-**Phase 2: Integration Test Update (Pending)**
-- [ ] Update `TestDashboardFaultsChart_Integration` to use new scenario
-- [ ] Add fault count assertion
-- [ ] Add percentage calculation assertion
-- [ ] Document expected behavior after RDL-139 fix
+**Phase 3: Testing ✅**
+- [x] Ran integration tests
+- [x] Verified test structure is correct
+- [x] Test fails as expected (returns 0% instead of 50%)
+- [x] Documented current vs expected behavior
 
-**Phase 3: Testing (Pending)**
-- [ ] Run integration tests
-- [ ] Verify test structure is correct
-- [ ] Document current vs expected behavior
+### Test Results
 
-### Key Findings
+```
+=== RUN   TestDashboardFaultsChart_Integration
+    Error: Max difference between 50 and 0 allowed is 0.01, but difference was 50
+    Message: Fault percentage should be 50% (15 faults out of 30 days). 
+             Note: This test requires RDL-139 SQL query fix to pass.
+             Current implementation counts log entries, not zero-page days.
+--- FAIL: TestDashboardFaultsChart_Integration (0.49s)
+```
 
-1. **Prerequisite Issue:** RDL-139 SQL query fix is required for tests to validate correct fault counts
-2. **Current Behavior:** Repository counts log entries (16 logs in `ScenarioFaultsByWeekday()`)
-3. **Expected Behavior:** Repository should count days with zero pages (15 faults in 30-day period)
-4. **Test Impact:** Test assertions will need to reflect the correct behavior after RDL-139 is merged
+**Analysis:**
+- Test correctly creates 15 reading days out of 30 total days
+- Current repository returns 0% (counts log entries, not zero-page days)
+- Expected after RDL-139: 50% fault rate (15 faults / 30 days)
+- **Test structure is correct; repository fix (RDL-139) is the blocker**
 
 ### Next Steps
 
-1. Create `ScenarioFaultsChartCorrect()` fixture with explicit reading/fault day distribution
-2. Update integration test to use new scenario
-3. Add assertions for fault count and percentage
-4. Run tests to verify structure (expectations will differ until RDL-139 is completed)
+1. **Wait for RDL-139 completion** - The SQL query fix is a prerequisite
+2. Once RDL-139 is merged, this test should pass with 50% fault rate
+3. Consider adding additional edge case tests (all days reading, no reading at all)
 
 ### Blockers
 
 - **RDL-139 must be completed first:** The SQL query fix is a prerequisite for correct test validation
-- Test will document expected behavior but cannot fully validate until repository is fixed
+- Test structure and assertions are complete and correct
+- Test will pass automatically once RDL-139 is merged
+
+### Files Modified
+
+1. `test/fixtures/dashboard/scenarios.go` - Added `ScenarioFaultsChartCorrect()`
+2. `test/dashboard_integration_test.go` - Updated `TestDashboardFaultsChart_Integration`
+
+### Code Quality
+
+- [x] `go fmt` passed
+- [x] `go vet` passed
+- [x] Clean Architecture layers followed (test fixtures)
+- [x] Test follows existing patterns
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
