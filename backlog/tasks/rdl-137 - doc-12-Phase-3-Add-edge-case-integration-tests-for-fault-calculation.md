@@ -3,9 +3,9 @@ id: RDL-137
 title: '[doc-12 Phase 3] Add edge case integration tests for fault calculation'
 status: Done
 assignee:
-  - next-task
+  - Catarina
 created_date: '2026-05-01 14:59'
-updated_date: '2026-05-01 15:33'
+updated_date: '2026-05-01 19:17'
 labels:
   - bugfix
   - testing
