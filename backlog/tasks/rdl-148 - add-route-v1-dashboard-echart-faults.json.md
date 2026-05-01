@@ -2,8 +2,10 @@
 id: RDL-148
 title: add route v1/dashboard/echart/faults.json
 status: To Do
-assignee: []
+assignee:
+  - worflow
 created_date: '2026-05-01 19:29'
+updated_date: '2026-05-01 19:29'
 labels: []
 dependencies: []
 ---
