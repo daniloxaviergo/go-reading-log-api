@@ -3,9 +3,9 @@ id: RDL-143
 title: '[doc-12 Phase 3] Update TestDashboardWeekdayFaults integration test'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-05-01 15:08'
-updated_date: '2026-05-01 17:43'
+updated_date: '2026-05-01 17:44'
 labels:
   - bugfix
   - testing
