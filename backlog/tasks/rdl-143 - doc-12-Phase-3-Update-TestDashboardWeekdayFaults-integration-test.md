@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:08'
-updated_date: '2026-05-01 17:42'
+updated_date: '2026-05-01 17:43'
 labels:
   - bugfix
   - testing
@@ -333,6 +333,72 @@ The integration test needs to:
 - ✅ go fmt and go vet pass with no errors
 - ✅ No regressions introduced
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## PR Summary - RDL-143: Update TestDashboardWeekdayFaults Integration Test
+
+### What Was Done
+Fixed the `TestDashboardWeekdayFaults_Integration` integration test by updating the test data setup to correctly create fault scenarios. The previous implementation incorrectly created log entries that were misinterpreted as faults. The new implementation creates proper fault scenarios where specific weekdays have NO reading activity, which correctly counts as faults according to the SQL query logic.
+
+### Key Changes
+
+#### File: `test/fixtures/dashboard/scenarios.go`
+- **Rewrote `ScenarioFaultsByWeekday()` function** to create proper fault scenarios
+  - Creates a 6-month date range (Oct 1, 2025 to Apr 1, 2026)
+  - Creates logs ONLY on Sundays, Tuesdays, Thursdays, and Saturdays (these are NOT faults)
+  - Does NOT create logs on Mondays, Wednesdays, and Fridays (these become faults)
+  - Added helper function `countWeekdaysInRange()` to calculate expected faults for a given weekday in a date range
+  - Added helper function `createWeekdayFaultsExpected()` to create expected results
+
+#### File: `test/dashboard_integration_test.go`
+- **Updated `TestDashboardWeekdayFaults_Integration`** test function
+  - Added `dto.SetTestDate()` to fix "today" date (Apr 1, 2026) for predictable test results
+  - Added detailed validation for each weekday's fault count with sub-tests
+  - Added total fault count validation (expected ~78-84 faults for Mon/Wed/Fri in 6-month range)
+  - Improved test documentation with clear explanation of the fault calculation logic
+
+### Changes Made to Fix the Issue
+The core issue was that the old fixture created log entries on specific weekdays and expected those entries to be counted as faults. However, the correct logic (after RDL-140 SQL fix) is that **faults = days WITHOUT reading activity**, not log entries. The new fixture correctly:
+1. Creates logs on specific weekdays (Sun, Tue, Thu, Sat) → NOT faults
+2. Does NOT create logs on other weekdays (Mon, Wed, Fri) → These become faults
+3. The SQL query's CTE with `generate_series` correctly identifies days without logs as faults
+
+### Testing
+- **TestDashboardWeekdayFaults_Integration**: PASS (all 7 sub-tests pass)
+  - weekday_0 (Sunday): 0 faults ✓
+  - weekday_1 (Monday): ~26 faults ✓
+  - weekday_2 (Tuesday): 0 faults ✓
+  - weekday_3 (Wednesday): ~27 faults ✓
+  - weekday_4 (Thursday): 0 faults ✓
+  - weekday_5 (Friday): ~26 faults ✓
+  - weekday_6 (Saturday): 0 faults ✓
+- **All dashboard integration tests**: PASS
+- **All unit tests**: PASS
+- **go fmt**: PASS (no formatting issues)
+- **go vet**: PASS (no static analysis issues)
+- **No regressions** introduced in existing tests
+
+### Verification
+The test now correctly validates that:
+1. HTTP handler returns 200 OK
+2. Response contains valid radar chart with 7 data points (one per weekday)
+3. Fault counts match expected distribution (0 for weekdays with logs, ~26-27 for weekdays without logs)
+4. Total fault count is within expected range (75-85)
+
+### Definition of Done Checklist
+- [x] All unit tests pass
+- [x] All integration tests pass execution and verification
+- [x] `go fmt` and `go vet` pass with no errors
+- [x] Clean Architecture layers properly followed (test layer only)
+- [x] Error responses consistent with existing patterns
+- [x] HTTP status codes correct for response type
+- [x] Documentation updated (inline comments in code)
+- [x] New code paths include error path tests
+- [x] HTTP handlers test both success and error responses
+- [x] Integration tests verify actual database interactions
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
