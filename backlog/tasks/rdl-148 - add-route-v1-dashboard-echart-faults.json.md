@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 19:29'
-updated_date: '2026-05-01 19:36'
+updated_date: '2026-05-01 19:37'
 labels: []
 dependencies: []
 ---
@@ -150,6 +150,31 @@ if w.Code != http.StatusOK {
 - [ ] Error responses consistent with existing patterns
 - [ ] HTTP status codes correct (200 OK, 500 Internal Server Error)
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress
+
+### Step 1: Research Complete ✅
+- Verified `DashboardHandler.Faults()` method is implemented in `internal/api/v1/handlers/dashboard_handler.go`
+- Verified `FaultsService` exists in `internal/service/dashboard/faults_service.go`
+- Confirmed route `/v1/dashboard/echart/faults.json` is NOT registered in `routes.go`
+- Dashboard endpoints section only has:
+  - `/v1/dashboard/day.json`
+  - `/v1/dashboard/projects.json`
+- Missing all ECharts endpoints including the faults endpoint
+
+### Step 2: Implementation Plan
+- Add route registration in `routes.go` following existing pattern
+- Add route verification test in `routes_test.go`
+- Run tests to verify implementation
+
+### Next Steps
+1. Add route: `r.HandleFunc("/v1/dashboard/echart/faults.json", dashboardHandler.Faults).Methods("GET")`
+2. Add test case to verify route responds correctly
+3. Run `go test ./internal/api/v1/...` to verify
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
