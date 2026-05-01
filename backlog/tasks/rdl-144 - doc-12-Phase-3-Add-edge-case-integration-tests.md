@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:08'
-updated_date: '2026-05-01 18:07'
+updated_date: '2026-05-01 18:08'
 labels:
   - bugfix
   - testing
@@ -256,6 +256,73 @@ func TestDashboardFaults_<Scenario>_Integration(t *testing.T) {
 - ✅ Zero pages read (end_page = start_page)
 - ✅ Weekday faults edge cases (empty database, single log entry)
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Added comprehensive edge case integration tests for dashboard fault calculation logic to ensure robust testing of boundary conditions and error scenarios.
+
+## What Was Done
+
+### New Integration Tests Added (4 tests, 14 test cases total)
+
+1. **TestDashboardFaults_YearBoundary_Integration**
+   - Tests date ranges spanning year boundaries (Dec 30 to Jan 2, Dec 31 to Jan 1)
+   - Validates correct fault counting across year transitions
+   - Includes repository-level and HTTP endpoint tests
+
+2. **TestDashboardFaults_ZeroPagesRead_Integration**
+   - Tests scenarios where end_page equals start_page (zero pages read)
+   - Validates that days with zero pages are correctly counted as faults
+   - Tests single log, multiple logs, and mixed scenarios
+
+3. **TestDashboardWeekdayFaults_EmptyDatabase_Integration**
+   - Tests weekday faults calculation with empty database
+   - Verifies all 7 weekdays have faults distributed evenly (~26-27 each)
+   - Includes repository and HTTP endpoint validation
+
+4. **TestDashboardWeekdayFaults_SingleLogEntry_Integration**
+   - Tests weekday faults with a single log entry on specific weekday
+   - Verifies single log affects fault distribution correctly
+   - Includes repository and HTTP endpoint validation
+
+### Files Modified
+
+- `test/dashboard_integration_test.go` - Added 4 new integration test functions with comprehensive test cases
+
+## Key Changes
+
+- All new tests follow Clean Architecture patterns
+- Tests use real database interactions (not mocks)
+- Both repository-level and HTTP endpoint tests included
+- Proper test isolation with cleanup between tests
+- Consistent naming conventions (`<Endpoint>_<Scenario>_Integration`)
+
+## Testing
+
+- All unit tests pass ✅
+- All integration tests pass ✅
+- `go fmt` passes ✅
+- `go vet` passes ✅
+- Build succeeds ✅
+
+## Notes
+
+- NULL values test was not implemented because the logs table has NOT NULL constraints on start_page/end_page columns
+- NULL handling is covered in existing unit tests (dashboard_repository_test.go)
+- Zero pages read scenario covers the practical equivalent of NULL handling
+
+## Edge Cases Now Covered
+
+- ✅ Empty database (all days faults)
+- ✅ Single log entry (one day with reading, rest faults)
+- ✅ Month boundary dates (cross month ranges)
+- ✅ Year boundary dates (Dec 31 to Jan 1 transitions)
+- ✅ Zero pages read (end_page = start_page)
+- ✅ Weekday faults edge cases (empty database, single log entry)
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
