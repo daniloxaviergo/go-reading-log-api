@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:08'
-updated_date: '2026-05-01 17:31'
+updated_date: '2026-05-01 17:34'
 labels:
   - bugfix
   - testing
@@ -263,6 +263,31 @@ The integration test needs to:
 - [ ] HTTP handlers test both success and error responses
 - [ ] Integration tests verify actual database interactions
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - RDL-143
+
+### Understanding the Task
+- **Goal**: Fix `TestDashboardWeekdayFaults_Integration` by updating test data setup
+- **Problem**: Current `ScenarioFaultsByWeekday()` creates log entries that are incorrectly interpreted as faults
+- **Solution**: Rewrite fixture to create proper fault scenarios where specific weekdays have NO reading activity
+
+### Key Understanding
+- A "fault" = a day where `sum(read_pages) = 0` (no logs or logs with zero pages)
+- The SQL query uses CTE with `generate_series` to create all dates, then LEFT JOINs to find days without reading
+- Weekday mapping: 0=Sunday, 1=Monday, ..., 6=Saturday
+
+### Implementation Steps
+1. ✅ Review task details and acceptance criteria
+2. ✅ Examine current test implementation and fixture
+3. ✅ Understand SQL query logic in `GetWeekdayFaults`
+4. 🔄 Update `ScenarioFaultsByWeekday()` fixture to create proper fault scenarios
+5. ⏳ Update integration test with expected values
+6. ⏳ Run tests and verify
+7. ⏳ Check acceptance criteria
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
