@@ -1,7 +1,7 @@
 ---
 id: RDL-136
 title: Fix integration test
-status: To Do
+status: Done
 assignee:
   - Thomas
 created_date: '2026-05-01 11:54'
