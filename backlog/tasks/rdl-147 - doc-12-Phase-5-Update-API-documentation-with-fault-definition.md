@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:08'
-updated_date: '2026-05-01 19:00'
+updated_date: '2026-05-01 19:05'
 labels:
   - documentation
   - phase-5
@@ -245,16 +245,43 @@ This task involves updating the API documentation to clarify the fault definitio
   1. New "Dashboard Endpoints" section after "Logs Endpoints"
   2. New "Fault Metrics" subsection under "Calculated Fields"
 
-**Phase 2: Documentation Updates** 🔄 In Progress
-- Adding Dashboard Endpoints section with faults endpoint documentation
-- Adding Fault Metrics subsection with clear definition and examples
-- Including visual tables and edge case documentation
+**Phase 2: Documentation Updates** ✅ Completed
+- ✅ Added "Dashboard Endpoints" section with:
+  - Health check endpoint documentation
+  - Daily Statistics endpoint (`/v1/dashboard/day.json`)
+  - Faults endpoint (`/v1/dashboard/echart/faults.json`)
+  - Weekday Faults endpoint (`/v1/dashboard/echart/faults_week_day.json`)
+  - Speculate vs Actual endpoint (`/v1/dashboard/echart/speculate_actual.json`)
+  - Mean Progress endpoint (`/v1/dashboard/echart/mean_progress.json`)
+  - Yearly Total endpoint (`/v1/dashboard/echart/last_year_total.json`)
+  - Dashboard Projects endpoint (`/v1/dashboard/projects.json`)
+  - Projects With Logs endpoint (`/v1/dashboard/projects_with_logs.json`)
+  - Last Days Trend endpoint (`/v1/dashboard/last_days.json`)
+  
+- ✅ Added "Fault Metrics" subsection with:
+  - Clear fault definition (day with zero pages read)
+  - Calculation formula and examples
+  - Visual table showing 10-day period example
+  - SQL query pattern with detailed breakdown
+  - Weekday faults documentation
+  - All 6 edge cases documented:
+    1. Empty Database
+    2. Single-Day Range
+    3. NULL Values in Logs
+    4. Logs with Zero Pages
+    5. All Days Have Reading
+    6. Date Range Boundaries
+  - Rails parity documentation
+
+**Phase 3: Validation** 🔄 In Progress
+- Running tests to verify no regressions
+- Verifying documentation accuracy
 
 **Next Steps:**
-1. Complete QWEN.md documentation updates
-2. Verify SQL queries match implementation
-3. Run tests to ensure no regressions
-4. Self-review for clarity and completeness
+1. Run tests (unit and integration)
+2. Run go fmt and go vet
+3. Self-review for clarity and completeness
+4. Mark task as Done
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
