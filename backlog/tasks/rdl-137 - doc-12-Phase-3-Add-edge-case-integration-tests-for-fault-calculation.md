@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 14:59'
-updated_date: '2026-05-01 15:18'
+updated_date: '2026-05-01 15:20'
 labels:
   - bugfix
   - testing
@@ -274,6 +274,38 @@ go test -v ./test/... -run TestDashboardFaults
 // Expected Faults: 7 (days without reading)
 ```
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress
+
+### Task Analysis
+- Reviewed task RDL-137: Add edge case integration tests for fault calculation
+- Reviewed existing test infrastructure in `test/dashboard_integration_test.go`
+- Reviewed repository implementation in `internal/adapter/postgres/dashboard_repository.go`
+- Reviewed test fixtures in `test/fixtures/dashboard/`
+
+### Implementation Plan
+Need to add 3 new integration test functions to `test/dashboard_integration_test.go`:
+
+1. **TestDashboardFaults_EmptyDatabase_Integration**: Tests when database has no logs (all days in range are faults)
+2. **TestDashboardFaults_SingleLogEntry_Integration**: Tests single log entry scenario (one day with reading, rest are faults)
+3. **TestDashboardFaults_MonthBoundary_Integration**: Tests date ranges spanning month boundaries
+
+### Current Status
+- [ ] TestDashboardFaults_EmptyDatabase_Integration - Not started
+- [ ] TestDashboardFaults_SingleLogEntry_Integration - Not started
+- [ ] TestDashboardFaults_MonthBoundary_Integration - Not started
+- [ ] Run tests and verify all pass
+- [ ] Check acceptance criteria
+- [ ] Mark task as Done
+
+### Notes
+- The existing `GetFaultsByDateRange` query counts logs, not days with zero pages (per PRD doc-012)
+- These tests will validate the CORRECT behavior as defined in the PRD
+- Tests will use real database interactions via `SetupTestDB()`
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
