@@ -1,0 +1,12 @@
+# Dashboard Configuration
+# This file contains default settings for the reading log dashboard.
+# Values can be overridden by placing a custom dashboard.yaml in the config directory.
+
+# Maximum faults before alert (matches Rails default)
+max_faults: 10
+
+# Prediction percentage for speculative calculations (0.15 = 15%)
+prediction_pct: 0.15
+
+# Default pages per day target
+pages_per_day: 25.0

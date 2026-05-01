@@ -6,21 +6,45 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"go-reading-log-api-next/internal/api/v1/middleware"
+	"go-reading-log-api-next/internal/domain/dto"
 	"go-reading-log-api-next/internal/domain/models"
 	"go-reading-log-api-next/internal/repository"
+	"go-reading-log-api-next/internal/service"
+	"go-reading-log-api-next/internal/service/dashboard"
 )
+
+// MockProjectsService is a mock implementation of ProjectsServiceInterface
+type MockProjectsService struct{}
+
+func (m *MockProjectsService) GetRunningProjectsWithLogs(ctx context.Context) ([]*dashboard.ProjectWithLogs, error) {
+	return []*dashboard.ProjectWithLogs{}, nil
+}
+
+func (m *MockProjectsService) CalculateStats(ctx context.Context) (*dto.StatsData, error) {
+	return dto.NewStatsData(), nil
+}
+
+func (m *MockProjectsService) GetDashboardProjects(ctx context.Context) (*dto.DashboardProjectsResponse, error) {
+	return dto.NewDashboardProjectsResponse(), nil
+}
+
+var _ dashboard.ProjectsServiceInterface = (*MockProjectsService)(nil)
 
 // TestSetupRoutes tests the SetupRoutes function
 func TestSetupRoutes(t *testing.T) {
 	// Create mock repositories
 	projectRepo := &MockProjectRepository{}
 	logRepo := &MockLogRepository{}
+	dashboardRepo := &MockDashboardRepository{}
+	userConfig := service.NewUserConfigService(service.GetDefaultConfig())
+	projectsService := &MockProjectsService{}
 
 	// Setup routes
-	handler := SetupRoutes(projectRepo, logRepo)
+	handler := SetupRoutes(projectRepo, logRepo, dashboardRepo, userConfig, dashboard.ProjectsServiceInterface(projectsService))
 
 	if handler == nil {
 		t.Fatal("Expected non-nil handler, got nil")
@@ -41,8 +65,11 @@ func TestSetupRoutes(t *testing.T) {
 func TestSetupRoutes_Routes(t *testing.T) {
 	projectRepo := &MockProjectRepository{}
 	logRepo := &MockLogRepository{}
+	dashboardRepo := &MockDashboardRepository{}
+	userConfig := service.NewUserConfigService(service.GetDefaultConfig())
+	projectsService := &MockProjectsService{}
 
-	handler := SetupRoutes(projectRepo, logRepo)
+	handler := SetupRoutes(projectRepo, logRepo, dashboardRepo, userConfig, dashboard.ProjectsServiceInterface(projectsService))
 
 	// Test healthz endpoint
 	req := httptest.NewRequest(http.MethodGet, "/healthz", nil)
@@ -79,8 +106,11 @@ func TestSetupRoutes_Routes(t *testing.T) {
 func TestSetupRoutes_MiddlewareChain(t *testing.T) {
 	projectRepo := &MockProjectRepository{}
 	logRepo := &MockLogRepository{}
+	dashboardRepo := &MockDashboardRepository{}
+	userConfig := service.NewUserConfigService(service.GetDefaultConfig())
+	projectsService := &MockProjectsService{}
 
-	handler := SetupRoutes(projectRepo, logRepo)
+	handler := SetupRoutes(projectRepo, logRepo, dashboardRepo, userConfig, dashboard.ProjectsServiceInterface(projectsService))
 
 	// Wrap with middleware chain
 	middlewareChain := middleware.Chain(handler,
@@ -180,4 +210,71 @@ func (m *MockLogRepository) Create(ctx context.Context, log *models.Log) (*model
 	m.Logs[log.ID] = log
 
 	return log, nil
+}
+
+// MockDashboardRepository is a mock implementation of repository.DashboardRepository
+type MockDashboardRepository struct{}
+
+func (m *MockDashboardRepository) GetPool() repository.PoolInterface {
+	return nil
+}
+
+func (m *MockDashboardRepository) GetDailyStats(ctx context.Context, date time.Time) (*dto.DailyStats, error) {
+	return dto.NewDailyStats(0, 0), nil
+}
+
+func (m *MockDashboardRepository) GetProjectAggregates(ctx context.Context) ([]*dto.ProjectAggregate, error) {
+	return []*dto.ProjectAggregate{}, nil
+}
+
+func (m *MockDashboardRepository) GetFaultsByDateRange(ctx context.Context, start, end time.Time) (*dto.FaultStats, error) {
+	return &dto.FaultStats{FaultCount: 0}, nil
+}
+
+func (m *MockDashboardRepository) GetWeekdayFaults(ctx context.Context, start, end time.Time) (*dto.WeekdayFaults, error) {
+	return dto.NewWeekdayFaults(make(map[int]int)), nil
+}
+
+func (m *MockDashboardRepository) GetLogsByDateRange(ctx context.Context, start, end time.Time) ([]*dto.LogEntry, error) {
+	return []*dto.LogEntry{}, nil
+}
+
+func (m *MockDashboardRepository) GetProjectWeekdayMean(ctx context.Context, projectID int64, weekday int) (float64, error) {
+	return 0.0, nil
+}
+
+func (m *MockDashboardRepository) CalculatePeriodPages(ctx context.Context, start, end time.Time) (int, error) {
+	return 0, nil
+}
+
+func (m *MockDashboardRepository) GetProjectsWithLogs(ctx context.Context) ([]*dto.ProjectAggregateResponse, error) {
+	return []*dto.ProjectAggregateResponse{}, nil
+}
+
+func (m *MockDashboardRepository) GetProjectLogs(ctx context.Context, projectID int64, limit int) ([]*dto.LogEntry, error) {
+	return []*dto.LogEntry{}, nil
+}
+
+func (m *MockDashboardRepository) GetMaxByWeekday(ctx context.Context, date time.Time) (*float64, error) {
+	return nil, nil
+}
+
+func (m *MockDashboardRepository) GetOverallMean(ctx context.Context, date time.Time) (*float64, error) {
+	return nil, nil
+}
+
+func (m *MockDashboardRepository) GetPreviousPeriodMean(ctx context.Context, date time.Time) (*float64, error) {
+	return nil, nil
+}
+
+func (m *MockDashboardRepository) GetPreviousPeriodSpecMean(ctx context.Context, date time.Time) (*float64, error) {
+	return nil, nil
+}
+
+func (m *MockDashboardRepository) GetMeanByWeekday(ctx context.Context, weekday int) (*float64, error) {
+	return nil, nil
+}
+
+func (m *MockDashboardRepository) GetRunningProjectsWithLogs(ctx context.Context) ([]*dto.ProjectWithLogs, error) {
+	return nil, nil
 }

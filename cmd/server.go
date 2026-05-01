@@ -14,6 +14,8 @@ import (
 	"go-reading-log-api-next/internal/api/v1/middleware"
 	"go-reading-log-api-next/internal/config"
 	"go-reading-log-api-next/internal/logger"
+	"go-reading-log-api-next/internal/service"
+	"go-reading-log-api-next/internal/service/dashboard"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -61,9 +63,20 @@ func main() {
 	// Create repository instances with the connection pool
 	projectRepo := postgres.NewProjectRepositoryImpl(dbPool)
 	logRepo := postgres.NewLogRepositoryImpl(dbPool)
+	dashboardRepo := postgres.NewDashboardRepositoryImpl(dbPool)
 
-	// Setup routes with repositories
-	router := api.SetupRoutes(projectRepo, logRepo)
+	// Create user config service for dashboard (loads from YAML or uses defaults)
+	userConfigService, err := service.LoadDashboardConfig("dashboard_config.yaml")
+	if err != nil {
+		log.Warn("Failed to load dashboard config", "error", err)
+		// Continue with defaults - not a critical error
+	}
+
+	// Create projects service for dashboard
+	projectsService := dashboard.NewProjectsService(dashboardRepo, dashboard.PgxPoolInterface(dbPool))
+
+	// Setup routes with repositories and services
+	router := api.SetupRoutes(projectRepo, logRepo, dashboardRepo, userConfigService, projectsService)
 
 	// Create middleware chain: Recovery -> CORS -> RequestID -> Timezone -> Logging -> Handler
 	middlewareChain := middleware.Chain(router,

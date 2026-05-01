@@ -60,6 +60,11 @@ help:
 	@echo "  make test-verbose      Run tests with verbose output"
 	@echo "  make test-coverage     Run tests and generate coverage report"
 	@echo "  make test-clean        Clean up orphaned test databases"
+	@echo "  make compare-responses Run Rails API comparison tests"
+	@echo ""
+	@echo "$(GREEN)Benchmark Commands:$(NC)"
+	@echo "  make benchmark-parallel  Run parallel performance benchmarks"
+	@echo "  make benchmark-large-scale Run large-scale benchmarks (10,000+ logs)"
 	@echo ""
 	@echo "$(GREEN)Examples:$(NC)"
 	@echo "  make run              # Start the server on :3000"
@@ -103,20 +108,20 @@ build:
 test:
 	@echo "$(BLUE)Running all tests...$(NC)"
 	@echo "$(BLUE)Loading test configuration from .env.test...$(NC)"
-	@export $$(xargs < .env.test | grep -v '^#' | xargs) && $(GO_TEST) $(TEST_PKG)
+	@export $$(xargs < .env.test | grep -v '^#' | xargs) && $(GO_TEST) -timeout=5m $(TEST_PKG)
 	@echo "$(GREEN)All tests passed!$(NC)"
 
 # Run tests with verbose output
 test-verbose:
 	@echo "$(BLUE)Running tests with verbose output...$(NC)"
 	@echo "$(BLUE)Loading test configuration from .env.test...$(NC)"
-	@export $$(xargs < .env.test | grep -v '^#' | xargs) && $(GO_TEST) -v $(TEST_PKG)
+	@export $$(xargs < .env.test | grep -v '^#' | xargs) && $(GO_TEST) -v -timeout=5m $(TEST_PKG)
 
 # Run tests with coverage report
 test-coverage:
 	@echo "$(BLUE)Running tests with coverage...$(NC)"
 	@echo "$(BLUE)Loading test configuration from .env.test...$(NC)"
-	@export $$(xargs < .env.test | grep -v '^#' | xargs) && $(GO_TEST) -coverprofile=$(COVERAGE_FILE) $(TEST_PKG)
+	@export $$(xargs < .env.test | grep -v '^#' | xargs) && $(GO_TEST) -coverprofile=$(COVERAGE_FILE) -timeout=5m $(TEST_PKG)
 	@echo "$(GREEN)Coverage report generated: $(COVERAGE_FILE)$(NC)"
 	$(GO) tool cover -func=$(COVERAGE_FILE)
 
@@ -137,6 +142,29 @@ benchmark-parallel:
 		$(GO) test -bench=BenchmarkParallel -benchmem -count=3 $(TEST_PKG)/performance
 	@echo "$(GREEN)Benchmark complete$(NC)"
 	@echo "$(YELLOW)Run 'go tool pprof -http=:8080 profile.out' to analyze results$(NC)"
+
+# Run large-scale performance benchmarks (10,000+ logs)
+benchmark-large-scale:
+	@echo "$(BLUE)========================================$(NC)"
+	@echo "$(BLUE)  Running Large-Scale Performance Benchmarks$(NC)"
+	@echo "$(BLUE)  Dataset: 100 projects, 10,000+ logs$(NC)"
+	@echo "$(BLUE)  Threshold: P95 < 500ms$(NC)"
+	@echo "$(BLUE)========================================$(NC)"
+	@export $$(xargs < .env.test | grep -v '^#' | xargs) && \
+		$(GO) test -bench=BenchmarkLargeScale -benchmem -count=3 $(TEST_PKG)/performance
+	@echo "$(GREEN)Large-scale benchmark complete$(NC)"
+	@echo "$(YELLOW)Results documented in: docs/performance/large-scale-benchmarks.md$(NC)"
+
+# Run Rails API comparison tests
+compare-responses:
+	@echo "$(BLUE)========================================$(NC)"
+	@echo "$(BLUE)  Running Rails API Comparison Tests$(NC)"
+	@echo "$(BLUE)========================================$(NC)"
+	@echo "$(YELLOW)Note: RAILS_API_URL must be set (e.g., http://localhost:3001)$(NC)"
+	@echo "$(YELLOW)Make sure Rails API is running on port 3001$(NC)"
+	@echo ""
+	@export $$(xargs < .env.test | grep -v '^#' | xargs) && \
+		$(GO) test -v ./test/integration/... -run ".*Comparison.*"
 
 # Alias for test-clean (convenience)
 test-cleanup: test-clean
