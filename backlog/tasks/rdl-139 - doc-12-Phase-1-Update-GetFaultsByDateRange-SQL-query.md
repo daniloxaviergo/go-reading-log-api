@@ -3,7 +3,7 @@ id: RDL-139
 title: '[doc-12 Phase 1] Update GetFaultsByDateRange SQL query'
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-05-01 15:07'
 updated_date: '2026-05-01 16:22'
 labels:
