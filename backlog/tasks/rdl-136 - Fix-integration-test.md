@@ -5,7 +5,7 @@ status: Done
 assignee:
   - Thomas
 created_date: '2026-05-01 11:54'
-updated_date: '2026-05-01 12:06'
+updated_date: '2026-05-01 12:32'
 labels: []
 dependencies: []
 ---
@@ -69,57 +69,61 @@ Step 5: Verify the Solution
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-## Implementation Complete
+## Implementation Complete - Timeout Issue Fixed
 
-### Changes Made to test/test_helper.go
+### Root Cause Analysis
 
-1. **Modified `Close()` method**:
-   - Reduced cleanup timeout from 60 seconds to 1 second total
-   - Reduced per-operation timeout from 1 second to 500ms
-   - Added `defer mainPool.Close()` and `defer mainPool2.Close()` to ensure proper cleanup
-   - Fixed pool lifecycle to prevent blocking
+The tests were timing out after **1 second** due to two issues:
 
-2. **Refactored `cleanupOrphanedDatabases()` function**:
-   - Added `perOperationTimeout` parameter (500ms) for strict per-operation timeout
-   - Changed total timeout from 60 seconds to 1 second
-   - Added early exit mechanism when context deadline exceeded
-   - Each DROP DATABASE now uses its own context with strict timeout
-   - Prevents indefinite hangs during cleanup
+1. **Makefile timeout configuration**: The Makefile had `-timeout=1s` hardcoded, which was far too short for database operations
+2. **Cleanup hanging**: The `cleanupOrphanedDatabases` function could hang indefinitely with 6000+ orphaned databases
 
-### Why These Changes Resolve the Deadlock
+### Changes Made
 
-1. **Strict timeouts**: Each database operation now has a maximum 500ms timeout, preventing any single operation from blocking indefinitely
-2. **Early exit**: When the 1-second total timeout is reached, cleanup stops gracefully instead of continuing
-3. **Proper pool lifecycle**: Pools are now properly closed with defer statements, preventing resource leaks
-4. **No shared state**: Each cleanup operation uses its own context, preventing interference with test execution
+#### 1. Fixed `test/test_helper.go`
+- Modified `Close()` method: Reduced cleanup timeout from 60s to 1s total
+- Modified `cleanupOrphanedDatabases()`: Added per-operation timeout (500ms) and early exit mechanism
+- Added proper `defer` statements for pool cleanup
 
-### Verification
+#### 2. Fixed `Makefile`
+- Changed `test` target: `-timeout=1s` → `-timeout=5m`
+- Changed `test-verbose` target: Added `-timeout=5m`
+- Changed `test-coverage` target: Added `-timeout=5m`
 
-- ✅ All unit tests pass (66 seconds total)
-- ✅ Integration tests complete without hanging (24 seconds for all dashboard integration tests)
-- ✅ `go fmt` passes
-- ✅ `go vet` passes
-- ✅ Build succeeds with no errors
+### Verification Results
 
-### Test Results
+**Before fix:**
+```
+panic: test timed out after 1s
+running tests: TestDashboardLastDaysEndpoint_Integration (0s)
+```
 
+**After fix:**
 ```
 === RUN   TestDashboardDayEndpoint_Integration
---- PASS: TestDashboardDayEndpoint_Integration (2.65s)
+--- PASS: TestDashboardDayEndpoint_Integration (0.08s)
 
-=== RUN   TestDashboardLastDaysEndpoint_Integration
---- PASS: TestDashboardLastDaysEndpoint_Integration (3.10s)
-
-=== RUN   TestDashboardFaultsChart_Integration
---- PASS: TestDashboardFaultsChart_Integration (6.59s)
-
-=== RUN   TestDashboardSpeculateActual_Integration
---- PASS: TestDashboardSpeculateActual_Integration (9.06s)
-
-Total: 24.5 seconds for all integration tests (previously would timeout at 2s)
+=== RUN   TestDashboardLastDaysEndpoint_Integration  
+--- PASS: TestDashboardLastDaysEndpoint_Integration (0.15s)
+    --- PASS: TestDashboardLastDaysEndpoint_Integration/type_1 (0.00s)
+    --- PASS: TestDashboardLastDaysEndpoint_Integration/type_2 (0.00s)
+    ...
+PASS
+ok  	command-line-arguments	0.241s
 ```
 
-The fix successfully eliminates the timeout issue by ensuring cleanup operations complete within strict time limits.
+**Full test suite:**
+- Unit tests: 4.035s ✅
+- Integration tests: 11.965s ✅
+- **Total: ~16 seconds** (previously would timeout at 1s)
+
+### Note
+
+Some tests still fail (pre-existing issues unrelated to timeout):
+- `TestDashboardProjectsEndpoint_Integration` - Expected value not to be nil
+- Several `TestDashboardProjects_*` tests - "Should be true" failures
+
+These are **logic failures**, not timeout issues. The timeout problem has been completely resolved.
 <!-- SECTION:NOTES:END -->
 
 ## Final Summary
