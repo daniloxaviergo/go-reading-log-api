@@ -2,8 +2,10 @@
 id: RDL-142
 title: '[doc-12 Phase 2] Rewrite TestGetWeekdayFaults unit tests'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-05-01 15:07'
+updated_date: '2026-05-01 17:07'
 labels:
   - bugfix
   - testing
