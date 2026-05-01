@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:02'
-updated_date: '2026-05-01 15:39'
+updated_date: '2026-05-01 15:42'
 labels:
   - bugfix
   - testing
@@ -227,6 +227,59 @@ t.Run("No reading activity", func(t *testing.T) {
 - [ ] Run full test suite to ensure no regressions
 - [ ] Update task description with test results
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress
+
+### Status: In Progress
+
+**Date:** 2026-05-01
+
+**Current State:**
+- Reviewed task requirements and acceptance criteria
+- Identified prerequisite RDL-139 is NOT completed (SQL query still counts logs instead of zero-page days)
+- Current `GetFaultsByDateRange` implementation counts log entries, not days with zero pages
+
+### Implementation Plan
+
+**Phase 1: Test Fixture Update (In Progress)**
+- [x] Analyze current test structure and fixtures
+- [ ] Add `ScenarioFaultsChartCorrect()` to `test/fixtures/dashboard/scenarios.go`
+- [ ] Create 30-day period with explicit reading days vs fault days
+- [ ] Document expected fault count (15 faults = 50% of 30 days)
+
+**Phase 2: Integration Test Update (Pending)**
+- [ ] Update `TestDashboardFaultsChart_Integration` to use new scenario
+- [ ] Add fault count assertion
+- [ ] Add percentage calculation assertion
+- [ ] Document expected behavior after RDL-139 fix
+
+**Phase 3: Testing (Pending)**
+- [ ] Run integration tests
+- [ ] Verify test structure is correct
+- [ ] Document current vs expected behavior
+
+### Key Findings
+
+1. **Prerequisite Issue:** RDL-139 SQL query fix is required for tests to validate correct fault counts
+2. **Current Behavior:** Repository counts log entries (16 logs in `ScenarioFaultsByWeekday()`)
+3. **Expected Behavior:** Repository should count days with zero pages (15 faults in 30-day period)
+4. **Test Impact:** Test assertions will need to reflect the correct behavior after RDL-139 is merged
+
+### Next Steps
+
+1. Create `ScenarioFaultsChartCorrect()` fixture with explicit reading/fault day distribution
+2. Update integration test to use new scenario
+3. Add assertions for fault count and percentage
+4. Run tests to verify structure (expectations will differ until RDL-139 is completed)
+
+### Blockers
+
+- **RDL-139 must be completed first:** The SQL query fix is a prerequisite for correct test validation
+- Test will document expected behavior but cannot fully validate until repository is fixed
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
