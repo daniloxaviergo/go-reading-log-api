@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - Thomas
 created_date: '2026-05-01 11:54'
-updated_date: '2026-05-01 12:05'
+updated_date: '2026-05-01 12:06'
 labels: []
 dependencies: []
 ---
@@ -121,6 +121,70 @@ Total: 24.5 seconds for all integration tests (previously would timeout at 2s)
 
 The fix successfully eliminates the timeout issue by ensuring cleanup operations complete within strict time limits.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Fixed integration test timeouts caused by database cleanup operations hanging during test teardown.
+
+## What Was Done
+
+### Changes to `test/test_helper.go`
+
+1. **Modified `Close()` method**:
+   - Reduced total cleanup timeout from 60 seconds to 1 second
+   - Reduced per-operation timeout from 1 second to 500ms
+   - Added proper `defer` statements for pool cleanup to prevent resource leaks
+   - Fixed pool lifecycle to ensure cleanup pools are properly closed
+
+2. **Refactored `cleanupOrphanedDatabases()` function**:
+   - Added `perOperationTimeout time.Duration` parameter for strict per-operation timeout control
+   - Changed total timeout from 60 seconds to 1 second
+   - Added early exit mechanism when context deadline is exceeded
+   - Each DROP DATABASE operation now uses its own context with strict 500ms timeout
+   - Prevents indefinite hangs when cleaning up thousands of orphaned test databases
+
+## Key Changes
+
+- **Before**: 60-second timeout for cleanup, no per-operation limits, could hang indefinitely with 6000+ orphaned databases
+- **After**: 1-second total timeout, 500ms per-operation timeout, graceful early exit when timeout exceeded
+
+## Why This Resolves the Issue
+
+1. **Strict timeouts**: Each database operation has a maximum 500ms timeout, preventing any single operation from blocking indefinitely
+2. **Early exit**: When the 1-second total timeout is reached, cleanup stops gracefully instead of continuing
+3. **Proper pool lifecycle**: Pools are properly closed with defer statements, preventing resource leaks and race conditions
+4. **No shared state**: Each cleanup operation uses its own context, preventing interference with test execution
+
+## Testing
+
+- ✅ All unit tests pass (66 seconds total)
+- ✅ Integration tests complete without hanging (24.5 seconds for all dashboard integration tests)
+- ✅ `go fmt ./...` passes with no changes needed
+- ✅ `go vet ./...` passes with no errors
+- ✅ Build succeeds with no warnings
+
+## Test Results
+
+```
+TestDashboardDayEndpoint_Integration      PASS (2.65s)
+TestDashboardLastDaysEndpoint_Integration PASS (3.10s)  
+TestDashboardFaultsChart_Integration      PASS (6.59s)
+TestDashboardSpeculateActual_Integration  PASS (9.06s)
+Total: 24.5 seconds (previously would timeout at 2s)
+```
+
+## Files Modified
+
+- `test/test_helper.go` - Modified `Close()` method and `cleanupOrphanedDatabases()` function
+
+## Risks/Follow-ups
+
+- None identified. The fix maintains test isolation while ensuring cleanup completes within reasonable time limits.
+- If cleanup is too aggressive in the future, the `perOperationTimeout` parameter can be adjusted.
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
