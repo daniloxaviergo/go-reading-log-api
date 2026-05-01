@@ -1,11 +1,11 @@
 ---
 id: RDL-146
 title: '[doc-12 Phase 5] Create faults calculation documentation'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-05-01 15:08'
-updated_date: '2026-05-01 18:52'
+updated_date: '2026-05-01 18:53'
 labels:
   - documentation
   - phase-5
