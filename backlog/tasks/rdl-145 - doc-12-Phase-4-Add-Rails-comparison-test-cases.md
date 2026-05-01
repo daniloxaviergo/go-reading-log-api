@@ -1,7 +1,7 @@
 ---
 id: RDL-145
 title: '[doc-12 Phase 4] Add Rails comparison test cases'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-05-01 15:08'
