@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:08'
-updated_date: '2026-05-01 18:45'
+updated_date: '2026-05-01 18:51'
 labels:
   - documentation
   - phase-5
@@ -211,22 +211,29 @@ Since this is a documentation task, "testing" involves:
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-Starting implementation of faults calculation documentation.
+✅ Documentation created successfully!
 
-**Progress:**
-1. ✅ Read reference materials:
-   - `internal/adapter/postgres/dashboard_repository.go` - Current SQL implementation
-   - `test/faults_rails_comparison_test.go` - Test scenarios
-   - `test/fixtures/dashboard/scenarios.go` - Test fixture definitions
-   - `prd_view doc-012` - PRD with technical decisions
+**Completed:**
+1. ✅ Created `docs/faults-calculation-explanation.md` with comprehensive content:
+   - Overview and fault definition
+   - Complete SQL query breakdown with CTE explanations
+   - Visual examples with ASCII diagrams
+   - Edge cases documentation (NULL, single-day, empty database, leap year)
+   - Rails vs Go comparison
+   - Previous incorrect implementation explanation
+   - Quick reference section
 
-2. 🔄 Creating documentation structure for `docs/faults-calculation-explanation.md`
+**Documentation Structure:**
+- 8 main sections covering all aspects of fault calculation
+- 4 detailed visual examples with test scenarios
+- Complete SQL query breakdowns with inline explanations
+- Edge case coverage for all scenarios from PRD doc-012
+- Rails parity comparison with functional equivalence table
 
 **Next Steps:**
-- Create the documentation file with all required sections
-- Include SQL query breakdowns with CTE explanations
-- Add visual examples and diagrams
-- Document edge cases and Rails comparisons
+- Validate documentation accuracy against existing tests
+- Run tests to ensure no regressions
+- Complete final review and mark task as done
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
