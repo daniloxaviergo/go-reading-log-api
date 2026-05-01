@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - Thomas
 created_date: '2026-05-01 11:54'
-updated_date: '2026-05-01 11:59'
+updated_date: '2026-05-01 12:05'
 labels: []
 dependencies: []
 ---
@@ -69,21 +69,57 @@ Step 5: Verify the Solution
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-## Analysis Complete - Issues Identified
+## Implementation Complete
 
-### Root Causes of Integration Test Timeouts
+### Changes Made to test/test_helper.go
 
-1. **60-second timeout in cleanupOrphanedDatabases**: With 6000+ orphaned databases, sequential dropping can exceed the timeout
-2. **No per-operation timeout**: Each DROP DATABASE operation inherits the 60s timeout, but should have a much shorter timeout (500ms)
-3. **Pool lifecycle issues**: The Close() method creates new pools for cleanup while the original pool might still be in use
-4. **Blocking cleanup on test completion**: The deferred cleanup runs after pool.Close() but can still block if there are many orphaned databases
+1. **Modified `Close()` method**:
+   - Reduced cleanup timeout from 60 seconds to 1 second total
+   - Reduced per-operation timeout from 1 second to 500ms
+   - Added `defer mainPool.Close()` and `defer mainPool2.Close()` to ensure proper cleanup
+   - Fixed pool lifecycle to prevent blocking
 
-### Fix Strategy
+2. **Refactored `cleanupOrphanedDatabases()` function**:
+   - Added `perOperationTimeout` parameter (500ms) for strict per-operation timeout
+   - Changed total timeout from 60 seconds to 1 second
+   - Added early exit mechanism when context deadline exceeded
+   - Each DROP DATABASE now uses its own context with strict timeout
+   - Prevents indefinite hangs during cleanup
 
-1. **Reduce per-operation timeout**: Change from 60s to 500ms per DROP DATABASE operation
-2. **Add early exit mechanism**: Stop cleanup if it exceeds 1 second total
-3. **Fix pool lifecycle**: Ensure cleanup pools are properly closed and don't interfere with test execution
-4. **Add logging**: Track cleanup progress for debugging
+### Why These Changes Resolve the Deadlock
+
+1. **Strict timeouts**: Each database operation now has a maximum 500ms timeout, preventing any single operation from blocking indefinitely
+2. **Early exit**: When the 1-second total timeout is reached, cleanup stops gracefully instead of continuing
+3. **Proper pool lifecycle**: Pools are now properly closed with defer statements, preventing resource leaks
+4. **No shared state**: Each cleanup operation uses its own context, preventing interference with test execution
+
+### Verification
+
+- ✅ All unit tests pass (66 seconds total)
+- ✅ Integration tests complete without hanging (24 seconds for all dashboard integration tests)
+- ✅ `go fmt` passes
+- ✅ `go vet` passes
+- ✅ Build succeeds with no errors
+
+### Test Results
+
+```
+=== RUN   TestDashboardDayEndpoint_Integration
+--- PASS: TestDashboardDayEndpoint_Integration (2.65s)
+
+=== RUN   TestDashboardLastDaysEndpoint_Integration
+--- PASS: TestDashboardLastDaysEndpoint_Integration (3.10s)
+
+=== RUN   TestDashboardFaultsChart_Integration
+--- PASS: TestDashboardFaultsChart_Integration (6.59s)
+
+=== RUN   TestDashboardSpeculateActual_Integration
+--- PASS: TestDashboardSpeculateActual_Integration (9.06s)
+
+Total: 24.5 seconds for all integration tests (previously would timeout at 2s)
+```
+
+The fix successfully eliminates the timeout issue by ensuring cleanup operations complete within strict time limits.
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
