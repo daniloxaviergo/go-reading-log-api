@@ -415,5 +415,5 @@ All tests pass:
 - [ ] #7 Documentation updated in QWEN.md
 - [x] #8 New code paths include error path tests
 - [x] #9 HTTP handlers test both success and error responses
-- [ ] #10 Integration tests verify actual database interactions
+- [x] #10 Integration tests verify actual database interactions
 <!-- DOD:END -->
