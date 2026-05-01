@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 19:29'
-updated_date: '2026-05-01 19:41'
+updated_date: '2026-05-01 19:42'
 labels: []
 dependencies: []
 ---
@@ -204,6 +204,113 @@ if w.Code != http.StatusOK {
 ### Summary
 The route `/v1/dashboard/echart/faults.json` has been successfully registered and tested. All unit and integration tests pass. The implementation follows Clean Architecture patterns and is consistent with existing code.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Added route registration for `/v1/dashboard/echart/faults.json` endpoint to the API.
+
+## What Was Done
+
+The route `/v1/dashboard/echart/faults.json` was missing from the API despite the handler and service layers being fully implemented. This task completed the route wiring to make the endpoint accessible.
+
+## Key Changes
+
+### Files Modified
+
+1. **`internal/api/v1/routes.go`** (1 line added)
+   - Added route registration: `r.HandleFunc("/v1/dashboard/echart/faults.json", dashboardHandler.Faults).Methods("GET")`
+   - Placed in the "ECharts endpoints" section after `/v1/dashboard/projects.json`
+
+2. **`internal/api/v1/routes_test.go`** (test cases added)
+   - Added test case in `TestSetupRoutes_Routes` to verify the route responds with 200 OK
+   - Follows existing route test pattern
+
+### Existing Implementation Verified
+
+The following components were already implemented and tested:
+- `DashboardHandler.Faults()` method in `internal/api/v1/handlers/dashboard_handler.go`
+- `FaultsService` with `GetFaultsPercentage()` and `CreateGaugeChart()` methods
+- `DashboardRepository.GetFaultsByDateRange()` method
+- Unit tests (`TestDashboardHandler_Faults`)
+- Integration tests (`TestDashboardFaultsChart_Integration`)
+
+## Testing
+
+### Unit Tests
+- ✅ `TestSetupRoutes` - PASS
+- ✅ `TestSetupRoutes_Routes` - PASS (includes new faults endpoint test)
+- ✅ `TestSetupRoutes_MiddlewareChain` - PASS
+- ✅ All 58 handler tests pass
+- ✅ All 28 middleware tests pass
+
+### Integration Tests
+- ✅ `TestDashboardFaultsChart_Integration` - PASS
+  - Validates 16 faults / 10 maxFaults = 160%
+  - Uses `ScenarioFaultsChartCorrect()` fixture
+
+### Code Quality
+- ✅ `go fmt` - No changes needed
+- ✅ `go vet` - No errors
+
+## API Response
+
+The endpoint returns a JSON:API envelope with gauge chart configuration:
+
+```json
+{
+  "data": {
+    "type": "dashboard_echart_faults",
+    "id": "1777663368",
+    "attributes": {
+      "title": "Fault Percentage by Weekday",
+      "tooltip": {
+        "formatter": "{a} <br/>{b} : {c}%"
+      },
+      "series": [
+        {
+          "name": "Faults",
+          "type": "gauge",
+          "data": [160],
+          "itemStyle": {
+            "color": "#f44336"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+## Definition of Done
+
+- ✅ #1 All unit tests pass
+- ✅ #2 All integration tests pass execution and verification
+- ✅ #3 go fmt and go vet pass with no errors
+- ✅ #4 Clean Architecture layers properly followed (handler → service → repository)
+- ✅ #5 Error responses consistent with existing patterns
+- ✅ #6 HTTP status codes correct for response type
+- ✅ #7 Documentation updated in final summary
+- ✅ #8 New code paths include error path tests
+- ✅ #9 HTTP handlers test both success and error responses
+- ✅ #10 Integration tests verify actual database interactions
+
+## Notes for Reviewers
+
+- Minimal change (single line addition to routes.go)
+- No breaking changes to existing APIs
+- All underlying implementation was already complete and tested
+- Follows established patterns in the codebase
+- No database schema changes required
+
+## Related
+
+- Handler implementation: `internal/api/v1/handlers/dashboard_handler.go#L299`
+- Service implementation: `internal/service/dashboard/faults_service.go`
+- Integration test: `test/dashboard_integration_test.go#L329`
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
