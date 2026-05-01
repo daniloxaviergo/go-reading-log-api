@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:08'
-updated_date: '2026-05-01 17:38'
+updated_date: '2026-05-01 17:42'
 labels:
   - bugfix
   - testing
@@ -291,8 +291,47 @@ The integration test needs to:
    - Set fixed "today" date for predictable results
    - Calculate expected faults based on fixture design
    - Validate each weekday's fault count
-6. 🔄 Run tests and verify
-7. ⏳ Check acceptance criteria
+6. ✅ Run tests and verify
+   - TestDashboardWeekdayFaults_Integration: PASS
+   - All dashboard integration tests: PASS
+   - All unit tests: PASS
+7. ✅ Code quality checks
+   - go fmt: PASS
+   - go vet: PASS
+8. ✅ All tests pass
+
+### Changes Made
+
+#### File: test/fixtures/dashboard/scenarios.go
+- Rewrote `ScenarioFaultsByWeekday()` to create proper fault scenarios
+- Created helper function `countWeekdaysInRange()` to calculate expected faults
+- Added helper function `createWeekdayFaultsExpected()` to create expected results
+- Fixture now creates logs on Sun/Tue/Thu/Sat only, leaving Mon/Wed/Fri as fault days
+
+#### File: test/dashboard_integration_test.go
+- Updated `TestDashboardWeekdayFaults_Integration` to set fixed "today" date (Apr 1, 2026)
+- Added detailed validation for each weekday's fault count
+- Added sub-tests for each weekday (weekday_0 through weekday_6)
+- Added total fault count validation
+
+### Test Results
+```
+=== RUN   TestDashboardWeekdayFaults_Integration
+--- PASS: TestDashboardWeekdayFaults_Integration (0.12s)
+    --- PASS: TestDashboardWeekdayFaults_Integration/weekday_0
+    --- PASS: TestDashboardWeekdayFaults_Integration/weekday_1
+    --- PASS: TestDashboardWeekdayFaults_Integration/weekday_2
+    --- PASS: TestDashboardWeekdayFaults_Integration/weekday_3
+    --- PASS: TestDashboardWeekdayFaults_Integration/weekday_4
+    --- PASS: TestDashboardWeekdayFaults_Integration/weekday_5
+    --- PASS: TestDashboardWeekdayFaults_Integration/weekday_6
+```
+
+### Verification
+- ✅ All unit tests pass
+- ✅ All integration tests pass
+- ✅ go fmt and go vet pass with no errors
+- ✅ No regressions introduced
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
