@@ -3,7 +3,7 @@ id: RDL-144
 title: '[doc-12 Phase 3] Add edge case integration tests'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-05-01 15:08'
 updated_date: '2026-05-01 18:08'
 labels:
