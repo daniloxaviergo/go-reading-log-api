@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:07'
-updated_date: '2026-05-01 17:14'
+updated_date: '2026-05-01 17:16'
 labels:
   - bugfix
   - testing
@@ -188,6 +188,30 @@ func TestDashboardRepository_GetWeekdayFaults_<Scenario>(t *testing.T) {
 - Test coverage remains at 100% for `GetWeekdayFaults` method
 - Code passes `go fmt` and `go vet`
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Analysis Phase
+
+### Current State
+- Existing tests: `TestDashboardRepository_GetWeekdayFaults` and `TestDashboardRepository_GetWeekdayFaults_EmptyRange`
+- Implementation plan requires adding 4 new test cases:
+  1. All Weekdays Represented
+  2. Some Weekdays Missing
+  3. Zero Faults for All Days
+  4. All Days Are Faults
+
+### Implementation Strategy
+1. Keep existing tests (they already cover basic scenarios)
+2. Add 4 new comprehensive test cases as specified in the plan
+3. Ensure all tests follow the existing patterns and use PostgreSQL DOW (0=Sunday)
+4. Run tests to verify all pass
+
+### Test Date Calculations
+- PostgreSQL DOW: 0=Sunday, 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday
+- Need to carefully calculate expected weekday distributions based on date ranges
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
