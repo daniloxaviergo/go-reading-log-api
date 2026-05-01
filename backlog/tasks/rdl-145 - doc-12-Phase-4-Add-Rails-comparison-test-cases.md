@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:08'
-updated_date: '2026-05-01 18:35'
+updated_date: '2026-05-01 18:37'
 labels:
   - testing
   - rails-parity
@@ -384,6 +384,98 @@ ok  	go-reading-log-api-next/test	0.926s
 - Fixed dates are used for reproducibility (UTC timezone)
 - Tests validate both success and error scenarios
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Successfully implemented Rails comparison test cases for fault calculation logic validation in the Go reading log API. Created three specific test scenarios to validate that the Go implementation matches the Rails API exactly for fault calculation logic.
+
+## What Was Done
+
+### New Files Created
+1. **test/faults_rails_comparison_test.go** (138 lines)
+   - `TestFaultsComparison_30DayRandomGaps` - Validates GetFaultsByDateRange with irregular reading patterns over 30 days
+   - `TestFaultsComparison_6MonthWeekdayValidation` - Validates GetWeekdayFaults distribution over 6-month period
+   - `TestFaultsComparison_LeapYearFebruary` - Validates leap year February 29 handling
+   - `TestFaultsComparison_ErrorHandling` - Validates error scenarios (empty database, single day range)
+
+### Files Modified
+1. **test/fixtures/dashboard/scenarios.go** (+180 lines)
+   - Added `ScenarioFaults30DayRandomGaps()` - Creates 30-day period with 12 reading days, 18 fault days
+   - Added `ScenarioFaults6MonthWeekday()` - Creates 6-month period with logs on Sun/Tue/Thu/Sat only
+   - Added `ScenarioFaultsLeapYearFebruary()` - Creates February 2024 scenario with 15 reading days
+
+## Key Changes
+
+### Test Scenarios Implemented
+1. **30-Day Random Gaps**: Jan 1-30, 2024 with reading on days 0, 3, 5, 8, 10, 13, 15, 18, 20, 23, 25, 28
+   - Expected: 18 faults (30 total days - 12 reading days)
+   - Result: ✓ PASS (18 faults)
+
+2. **6-Month Weekday Validation**: Oct 1, 2025 to Apr 1, 2026
+   - Logs on: Sunday, Tuesday, Thursday, Saturday
+   - Expected faults: Monday (~26), Wednesday (~27), Friday (~26)
+   - Result: ✓ PASS (79 total faults, within expected range 78-84)
+
+3. **Leap Year February**: Feb 1-29, 2024 (29 days)
+   - Reading days: Every other day (15 days total, includes Feb 29)
+   - Expected: 14 faults (29 - 15 = 14)
+   - Result: ✓ PASS (14 faults, Feb 29 correctly handled as reading day)
+
+## Testing
+
+All tests pass successfully:
+```
+go test -v ./test/... -run "TestFaultsComparison"
+
+=== RUN   TestFaultsComparison_30DayRandomGaps
+--- PASS: TestFaultsComparison_30DayRandomGaps (0.09s)
+
+=== RUN   TestFaultsComparison_6MonthWeekdayValidation
+--- PASS: TestFaultsComparison_6MonthWeekdayValidation (0.57s)
+
+=== RUN   TestFaultsComparison_LeapYearFebruary
+--- PASS: TestFaultsComparison_LeapYearFebruary (0.10s)
+
+=== RUN   TestFaultsComparison_ErrorHandling
+--- PASS: TestFaultsComparison_ErrorHandling (0.16s)
+
+PASS
+ok  	go-reading-log-api-next/test	0.926s
+```
+
+Additional validation:
+- ✓ `go fmt ./test/...` - Passes with no errors
+- ✓ `go vet ./test/...` - Passes with no errors
+- ✓ `go build ./...` - Builds successfully with no warnings
+
+## Technical Approach
+
+- Reused existing test infrastructure (fixtures, helpers, database setup)
+- Tests use pre-calculated expected values based on Rails logic documented in doc-012
+- Integration tests using real PostgreSQL test database
+- Each test creates fresh database via `SetupTestDB()` to avoid state pollution
+- Fixed dates in UTC timezone for reproducibility
+- Follows existing test patterns from `dashboard_integration_test.go`
+
+## Clean Architecture Compliance
+
+- Tests repository layer via adapter (PostgreSQL implementation)
+- No business logic changes - only test additions
+- Follows repository pattern for database access
+- Uses context with timeout (15 seconds) matching `dashboardContextTimeout`
+
+## Risks/Follow-ups
+
+None identified. All tests pass and implementation follows existing patterns. Tests are ready for CI/CD pipeline integration.
+
+## Related Tasks
+
+- RDL-139: GetFaultsByDateRange SQL query fix (dependency - DONE)
+- RDL-140: GetWeekdayFaults SQL query fix (dependency - DONE)
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
