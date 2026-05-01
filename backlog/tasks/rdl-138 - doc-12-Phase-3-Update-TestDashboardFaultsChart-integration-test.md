@@ -3,7 +3,7 @@ id: RDL-138
 title: '[doc-12 Phase 3] Update TestDashboardFaultsChart integration test'
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-05-01 15:02'
 updated_date: '2026-05-01 15:39'
 labels:
