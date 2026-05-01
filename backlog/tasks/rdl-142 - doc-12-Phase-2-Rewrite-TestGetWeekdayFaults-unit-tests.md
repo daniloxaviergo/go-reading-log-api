@@ -3,9 +3,9 @@ id: RDL-142
 title: '[doc-12 Phase 2] Rewrite TestGetWeekdayFaults unit tests'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-05-01 15:07'
-updated_date: '2026-05-01 17:23'
+updated_date: '2026-05-01 17:24'
 labels:
   - bugfix
   - testing
