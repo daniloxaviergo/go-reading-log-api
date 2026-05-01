@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:07'
-updated_date: '2026-05-01 15:58'
+updated_date: '2026-05-01 16:16'
 labels:
   - bugfix
   - repository
@@ -346,6 +346,63 @@ go test ./...
 
 **Implementation Ready**: ✅ This plan provides sufficient detail for another agent to implement the fix without reading additional documentation. All edge cases, test scenarios, and risk mitigations are documented.
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress - RDL-139: Update GetFaultsByDateRange SQL query
+
+### Completed Tasks
+
+#### 1. Updated SQL Query in `internal/adapter/postgres/dashboard_repository.go`
+- Replaced simple log count query with CTE-based implementation
+- Added `daily_read` CTE to aggregate daily reading activity
+- Added `all_dates` CTE using `generate_series()` to create all dates in range
+- LEFT JOIN to include days without logs
+- COUNT days where `daily_pages IS NULL OR daily_pages = 0`
+
+#### 2. Updated Unit Tests in `test/unit/dashboard_repository_test.go`
+- Rewrote `TestDashboardRepository_GetFaultsByDateRange` with correct expectations
+- Added `TestDashboardRepository_GetFaultsByDateRange_NoLogs` - all days are faults
+- Added `TestDashboardRepository_GetFaultsByDateRange_AllDaysHaveReading` - 0 faults
+- Added `TestDashboardRepository_GetFaultsByDateRange_SingleDay` - single day range
+- Added `TestDashboardRepository_GetFaultsByDateRange_ZeroPagesRead` - logs with 0 pages
+- Added `ptr()` helper function for string pointers
+
+#### 3. Updated Integration Tests in `test/dashboard_integration_test.go`
+- Updated comments to reflect RDL-139 fix completion
+- Changed log statements to assertions for better test validation
+- Fixed `TestDashboardFaultsChart_Integration` to use `dto.SetTestDate()` for deterministic testing
+- Updated expected fault percentage from 50% to 160% (16 faults / 10 maxFaults)
+
+#### 4. Added Helper Function in `internal/domain/dto/dashboard.go`
+- Added `ResetTestDate()` function to reset the global date function after tests
+
+### Test Results
+
+All tests pass:
+- ✅ Unit tests: `TestDashboardRepository_GetFaultsByDateRange` (5 test cases)
+- ✅ Integration tests: All `TestDashboardFaults*` tests pass
+- ✅ `go fmt` - passes
+- ✅ `go vet` - passes
+- ✅ Build - succeeds
+
+### Key Changes
+
+1. **SQL Query Logic**: Changed from counting log entries to counting days with zero pages read
+2. **Edge Cases Handled**:
+   - Empty database (all days are faults)
+   - Single day range
+   - Logs with zero pages (end_page == start_page)
+   - Multiple logs on same day (count as 1 day with reading)
+   - NULL values in start_page/end_page
+
+### Files Modified
+- `internal/adapter/postgres/dashboard_repository.go` - Main implementation
+- `test/unit/dashboard_repository_test.go` - Unit tests
+- `test/dashboard_integration_test.go` - Integration tests
+- `internal/domain/dto/dashboard.go` - Added ResetTestDate() helper
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
