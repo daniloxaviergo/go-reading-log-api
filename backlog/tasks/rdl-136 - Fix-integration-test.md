@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - Thomas
 created_date: '2026-05-01 11:54'
-updated_date: '2026-05-01 11:56'
+updated_date: '2026-05-01 11:59'
 labels: []
 dependencies: []
 ---
@@ -69,23 +69,21 @@ Step 5: Verify the Solution
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-## Step 1: Analysis Complete
+## Analysis Complete - Issues Identified
 
-**Issues Identified in test/test_helper.go:**
+### Root Causes of Integration Test Timeouts
 
-1. **Long timeout in Close() deferred cleanup**: The `cleanupOrphanedDatabases` function uses a 60-second timeout, which can cause test timeouts when there are many orphaned databases.
+1. **60-second timeout in cleanupOrphanedDatabases**: With 6000+ orphaned databases, sequential dropping can exceed the timeout
+2. **No per-operation timeout**: Each DROP DATABASE operation inherits the 60s timeout, but should have a much shorter timeout (500ms)
+3. **Pool lifecycle issues**: The Close() method creates new pools for cleanup while the original pool might still be in use
+4. **Blocking cleanup on test completion**: The deferred cleanup runs after pool.Close() but can still block if there are many orphaned databases
 
-2. **Sequential database drops**: The cleanup iterates through all orphaned databases one-by-one, which can be very slow with 6000+ databases.
+### Fix Strategy
 
-3. **Pool lifecycle issues**: The `pool.Close()` is called before the deferred cleanup, but the cleanup creates new pools that may block.
-
-4. **No context cancellation propagation**: Database operations during cleanup don't properly respect context cancellation.
-
-**Fix Plan:**
-- Reduce cleanup timeout to 500ms per database operation
-- Add early exit if cleanup takes too long
-- Ensure pool.Close() completes before cleanup
-- Add proper error handling and logging
+1. **Reduce per-operation timeout**: Change from 60s to 500ms per DROP DATABASE operation
+2. **Add early exit mechanism**: Stop cleanup if it exceeds 1 second total
+3. **Fix pool lifecycle**: Ensure cleanup pools are properly closed and don't interfere with test execution
+4. **Add logging**: Track cleanup progress for debugging
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
