@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-05-01 15:08'
-updated_date: '2026-05-01 18:53'
+updated_date: '2026-05-01 18:58'
 labels:
   - documentation
   - phase-5
@@ -20,6 +20,216 @@ priority: medium
 <!-- SECTION:DESCRIPTION:BEGIN -->
 Update API documentation to clarify fault definition (days with zero pages read), add calculation examples showing how faults are counted, and document edge cases (NULL handling, single-day ranges, empty database). Ensure documentation matches Rails behavior.
 <!-- SECTION:DESCRIPTION:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+### 1. Technical Approach
+
+This task involves updating the API documentation to clarify the fault definition and add calculation examples. The approach is:
+
+1. **Add a new Dashboard API section** to the QWEN.md documentation file that includes:
+   - Clear definition of what a "fault" is (day with zero pages read)
+   - Dashboard endpoints documentation (`/v1/dashboard/echart/faults.json`)
+   - Calculation examples showing how faults are counted
+   - Edge cases documentation (NULL handling, single-day ranges, empty database)
+   - SQL query examples for transparency
+
+2. **Ensure Rails parity documentation** - Document that the Go implementation matches Rails behavior exactly
+
+3. **Reference existing detailed documentation** - Link to `docs/faults-calculation-explanation.md` for deep technical details
+
+**Why this approach:**
+- QWEN.md is the primary project context file for AI assistants and developers
+- README.md is more high-level and focuses on Phase 1 endpoints
+- The detailed technical explanation already exists in `docs/faults-calculation-explanation.md`
+- Following the existing documentation pattern in QWEN.md (similar to how Calculated Fields are documented)
+
+### 2. Files to Modify
+
+| File | Change Type | Purpose |
+|------|-------------|---------|
+| `QWEN.md` | Modify | Add Dashboard API endpoints section with fault calculation documentation |
+
+**Specific sections to add to QWEN.md:**
+
+1. **New section after "Logs Endpoints"** - "Dashboard Endpoints"
+   - Health check endpoint (already exists)
+   - Faults endpoint documentation
+   - Weekday faults endpoint documentation
+   - Fault definition and calculation logic
+
+2. **New subsection under "Calculated Fields"** - "Fault Metrics"
+   - Definition of fault (day with zero pages)
+   - Calculation formula
+   - Examples with visual tables
+   - Edge cases
+
+**Files to review (no changes needed):**
+- `docs/faults-calculation-explanation.md` - Already comprehensive, will be referenced
+- `README.md` - High-level overview, no changes needed for Phase 1 focus
+
+### 3. Dependencies
+
+**Prerequisites:**
+- RDL-146 (Create faults calculation documentation) - ✅ **COMPLETED**
+  - The detailed technical document `docs/faults-calculation-explanation.md` already exists
+  - All SQL queries and algorithms are documented there
+
+**Existing Implementation (no code changes needed):**
+- `internal/adapter/postgres/dashboard_repository.go` - GetFaultsByDateRange and GetWeekdayFaults methods are implemented
+- `internal/api/v1/handlers/dashboard_handler.go` - Handlers are implemented
+- All tests are passing (RDL-139 through RDL-146 completed)
+
+**No blocking issues** - This is purely a documentation task.
+
+### 4. Code Patterns
+
+**Documentation Style to Follow:**
+
+1. **End Format** - Match existing endpoint documentation style in QWEN.md:
+   ```markdown
+   ### Endpoint Name
+
+   | Property | Value |
+   |----------|-------|
+   | **Method** | GET |
+   | **Path** | `/v1/endpoint.json` |
+   | **Description** | Description |
+   | **Authentication** | None |
+   | **Response Code** | 200 OK |
+
+   **Request:**
+   ```bash
+   curl http://localhost:3000/v1/endpoint.json
+   ```
+
+   **Response (200 OK):**
+   ```json
+   {
+     "example": "response"
+   }
+   ```
+   ```
+
+2. **Calculated Fields Format** - Match existing table format:
+   ```markdown
+   | Field | Type | Description | Formula |
+   |-------|------|-------------|---------|
+   | `field_name` | type | Description | Formula |
+   ```
+
+3. **Edge Cases Format** - Use the pattern from `docs/faults-calculation-explanation.md`:
+   ```markdown
+   ### Edge Case: Description
+
+   **Scenario:** Brief description
+
+   **Expected Result:** What the API returns
+
+   **Key Takeaway:** Important note
+   ```
+
+4. **Examples with Visual Tables** - Use the format from existing documentation:
+   ```markdown
+   | Day | Date | Logs | Pages Read | Daily Sum | Fault? |
+   |-----|------|------|------------|-----------|--------|
+   | 1   | Jan 1| Yes  | 25         | 25        | No     |
+   | 2   | Jan 2| No   | 0          | NULL      | YES ⚠️ |
+   ```
+
+### 5. Testing Strategy
+
+**This is a documentation task - no code tests required.**
+
+**Validation Steps:**
+1. **Manual Review** - Verify documentation accuracy against:
+   - `docs/faults-calculation-explanation.md` (source of truth)
+   - `internal/adapter/postgres/dashboard_repository.go` (actual implementation)
+   - Rails application reference (if available)
+
+2. **Consistency Check** - Ensure:
+   - Terminology matches (fault = day with zero pages)
+   - SQL queries in documentation match actual code
+   - Examples are mathematically correct
+   - Edge cases align with implementation
+
+3. **Peer Review** - Have team member verify:
+   - Documentation is clear and accurate
+   - Examples are easy to understand
+   - Rails parity is correctly described
+
+### 6. Risks and Considerations
+
+**Known Issues/Considerations:**
+
+1. **Documentation Accuracy Risk**
+   - **Mitigation:** Use `docs/faults-calculation-explanation.md` as the source of truth
+   - **Mitigation:** Cross-reference with actual SQL queries in `dashboard_repository.go`
+
+2. **Rails Parity Claims**
+   - **Consideration:** Document that Go implementation matches Rails behavior
+   - **Verification:** RDL-145 added Rails comparison test cases (completed)
+
+3. **Edge Case Coverage**
+   - **Must Document:**
+     - NULL values in start_page/end_page (treated as 0)
+     - Single-day date ranges (start_date == end_date)
+     - Empty database (all days are faults)
+     - Logs with zero pages (start_page == end_page)
+     - Inclusive date range boundaries (BETWEEN $1 AND $2)
+
+4. **Documentation Maintenance**
+   - **Consideration:** If faults calculation logic changes, both docs need update
+   - **Recommendation:** Add comment in QWEN.md to reference `docs/faults-calculation-explanation.md`
+
+5. **Phase 1 Context**
+   - **Note:** Dashboard endpoints are part of the completed Phase 1 work
+   - **Clarification:** Document that faults endpoints are read-only (consistent with Phase 1)
+
+**No Blocking Issues Identified**
+
+**Implementation Timeline:**
+- Estimated time: 30-45 minutes
+- Steps:
+  1. Review existing documentation (10 min)
+  2. Draft Dashboard endpoints section (15 min)
+  3. Add fault calculation examples (10 min)
+  4. Review and refine (10 min)
+
+---
+
+## Implementation Checklist
+
+### Phase 1: Content Planning
+- [ ] Review `docs/faults-calculation-explanation.md` for accurate information
+- [ ] Review existing QWEN.md structure and formatting
+- [ ] Identify exact insertion points for new sections
+
+### Phase 2: Documentation Updates
+- [ ] Add "Dashboard Endpoints" section with faults endpoint documentation
+- [ ] Add "Fault Metrics" subsection under "Calculated Fields"
+- [ ] Include visual examples with tables
+- [ ] Document all edge cases
+- [ ] Add curl examples for testing
+
+### Phase 3: Validation
+- [ ] Verify SQL queries match implementation
+- [ ] Verify calculation examples are mathematically correct
+- [ ] Ensure Rails parity claims are accurate
+- [ ] Check formatting consistency with existing docs
+
+### Phase 4: Review
+- [ ] Self-review for clarity and completeness
+- [ ] Request peer review if needed
+- [ ] Update task status to Done
+
+---
+
+*Implementation Plan Version: 1.0*
+*Created: 2026-05-01*
+*Author: Implementation Planner*
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
