@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:07'
-updated_date: '2026-05-01 17:22'
+updated_date: '2026-05-01 17:23'
 labels:
   - bugfix
   - testing
@@ -236,6 +236,43 @@ Successfully added 4 new comprehensive test cases:
 - HTTP status codes correct for response type
 - New code paths include error path tests
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Task Completed: Rewrite TestGetWeekdayFaults Unit Tests
+
+### What Was Done
+Rewrote the `TestGetWeekdayFaults` unit tests to validate correct weekday grouping logic that matches the Rails implementation. Added 4 comprehensive test cases to cover all scenarios specified in the implementation plan.
+
+### Key Changes
+**File Modified:** `test/unit/dashboard_repository_test.go`
+
+**New Test Cases Added:**
+1. `TestDashboardRepository_GetWeekdayFaults_AllWeekdaysRepresented` - Tests 4-week period (28 days) where Mondays have all faults
+2. `TestDashboardRepository_GetWeekdayFaults_SomeWeekdaysMissing` - Tests 10-day irregular range with partial weekday coverage
+3. `TestDashboardRepository_GetWeekdayFaults_ZeroFaults` - Tests 7-day range with reading every day (0 faults)
+4. `TestDashboardRepository_GetWeekdayFaults_AllDaysAreFaults` - Tests 8-day range with no logs (all days are faults)
+
+### Testing
+- ✅ All 7 `GetWeekdayFaults` tests pass
+- ✅ All unit tests pass (150+ tests)
+- ✅ All integration tests pass
+- ✅ `go fmt` passes with no errors
+- ✅ `go vet` passes with no errors
+- ✅ Application builds successfully
+
+### Technical Details
+- Tests validate PostgreSQL DOW mapping (0=Sunday, 1=Monday, etc.)
+- Tests use CTE-based SQL query pattern matching Rails logic
+- Each test creates isolated database state using `test.SetupTestDB()`
+- Weekday distribution calculations verified for edge cases
+
+### No Breaking Changes
+- Existing tests continue to pass
+- No changes to production code
+- Only test file modifications
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
