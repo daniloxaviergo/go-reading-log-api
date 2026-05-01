@@ -1,7 +1,7 @@
 ---
 id: RDL-142
 title: '[doc-12 Phase 2] Rewrite TestGetWeekdayFaults unit tests'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-05-01 15:07'
