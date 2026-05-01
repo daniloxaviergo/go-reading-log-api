@@ -2,8 +2,10 @@
 id: RDL-141
 title: '[doc-12 Phase 1] Verify context timeout and error handling'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-05-01 15:07'
+updated_date: '2026-05-01 16:45'
 labels:
   - bugfix
   - repository
