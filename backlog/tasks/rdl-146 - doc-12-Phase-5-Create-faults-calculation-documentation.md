@@ -3,7 +3,7 @@ id: RDL-146
 title: '[doc-12 Phase 5] Create faults calculation documentation'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-05-01 15:08'
 updated_date: '2026-05-01 18:53'
 labels:
