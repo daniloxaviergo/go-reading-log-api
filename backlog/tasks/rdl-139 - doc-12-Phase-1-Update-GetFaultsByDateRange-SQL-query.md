@@ -1,11 +1,11 @@
 ---
 id: RDL-139
 title: '[doc-12 Phase 1] Update GetFaultsByDateRange SQL query'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-05-01 15:07'
-updated_date: '2026-05-01 16:20'
+updated_date: '2026-05-01 16:21'
 labels:
   - bugfix
   - repository
