@@ -2,8 +2,10 @@
 id: RDL-147
 title: '[doc-12 Phase 5] Update API documentation with fault definition'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-05-01 15:08'
+updated_date: '2026-05-01 18:53'
 labels:
   - documentation
   - phase-5
