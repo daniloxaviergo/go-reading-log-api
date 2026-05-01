@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:08'
-updated_date: '2026-05-01 18:58'
+updated_date: '2026-05-01 19:00'
 labels:
   - documentation
   - phase-5
@@ -230,6 +230,32 @@ This task involves updating the API documentation to clarify the fault definitio
 *Created: 2026-05-01*
 *Author: Implementation Planner*
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+### Implementation Progress
+
+**Status:** In Progress
+
+**Phase 1: Content Planning** ✅ Completed
+- Reviewed `docs/faults-calculation-explanation.md` - comprehensive technical details available
+- Reviewed existing QWEN.md structure - identified insertion points
+- Identified exact sections to add:
+  1. New "Dashboard Endpoints" section after "Logs Endpoints"
+  2. New "Fault Metrics" subsection under "Calculated Fields"
+
+**Phase 2: Documentation Updates** 🔄 In Progress
+- Adding Dashboard Endpoints section with faults endpoint documentation
+- Adding Fault Metrics subsection with clear definition and examples
+- Including visual tables and edge case documentation
+
+**Next Steps:**
+1. Complete QWEN.md documentation updates
+2. Verify SQL queries match implementation
+3. Run tests to ensure no regressions
+4. Self-review for clarity and completeness
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
