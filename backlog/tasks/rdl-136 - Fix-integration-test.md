@@ -2,8 +2,10 @@
 id: RDL-136
 title: Fix integration test
 status: To Do
-assignee: []
+assignee:
+  - Thomas
 created_date: '2026-05-01 11:54'
+updated_date: '2026-05-01 11:55'
 labels: []
 dependencies: []
 ---
