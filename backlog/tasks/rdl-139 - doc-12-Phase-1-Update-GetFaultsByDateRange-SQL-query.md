@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:07'
-updated_date: '2026-05-01 16:19'
+updated_date: '2026-05-01 16:20'
 labels:
   - bugfix
   - repository
@@ -403,6 +403,65 @@ All tests pass:
 - `test/dashboard_integration_test.go` - Integration tests
 - `internal/domain/dto/dashboard.go` - Added ResetTestDate() helper
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Implemented CTE-based SQL query in `GetFaultsByDateRange` to correctly count days with zero pages read instead of counting log entries.
+
+## What Was Done
+
+1. **Updated SQL Query** (`internal/adapter/postgres/dashboard_repository.go`)
+   - Replaced simple log count query with CTE-based implementation
+   - Added `daily_read` CTE to aggregate daily reading activity
+   - Added `all_dates` CTE using PostgreSQL's `generate_series()` to create all dates in range
+   - LEFT JOIN to include days without logs
+   - COUNT days where `daily_pages IS NULL OR daily_pages = 0`
+
+2. **Updated Unit Tests** (`test/unit/dashboard_repository_test.go`)
+   - Rewrote `TestDashboardRepository_GetFaultsByDateRange` with correct expectations
+   - Added 4 new test cases covering edge cases:
+     - No logs in range (all days are faults)
+     - All days have reading (0 faults)
+     - Single day range
+     - Logs with zero pages read
+
+3. **Updated Integration Tests** (`test/dashboard_integration_test.go`)
+   - Updated comments to reflect RDL-139 fix completion
+   - Changed log statements to assertions for better test validation
+   - Fixed `TestDashboardFaultsChart_Integration` to use `dto.SetTestDate()` for deterministic testing
+
+4. **Added Helper Function** (`internal/domain/dto/dashboard.go`)
+   - Added `ResetTestDate()` function to reset the global date function after tests
+
+## Key Changes
+
+- **SQL Query Logic**: Changed from counting log entries to counting days with zero pages read
+- **Edge Cases Handled**: Empty database, single day range, logs with zero pages, multiple logs on same day, NULL values
+
+## Tests Run
+
+- ✅ Unit tests: `go test -v ./test/unit/... -run TestDashboardRepository_GetFaultsByDateRange` (5 test cases pass)
+- ✅ Integration tests: `go test -v ./test/... -run TestDashboardFaults` (all tests pass)
+- ✅ Code quality: `go fmt` and `go vet` pass with no errors
+- ✅ Build: `go build ./cmd/server.go` succeeds
+
+## Files Modified
+
+- `internal/adapter/postgres/dashboard_repository.go` - Main implementation
+- `test/unit/dashboard_repository_test.go` - Unit tests
+- `test/dashboard_integration_test.go` - Integration tests
+- `internal/domain/dto/dashboard.go` - Added ResetTestDate() helper
+
+## Notes for Reviewers
+
+- The fault calculation now correctly counts days with zero pages read, matching the Rails logic
+- All integration tests verify actual database interactions
+- The implementation follows Clean Architecture patterns
+- No breaking changes to the API interface
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
