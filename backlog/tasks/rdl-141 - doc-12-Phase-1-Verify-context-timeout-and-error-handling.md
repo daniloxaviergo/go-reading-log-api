@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:07'
-updated_date: '2026-05-01 16:53'
+updated_date: '2026-05-01 16:56'
 labels:
   - bugfix
   - repository
@@ -427,6 +427,73 @@ go test -cover ./test/unit/...
 
 **Note**: This is primarily a verification task. If all existing code already follows the correct patterns (which appears to be the case based on initial review), the main work will be adding comprehensive tests to ensure these patterns are maintained.
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress
+
+### Phase 1: Code Audit - COMPLETED ✅
+
+#### Repository Layer Audit (`internal/adapter/postgres/dashboard_repository.go`)
+**All 15 methods verified:**
+1. ✅ GetDailyStats - Has timeout + error wrapping
+2. ✅ GetProjectAggregates - Has timeout + error wrapping
+3. ✅ GetFaultsByDateRange - Has timeout + error wrapping
+4. ✅ GetWeekdayFaults - Has timeout + error wrapping
+5. ✅ GetLogsByDateRange - Has timeout + error wrapping
+6. ✅ GetProjectWeekdayMean - Has timeout + error wrapping
+7. ✅ CalculatePeriodPages - Has timeout + error wrapping
+8. ✅ GetProjectsWithLogs - Has timeout + error wrapping
+9. ✅ GetProjectLogs - Has timeout + error wrapping
+10. ✅ GetMaxByWeekday - Has timeout + error wrapping
+11. ✅ GetOverallMean - Has timeout + error wrapping
+12. ✅ GetPreviousPeriodMean - Has timeout + error wrapping
+13. ✅ GetPreviousPeriodSpecMean - Has timeout + error wrapping
+14. ✅ GetMeanByWeekday - Has timeout + error wrapping
+15. ✅ GetRunningProjectsWithLogs - Has timeout + error wrapping
+
+**Pattern Verification:**
+- ✅ All methods use `context.WithTimeout(ctx, dashboardContextTimeout)` (15 seconds)
+- ✅ All methods call `defer cancel()` immediately after timeout creation
+- ✅ All database operations use the timeout context
+- ✅ Error wrapping follows pattern `fmt.Errorf("failed to <operation>: %w", err)`
+- ✅ `pgx.ErrNoRows` handled appropriately where needed
+
+#### Service Layer Audit
+**Files reviewed:**
+- ✅ `day_service.go` - Context flows correctly to repository calls
+- ✅ `faults_service.go` - Context flows correctly to repository calls
+- ✅ `weekday_faults_service.go` - Context flows correctly to repository calls
+
+**Pattern Verification:**
+- ✅ All service methods accept `ctx context.Context` parameter
+- ✅ Context is passed through to repository methods
+- ✅ Error wrapping follows same pattern as repository layer
+
+#### Handler Layer Audit
+**File reviewed:**
+- ✅ `dashboard_handler.go` - All handlers use `r.Context()` and pass it through
+
+**Pattern Verification:**
+- ✅ All handlers extract context using `ctx := r.Context()`
+- ✅ Context passed to services and repositories
+- ✅ Context cancellation will propagate through all layers
+
+### Phase 2: Test Implementation - IN PROGRESS 🚧
+
+**Current State:**
+- Existing tests use `context.Background()` without timeout verification
+- Need to add context timeout tests for all 15 methods
+- Need to add context cancellation tests
+- Need to add error wrapping verification tests
+
+**Next Steps:**
+1. Add context timeout tests to `test/unit/dashboard_repository_test.go`
+2. Add context cancellation tests
+3. Add error wrapping verification tests
+4. Run tests to verify all pass
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
