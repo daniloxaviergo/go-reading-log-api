@@ -445,6 +445,84 @@ The API computes several derived fields for each project:
 | `median_day` | float | Pages per day (rounded to 2 decimals) | `round(page / days_reading, 2)` |
 | `finished_at` | datetime | Estimated completion date | Based on median_day calculation |
 
+### max_day Field (Dashboard)
+
+The `max_day` field represents the maximum pages read in a single day for a specific weekday across all projects.
+
+| Field | Type | Description | Formula |
+|-------|------|-------------|---------|
+| `max_day` | float (nullable) | Maximum pages read on target weekday | `MAX(end_page - start_page)` for logs where `EXTRACT(DOW FROM data) = weekday` |
+
+**Usage:** Used in dashboard statistics to show peak reading performance for each weekday.
+
+### per_mean_day Field (Dashboard)
+
+The `per_mean_day` field represents the ratio of the current day's mean pages to the overall mean for that weekday across all logs.
+
+| Field | Type | Description | Formula |
+|-------|------|-------------|---------|
+| `per_mean_day` | float (nullable) | Ratio of current mean to weekday mean | `mean_day / prev_period_mean` where `prev_period_mean` is the average pages for all logs of the same weekday |
+
+**Calculation Details:**
+- **current mean_day**: Average pages read on the target date (sum of pages / log count for that day)
+- **prev_period_mean**: Average pages across ALL logs for the same weekday (0=Sunday to 6=Saturday)
+- **Formula**: `per_mean_day = mean_day / prev_period_mean`
+- **Rounding**: Result is rounded to 3 decimal places
+- **Return Type**: `*float64` (nullable pointer)
+
+**Edge Cases:**
+- Returns `null` when `prev_period_mean` is `nil` (no logs for that weekday)
+- Returns `null` when `prev_period_mean` is `0` (avoids division by zero)
+- Returns `null` when `mean_day` is `0` (no logs for target date)
+
+**Example Response:**
+```json
+{
+  "stats": {
+    "mean_day": 30.0,
+    "prev_period_mean": 25.0,
+    "per_mean_day": 1.2
+  }
+}
+```
+
+**Usage:** Used in dashboard statistics to compare current performance against historical averages for the same weekday.
+
+### per_spec_mean_day Field (Dashboard)
+
+The `per_spec_mean_day` field represents the ratio of the speculative mean to the previous period speculative mean.
+
+| Field | Type | Description | Formula |
+|-------|------|-------------|---------|
+| `per_spec_mean_day` | float (nullable) | Ratio of speculative mean to previous speculative mean | `spec_mean_day / prev_period_spec_mean` |
+
+**Calculation Details:**
+- **spec_mean_day**: Speculative mean for current day = `mean_day * 1.15`
+- **prev_period_spec_mean**: Speculative mean for all logs of same weekday = `prev_period_mean * 1.15`
+- **Formula**: `per_spec_mean_day = spec_mean_day / prev_period_spec_mean`
+- **Rounding**: Result is rounded to 3 decimal places
+- **Return Type**: `*float64` (nullable pointer)
+
+**Edge Cases:**
+- Returns `null` when `prev_period_spec_mean` is `nil` (no logs for that weekday)
+- Returns `null` when `prev_period_spec_mean` is `0` (avoids division by zero)
+- Returns `null` when `spec_mean_day` is `0` (no logs for target date)
+
+**Example Response:**
+```json
+{
+  "stats": {
+    "mean_day": 30.0,
+    "spec_mean_day": 34.5,
+    "prev_period_mean": 25.0,
+    "prev_period_spec_mean": 28.75,
+    "per_spec_mean_day": 1.2
+  }
+}
+```
+
+**Usage:** Used in dashboard statistics to compare speculative performance against historical speculative averages for the same weekday.
+
 ### Status Values
 
 The `status` field can have one of these values:
@@ -679,6 +757,51 @@ type ProjectRepository interface {
 
 Adapters implement the interface in `internal/adapter/postgres/`.
 
+### Dashboard Repository Methods
+
+The `DashboardRepository` interface in `internal/repository/dashboard_repository.go` provides aggregated data queries:
+
+| Method | Description | Return Type |
+|--------|-------------|-------------|
+| `GetDailyStats` | Daily page statistics with weekday breakdown | `*dto.DailyStats` |
+| `GetProjectAggregates` | Project-level sums and counts | `[]*dto.ProjectAggregate` |
+| `GetFaultsByDateRange` | Fault count within date range | `*dto.FaultStats` |
+| `GetWeekdayFaults` | Fault distribution by weekday (0-6) | `*dto.WeekdayFaults` |
+| `GetLogsByDateRange` | Log entries within date range | `[]*dto.LogEntry` |
+| `GetProjectWeekdayMean` | Mean pages for project on specific weekday | `float64` |
+| `CalculatePeriodPages` | Total pages within date range | `int` |
+| `GetProjectsWithLogs` | All projects with eager-loaded logs | `[]*dto.ProjectAggregateResponse` |
+| `GetProjectLogs` | Logs for specific project (ordered DESC) | `[]*dto.LogEntry` |
+| `GetMaxByWeekday` | Maximum pages read on target weekday | `*float64` |
+| `GetOverallMean` | Overall mean across all weekdays | `*float64` |
+| `GetPreviousPeriodMean` | Mean for same weekday 7 days prior | `*float64` |
+| `GetPreviousPeriodSpecMean` | Speculative mean (mean * 1.15) | `*float64` |
+
+#### GetMaxByWeekday Implementation
+
+**Method Signature:**
+```go
+GetMaxByWeekday(ctx context.Context, date time.Time) (*float64, error)
+```
+
+**SQL Query Pattern:**
+```sql
+SELECT MAX(CASE 
+    WHEN start_page IS NOT NULL AND end_page IS NOT NULL 
+    THEN end_page - start_page 
+    ELSE 0 
+END)
+FROM logs
+WHERE EXTRACT(DOW FROM data::timestamp)::int = $1
+```
+
+**Key Details:**
+- Uses PostgreSQL `EXTRACT(DOW FROM ...)` where 0=Sunday, 1=Monday, ..., 6=Saturday
+- Returns `*float64` (nullable pointer) to handle cases where no data exists
+- Returns `nil` when no logs exist for the target weekday
+- Uses 15-second context timeout (`dashboardContextTimeout`)
+- Handles NULL values gracefully using SQL CASE statement
+
 ### Dependency Injection
 
 Repositories are injected into handlers:
@@ -812,82 +935,43 @@ Context is embedded in domain models for timeout and cancellation propagation.
 1. Create middleware function in `internal/api/v1/middleware/`
 2. Add to middleware chain in `cmd/server.go`
 
-### Cleanup Procedures
+### Quick Reference Guide
 
-#### Auto-cleanup mechanism
-The integration test helper automatically cleans up test databases after each test run using `TestHelper.Close()`. This ensures no leftover data affects subsequent tests. The cleanup process includes:
-- Dropping the current test database (e.g., `reading_log_test_12345_67890_123456789`)
-- Cleaning up orphaned test databases from previous test runs by dropping all databases matching the pattern `reading_log_test_%`
+#### Database Cleanup Commands
 
-Example usage in integration tests:
-```go
-helper, err := test.SetupTestDB()
-if err != nil {
-    t.Fatal(err)
-}
-defer helper.Close()
+```bash
+# Reset entire test database (using Makefile)
+make test-clean
 
-// Test cases here
+# Manually drop all orphaned test databases
+psql -c "SELECT datname FROM pg_database WHERE datname LIKE 'reading_log_test_%';" | grep reading_log_test | xargs -I {} psql -c "DROP DATABASE IF EXISTS {};"
+
+# Clean specific tables within a database
+TRUNCATE TABLE logs CASCADE;
+TRUNCATE TABLE projects CASCADE;
 ```
 
-#### Server Log Management
+⚠️ WARNING: Never run manual cleanup commands on production databases (`reading_log`). Always verify you're using the `reading_log_test` database.
 
-When using `make run`, server output is written to `server.log`. To prevent excessive log growth:
-- Run `rm server.log` to manually clear the log
-- Add a `clean-log` target to your Makefile for convenience:
-  ```makefile
-clean-log:
-	rm -f server.log
-  ```
+#### Validation Rules Summary
 
-#### Database naming conventions
-All test databases follow a unique naming convention to ensure parallel test safety:
+| Table | Field | Validation Rule |
+|-------|-------|-----------------|
+| projects | page | Must be ≤ total_page |
+| logs | start_page | Must be ≤ end_page |
+| logs | end_page | Must be ≥ start_page |
 
-- Format: `reading_log_test_<pid>_<goroutine_id>_<timestamp>`
-- Example: `reading_log_test_12345_67890_1620000000`
-- The name includes:
-  - Process ID (`os.Getpid()`)
-  - Goroutine ID (extracted from stack trace)
-  - Current timestamp in UnixNano format
+#### Troubleshooting
 
-This ensures each test runs in its own isolated database, preventing conflicts during parallel execution.
+If tests fail due to existing test databases:
 
-#### SQL cleanup patterns
-The following SQL commands are used for database cleanup:
+```bash
+# Check for orphaned test databases
+psql -c "SELECT datname FROM pg_database WHERE datname LIKE 'reading_log_test_%';"
 
-1. **Drop orphaned test databases**:
-   ```sql
-   SELECT datname FROM pg_database WHERE datname LIKE 'reading_log_test_%' AND datname != 'current_test_db';
-   DROP DATABASE IF EXISTS <database_name>;
-   ```
-
-2. **Reset entire test database** (used in `make test-clean`):
-   ```sql
-   DROP DATABASE IF EXISTS reading_log_test;
-   CREATE DATABASE reading_log_test;
-   ```
-
-3. **Clean specific tables within a database**:
-   ```sql
-   TRUNCATE TABLE logs CASCADE;
-   TRUNCATE TABLE projects CASCADE;
-   ```
-
-⚠️ **WARNING:** Never run manual cleanup commands on production databases (`reading_log`). Always verify you're using the `reading_log_test` database.
-
-#### Rationale for per-test database strategy
-- **Isolation**: Each test runs in its own database, preventing side effects between tests.
-- **Parallel execution**: Unique database names allow multiple tests to run simultaneously without interference.
-- **Simplicity**: Dropping entire databases is safer than schema resets which could accidentally affect other environments.
-- **Consistency**: Ensures a clean state for every test run, regardless of previous failures.
-
-#### Troubleshooting steps
-- **Test database conflicts**: If tests fail due to existing databases, manually drop all `reading_log_test_%` databases:
-  ```bash
-  psql -c "SELECT datname FROM pg_database WHERE datname LIKE 'reading_log_test_%';" | grep reading_log_test | xargs -I {} psql -c "DROP DATABASE IF EXISTS {};"
-  ```
-- **Slow cleanup**: If cleanup takes too long, ensure no other processes are using the test databases. Use `pg_terminate_backend` to kill lingering connections.
-- **Permission issues**: Verify the database user has sufficient privileges to drop databases.
+# Drop them all safely
+psql -c "SELECT datname FROM pg_database WHERE datname LIKE 'reading_log_test_%';" | grep reading_log_test | xargs -I {} psql -c "DROP DATABASE IF EXISTS {};"
+```
 
 ## Troubleshooting
 
@@ -951,6 +1035,106 @@ docker exec -it reading-log-db psql -U postgres -d reading_log
 
 See `.qwen/settings.json` for editor/IDE configuration settings.
 
+## StatsData Null Validation Behavior
+
+### Overview
+
+The `StatsData` DTO in `internal/domain/dto/dashboard_response.go` supports nullable pointer fields for ratio calculations. The validation logic correctly accepts `null` (nil) values for these fields without errors.
+
+### Nullable Ratio Fields
+
+| Field | Type | JSON Name | Description |
+|-------|------|-----------|-------------|
+| `PerPages` | `*float64` | `per_pages` | Ratio: last_week / previous_week |
+| `PerMeanDay` | `*float64` | `per_mean_day` | Ratio of mean day to previous period mean |
+| `PerSpecMeanDay` | `*float64` | `per_spec_mean_day` | Ratio of speculative mean to previous period spec mean |
+| `MaxDay` | `*float64` | `max_day` | Maximum pages in a single day |
+| `MeanGeral` | `*float64` | `mean_geral` | General mean across all days |
+
+### Validation Rules
+
+The `StatsData.Validate()` method follows these rules for nullable fields:
+
+1. **Nil values are accepted** - No validation error when pointer fields are `nil`
+2. **Non-nil values are validated** - When a pointer is set, the value must be non-negative
+3. **JSON serialization** - Nil fields are omitted from JSON output (using `omitempty`)
+
+```go
+// Example validation logic for PerPages
+if s.PerPages != nil {
+    if *s.PerPages < 0 {
+        return fmt.Errorf("per_pages cannot be negative")
+    }
+}
+```
+
+### Valid Null Scenarios
+
+All of the following scenarios are valid and pass validation:
+
+1. **All ratio fields nil** - Empty StatsData with no ratio calculations
+2. **Individual field nil** - Some ratio fields calculated, others nil
+3. **Mixed null/value** - Combination of null and non-null ratio fields
+
+### Invalid Scenarios
+
+The following scenarios fail validation:
+
+1. **Negative values** - Any ratio field with a negative value when set
+2. **Nil StatsData** - The StatsData struct itself cannot be nil
+
+### Service Layer Integration
+
+The service layer (implemented in RDL-118) returns `nil` for ratio fields when:
+- Denominator is zero (avoids division by zero)
+- No data available for calculation
+- Previous period has no logs
+
+Example cases where `nil` is returned:
+- `per_pages`: When `previous_week_pages = 0`
+- `per_mean_day`: When `prev_period_mean = 0` or `nil`
+- `per_spec_mean_day`: When `prev_period_spec_mean = 0` or `nil`
+
+### Test Coverage
+
+Comprehensive test coverage for null validation is implemented in `test/unit/dashboard_response_test.go`:
+
+| Test Function | Coverage |
+|---------------|----------|
+| `TestStatsData_RatioFields_NullValidation` | All null scenarios (10 test cases) |
+| `TestStatsData_AllNullRatioFields_Validation` | Acceptance criteria verification |
+| `TestStatsData_MixedNullAndValue_RatioFields` | Mixed null/value combinations (7 test cases) |
+| `TestStatsData_RatioFields_JSONSerialization` | JSON serialization of null values |
+
+### Related Tasks
+
+- **RDL-111**: Updated StatsData DTO with nullable fields
+- **RDL-118**: Implemented null handling in service layer
+- **RDL-119**: Added comprehensive test coverage for null validation
+
+### Example API Response
+
+```json
+{
+  "stats": {
+    "previous_week_pages": 100,
+    "last_week_pages": 150,
+    "per_pages": 1.5,
+    "mean_day": 25.0,
+    "spec_mean_day": 28.75,
+    "per_mean_day": null,
+    "per_spec_mean_day": null,
+    "max_day": 35.0,
+    "mean_geral": 22.5
+  }
+}
+```
+
+In this example:
+- `per_pages` has a value (1.5)
+- `per_mean_day` and `per_spec_mean_day` are `null` (previous period had no data)
+- `max_day` and `mean_geral` have calculated values
+
 ---
 
-*Last updated: 2026-04-03*
+*Last updated: 2026-04-28*
