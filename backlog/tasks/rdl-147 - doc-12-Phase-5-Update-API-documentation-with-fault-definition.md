@@ -3,7 +3,7 @@ id: RDL-147
 title: '[doc-12 Phase 5] Update API documentation with fault definition'
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-05-01 15:08'
 updated_date: '2026-05-01 18:58'
 labels:
