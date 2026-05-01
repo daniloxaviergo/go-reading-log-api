@@ -3,9 +3,9 @@ id: RDL-148
 title: add route v1/dashboard/echart/faults.json
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-05-01 19:29'
-updated_date: '2026-05-01 19:35'
+updated_date: '2026-05-01 19:36'
 labels: []
 dependencies: []
 ---
