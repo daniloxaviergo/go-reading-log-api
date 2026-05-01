@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - Thomas
 created_date: '2026-05-01 11:54'
-updated_date: '2026-05-01 11:55'
+updated_date: '2026-05-01 11:56'
 labels: []
 dependencies: []
 ---
@@ -65,6 +65,28 @@ Step 5: Verify the Solution
     - Explain why the changes resolve the concurrency deadlock.
     - Suggest a command to run tests with increased verbosity (`-v`) or timeout (`-timeout=5m`) to verify the fix.
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Step 1: Analysis Complete
+
+**Issues Identified in test/test_helper.go:**
+
+1. **Long timeout in Close() deferred cleanup**: The `cleanupOrphanedDatabases` function uses a 60-second timeout, which can cause test timeouts when there are many orphaned databases.
+
+2. **Sequential database drops**: The cleanup iterates through all orphaned databases one-by-one, which can be very slow with 6000+ databases.
+
+3. **Pool lifecycle issues**: The `pool.Close()` is called before the deferred cleanup, but the cleanup creates new pools that may block.
+
+4. **No context cancellation propagation**: Database operations during cleanup don't properly respect context cancellation.
+
+**Fix Plan:**
+- Reduce cleanup timeout to 500ms per database operation
+- Add early exit if cleanup takes too long
+- Ensure pool.Close() completes before cleanup
+- Add proper error handling and logging
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
