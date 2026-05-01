@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:08'
-updated_date: '2026-05-01 17:52'
+updated_date: '2026-05-01 17:54'
 labels:
   - bugfix
   - testing
@@ -213,6 +213,28 @@ func TestDashboardFaults_<Scenario>_Integration(t *testing.T) {
 - [ ] Code follows Clean Architecture patterns
 - [ ] `go fmt` and `go vet` pass
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress
+
+### Analysis Complete
+- Reviewed existing integration tests in `test/dashboard_integration_test.go`
+- Found existing edge case tests: EmptyDatabase, SingleLogEntry, MonthBoundary, AllDaysReading, NoReadingActivity
+- Identified missing tests from implementation plan:
+  1. WeekdayFaults_EmptyDatabase_Integration
+  2. WeekdayFaults_SingleLogEntry_Integration
+  3. Faults_YearBoundary_Integration
+  4. Faults_NULLValues_Integration
+  5. WeekdayFaults edge cases integration tests
+
+### Next Steps
+- Add missing integration tests for weekday faults edge cases
+- Add year boundary integration test
+- Add NULL values handling integration test
+- Run all tests to verify coverage
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
