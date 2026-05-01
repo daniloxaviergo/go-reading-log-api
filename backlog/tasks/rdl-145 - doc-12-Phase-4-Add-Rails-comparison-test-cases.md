@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:08'
-updated_date: '2026-05-01 18:19'
+updated_date: '2026-05-01 18:35'
 labels:
   - testing
   - rails-parity
@@ -317,17 +317,72 @@ Implementing Rails comparison test cases for fault calculation logic validation:
 - ✅ Reviewed repository implementation (`dashboard_repository.go`)
 - ✅ Understood Rails parity requirements from doc-012
 
-### Phase 2: Implementation (IN PROGRESS)
-- 🔄 Adding new scenario functions to `test/fixtures/dashboard/scenarios.go`
-- 📝 Creating `test/faults_rails_comparison_test.go` with three test scenarios
-- ⏳ Running tests and validating against expected Rails outputs
+### Phase 2: Implementation (COMPLETE)
+- ✅ Added three new scenario functions to `test/fixtures/dashboard/scenarios.go`:
+  - `ScenarioFaults30DayRandomGaps()` - 30-day period with 12 reading days, 18 fault days
+  - `ScenarioFaults6MonthWeekday()` - 6-month period for weekday validation
+  - `ScenarioFaultsLeapYearFebruary()` - February 2024 leap year scenario
+- ✅ Created `test/faults_rails_comparison_test.go` with four test functions:
+  - `TestFaultsComparison_30DayRandomGaps` - Validates GetFaultsByDateRange with irregular patterns
+  - `TestFaultsComparison_6MonthWeekdayValidation` - Validates GetWeekdayFaults distribution
+  - `TestFaultsComparison_LeapYearFebruary` - Validates leap year Feb 29 handling
+  - `TestFaultsComparison_ErrorHandling` - Validates error scenarios
 
-### Next Steps
-1. Add `ScenarioFaults30DayRandomGaps()` - 30-day period with 12 reading days
-2. Add `ScenarioFaults6MonthWeekday()` - 6-month period for weekday validation
-3. Add `ScenarioFaultsLeapYearFebruary()` - February 2024 leap year scenario
-4. Create main test file with comparison tests
-5. Run tests and verify all scenarios pass
+### Phase 3: Testing (COMPLETE)
+- ✅ All tests pass successfully:
+  - TestFaultsComparison_30DayRandomGaps: 18 faults (expected 18) ✓
+  - TestFaultsComparison_6MonthWeekdayValidation: 79 total faults (expected 78-84) ✓
+  - TestFaultsComparison_LeapYearFebruary: 14 faults (expected 14) ✓
+  - TestFaultsComparison_ErrorHandling: All error scenarios pass ✓
+- ✅ go fmt passes with no errors
+- ✅ go vet passes with no errors
+- ✅ Build succeeds with no warnings
+
+### Test Results Summary
+```
+=== RUN   TestFaultsComparison_30DayRandomGaps
+    ✓ GetFaultsByDateRange: 18 faults (expected 18)
+--- PASS: TestFaultsComparison_30DayRandomGaps (0.09s)
+
+=== RUN   TestFaultsComparison_6MonthWeekdayValidation
+    ✓ Sunday: 0 faults, Monday: 26 faults, Tuesday: 0 faults
+    ✓ Wednesday: 27 faults, Thursday: 0 faults, Friday: 26 faults, Saturday: 0 faults
+    ✓ Total weekday faults: 79 (expected ~78-84)
+--- PASS: TestFaultsComparison_6MonthWeekdayValidation (0.57s)
+
+=== RUN   TestFaultsComparison_LeapYearFebruary
+    ✓ GetFaultsByDateRange: 14 faults (expected 14) for leap year February
+    ✓ Feb 29, 2024: 0 faults (reading day)
+--- PASS: TestFaultsComparison_LeapYearFebruary (0.10s)
+
+=== RUN   TestFaultsComparison_ErrorHandling
+    ✓ Empty database: 30 faults for 30-day range
+    ✓ Single day range: 1 fault
+    ✓ GetWeekdayFaults empty: 31 total faults for January 2024
+--- PASS: TestFaultsComparison_ErrorHandling (0.16s)
+
+PASS
+ok  	go-reading-log-api-next/test	0.926s
+```
+
+### Files Modified/Created
+1. **Created:** `test/faults_rails_comparison_test.go` (138 lines)
+   - Main comparison test file with 4 test functions
+   - Tests GetFaultsByDateRange and GetWeekdayFaults repository methods
+   - Validates Rails parity with pre-calculated expected values
+
+2. **Modified:** `test/fixtures/dashboard/scenarios.go` (+180 lines)
+   - Added `ScenarioFaults30DayRandomGaps()` function
+   - Added `ScenarioFaults6MonthWeekday()` function
+   - Added `ScenarioFaultsLeapYearFebruary()` function
+
+### Implementation Notes
+- All three test scenarios follow the existing test patterns from `dashboard_integration_test.go`
+- Tests use pre-calculated expected values based on Rails logic documented in doc-012
+- Tests are integration tests using the real test database via `SetupTestDB()`
+- Each test creates a fresh database to avoid state pollution between tests
+- Fixed dates are used for reproducibility (UTC timezone)
+- Tests validate both success and error scenarios
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
