@@ -8,6 +8,7 @@ import (
 	"go-reading-log-api-next/internal/config"
 	"go-reading-log-api-next/internal/domain/dto"
 	"go-reading-log-api-next/internal/domain/models"
+	"go-reading-log-api-next/test/testutil"
 )
 
 // TestProject_CalculateDaysUnreading tests the CalculateDaysUnreading method
@@ -40,7 +41,7 @@ func TestProject_CalculateDaysUnreading(t *testing.T) {
 			logs: []*dto.LogResponse{
 				{Data: timePtr(today.AddDate(0, 0, -3))},
 			},
-			expected: intPtr(3),
+			expected: testutil.IntPtr(3),
 		},
 		{
 			name: "multiple_logs_returns_most_recent",
@@ -49,7 +50,7 @@ func TestProject_CalculateDaysUnreading(t *testing.T) {
 				{Data: timePtr(today.AddDate(0, 0, -6))},
 				{Data: timePtr(today.AddDate(0, 0, -4))},
 			},
-			expected: intPtr(4),
+			expected: testutil.IntPtr(4),
 		},
 	}
 
@@ -98,7 +99,7 @@ func TestProject_CalculateDaysUnreading_EdgeCases(t *testing.T) {
 				Reinicia:  false,
 			},
 			logs:     nil,
-			expected: intPtr(0),
+			expected: testutil.IntPtr(0),
 		},
 		{
 			name: "no_logs_with_started_at",
@@ -110,7 +111,7 @@ func TestProject_CalculateDaysUnreading_EdgeCases(t *testing.T) {
 				StartedAt: func() *time.Time { t := time.Now(); return &t }(),
 			},
 			logs:     nil,
-			expected: intPtr(0), // At least 0 days
+			expected: testutil.IntPtr(0), // At least 0 days
 		},
 		{
 			name: "log_after_started_at",
@@ -124,7 +125,7 @@ func TestProject_CalculateDaysUnreading_EdgeCases(t *testing.T) {
 			logs: []*dto.LogResponse{
 				{Data: timePtr(time.Now())}, // Today
 			},
-			expected: intPtr(0),
+			expected: testutil.IntPtr(0),
 		},
 	}
 
@@ -412,7 +413,7 @@ func TestProject_CalculateMedianDay_EdgeCases(t *testing.T) {
 				Page:      50,
 				Reinicia:  false,
 			},
-			expected: floatPtr(0.0),
+			expected: testutil.FloatPtr(0.0),
 		},
 		{
 			name: "zero_days_reading_returns_zero",
@@ -424,7 +425,7 @@ func TestProject_CalculateMedianDay_EdgeCases(t *testing.T) {
 				Reinicia:  false,
 				StartedAt: func() *time.Time { t := time.Now(); return &t }(),
 			},
-			expected: floatPtr(0.0),
+			expected: testutil.FloatPtr(0.0),
 		},
 		{
 			name: "page_zero_returns_zero",
@@ -436,7 +437,7 @@ func TestProject_CalculateMedianDay_EdgeCases(t *testing.T) {
 				Reinicia:  false,
 				StartedAt: func() *time.Time { t := time.Now().AddDate(0, 0, -7); return &t }(),
 			},
-			expected: floatPtr(0.0),
+			expected: testutil.FloatPtr(0.0),
 		},
 	}
 
@@ -712,12 +713,4 @@ func stringPtr(s string) *string {
 
 func timePtr(t time.Time) *time.Time {
 	return &t
-}
-
-func intPtr(i int) *int {
-	return &i
-}
-
-func floatPtr(f float64) *float64 {
-	return &f
 }

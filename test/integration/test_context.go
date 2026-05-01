@@ -14,12 +14,14 @@ import (
 	"go-reading-log-api-next/internal/config"
 	"go-reading-log-api-next/internal/domain/dto"
 	"go-reading-log-api-next/internal/repository"
+	"go-reading-log-api-next/internal/service"
+	"go-reading-log-api-next/internal/service/dashboard"
 	"go-reading-log-api-next/test"
 )
 
 // SetupRoutes is a wrapper for api.SetupRoutes
-func SetupRoutes(repo repository.ProjectRepository, logRepo repository.LogRepository) http.Handler {
-	return api.SetupRoutes(repo, logRepo)
+func SetupRoutes(repo repository.ProjectRepository, logRepo repository.LogRepository, dashboardRepo repository.DashboardRepository, userConfig *service.UserConfigService, projectsService dashboard.ProjectsServiceInterface) http.Handler {
+	return api.SetupRoutes(repo, logRepo, dashboardRepo, userConfig, projectsService)
 }
 
 const testContextTimeout = 30 * time.Second
@@ -57,9 +59,20 @@ func Setup(t *testing.T) *IntegrationTestContext {
 	// Create PostgreSQL repositories (not mocks) for integration tests
 	projectRepo := postgres.NewProjectRepositoryImpl(helper.Pool)
 	logRepo := postgres.NewLogRepositoryImpl(helper.Pool)
+	dashboardRepo := postgres.NewDashboardRepositoryImpl(helper.Pool)
 
-	// Setup routes with PostgreSQL repositories
-	router := SetupRoutes(projectRepo, logRepo)
+	// Create user config service (uses defaults if config file not found)
+	userConfig, err := service.LoadDashboardConfig("dashboard_config.yaml")
+	if err != nil {
+		// Continue with defaults - not critical for integration tests
+		userConfig = service.NewUserConfigService(service.GetDefaultConfig())
+	}
+
+	// Create projects service for dashboard
+	projectsService := dashboard.NewProjectsService(dashboardRepo, helper.Pool)
+
+	// Setup routes with PostgreSQL repositories and services
+	router := SetupRoutes(projectRepo, logRepo, dashboardRepo, userConfig, projectsService)
 
 	return &IntegrationTestContext{
 		TestHelper: helper,

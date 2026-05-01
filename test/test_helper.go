@@ -311,25 +311,27 @@ func (h *TestHelper) Close() {
 				cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBDatabase)
 
 			// First, cleanup orphaned databases from previous sessions
-			// Use 60 second timeout for potentially large cleanup (6000+ databases)
-			ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+			// Use 1 second total timeout to prevent blocking test results
+			ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 			defer cancel()
 
 			mainPool, err := pgxpool.New(ctx, connStr)
 			if err == nil {
+				defer mainPool.Close()
 				// Call cleanupOrphanedDatabases to drop old test databases
 				// Pass current testDBName to exclude it from cleanup
-				_ = cleanupOrphanedDatabases(mainPool, testDBName)
-				mainPool.Close()
+				// Use strict 500ms per-operation timeout to prevent hangs
+				_ = cleanupOrphanedDatabases(mainPool, testDBName, 500*time.Millisecond)
 			}
 
 			// Then drop the current test database
-			// Use 1 second timeout for immediate drop
-			ctx2, cancel2 := context.WithTimeout(context.Background(), 1*time.Second)
+			// Use 500ms timeout for immediate drop
+			ctx2, cancel2 := context.WithTimeout(context.Background(), 500*time.Millisecond)
 			defer cancel2()
 
 			mainPool2, err := pgxpool.New(ctx2, connStr)
 			if err == nil {
+				defer mainPool2.Close()
 				// Use DROP DATABASE IF EXISTS to handle missing databases gracefully
 				// Log errors but don't propagate them to avoid blocking test results
 				_, dropErr := mainPool2.Exec(ctx2, fmt.Sprintf("DROP DATABASE IF EXISTS %s", testDBName))
@@ -338,7 +340,6 @@ func (h *TestHelper) Close() {
 					// This ensures cleanup doesn't block test results
 					_ = dropErr
 				}
-				mainPool2.Close()
 			}
 		}()
 
@@ -375,10 +376,12 @@ func TestName(t *testing.T) string {
 
 // cleanupOrphanedDatabases identifies and drops test databases older than 24 hours
 // excludeName is the current test database name to exclude from cleanup
+// perOperationTimeout is the maximum time allowed for each DROP DATABASE operation
 // This function queries pg_database for databases matching the pattern reading_log_test_%
-// and drops each identified orphan. The cleanup must complete in under 1 minute for 6,000+ databases.
-func cleanupOrphanedDatabases(pool *pgxpool.Pool, excludeName string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+// and drops each identified orphan. The cleanup uses strict timeouts to prevent blocking.
+func cleanupOrphanedDatabases(pool *pgxpool.Pool, excludeName string, perOperationTimeout time.Duration) error {
+	// Use a 1 second total timeout for the entire cleanup operation
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
 	// Query for orphaned databases matching the pattern
@@ -406,9 +409,22 @@ func cleanupOrphanedDatabases(pool *pgxpool.Pool, excludeName string) error {
 		toDrop = append(toDrop, name)
 	}
 
-	// Drop each orphaned database
+	// Drop each orphaned database with strict per-operation timeout
 	for _, dbName := range toDrop {
-		_, dropErr := pool.Exec(ctx, fmt.Sprintf("DROP DATABASE IF EXISTS %s", dbName))
+		// Check if we've exceeded the total timeout
+		select {
+		case <-ctx.Done():
+			// Timeout exceeded, stop cleanup to prevent blocking
+			return nil
+		default:
+			// Continue with cleanup
+		}
+
+		// Use a separate context with strict timeout for each DROP operation
+		dropCtx, dropCancel := context.WithTimeout(context.Background(), perOperationTimeout)
+		_, dropErr := pool.Exec(dropCtx, fmt.Sprintf("DROP DATABASE IF EXISTS %s", dbName))
+		dropCancel()
+
 		if dropErr != nil {
 			// Log errors but don't fail the cleanup
 			// This ensures cleanup doesn't block test results

@@ -1,15 +1,13 @@
 ---
 id: RDL-125
-title: >-
-  [doc-011 Phase 1] Update dashboard_response.go DTOs with ProjectWithLogs and
-  StatsData
+title: '[doc-011 Phase 2] Register /v1/dashboard/projects.json route in routes.go'
 status: To Do
 assignee: []
 created_date: '2026-04-28 11:15'
 labels:
   - feature
   - backend
-  - phase-1
+  - phase-2
 dependencies: []
 documentation:
   - doc-011
@@ -19,15 +17,15 @@ priority: high
 ## Description
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
-Update internal/domain/dto/dashboard_response.go to add/verify ProjectWithLogs struct with all required fields (id, name, total_page, page, started_at, progress, status, logs_count, days_unreading, median_day, finished_at, logs) and StatsData struct for progress_geral, total_pages, pages. Implement JSON marshaling for the response structure matching Rails format.
+Add route registration in internal/api/v1/routes.go for GET /v1/dashboard/projects.json endpoint. Verify route registration does not conflict with existing routes.
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 ProjectWithLogs struct contains all 12 required project fields plus logs array
-- [ ] #2 StatsData struct contains progress_geral, total_pages, pages fields
-- [ ] #3 JSON marshaling produces flat structure with projects array and stats object at root
-- [ ] #4 Float values support 3 decimal precision
+- [ ] #1 Route registered: r.HandleFunc("/v1/dashboard/projects.json", handler.Projects).Methods("GET")
+- [ ] #2 No route conflicts with existing endpoints
+- [ ] #3 Server starts without route registration errors
+- [ ] #4 Endpoint accessible at http://localhost:3000/v1/dashboard/projects.json
 <!-- AC:END -->
 
 ## Definition of Done

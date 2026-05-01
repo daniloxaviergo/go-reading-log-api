@@ -8,6 +8,8 @@ import (
 
 	"go-reading-log-api-next/internal/adapter/postgres"
 	"go-reading-log-api-next/internal/config"
+	"go-reading-log-api-next/internal/service"
+	"go-reading-log-api-next/internal/service/dashboard"
 	"go-reading-log-api-next/test"
 )
 
@@ -258,7 +260,12 @@ func TestProjectsNewWithCustomConfig(t *testing.T) {
 	// Create a router and test server for this test
 	projectRepo := postgres.NewProjectRepositoryImpl(helper.Pool)
 	logRepo := postgres.NewLogRepositoryImpl(helper.Pool)
-	router := SetupRoutes(projectRepo, logRepo)
+	dashboardRepo := postgres.NewDashboardRepositoryImpl(helper.Pool)
+	userConfig, err := service.LoadDashboardConfig("dashboard_config.yaml")
+	if err != nil {
+		userConfig = service.NewUserConfigService(service.GetDefaultConfig())
+	}
+	router := SetupRoutes(projectRepo, logRepo, dashboardRepo, userConfig, dashboard.ProjectsServiceInterface(&MockProjectsService{}))
 	server := httptest.NewServer(router)
 	defer server.Close()
 
