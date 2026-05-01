@@ -3,7 +3,7 @@ id: RDL-141
 title: '[doc-12 Phase 1] Verify context timeout and error handling'
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-05-01 15:07'
 updated_date: '2026-05-01 17:07'
 labels:
