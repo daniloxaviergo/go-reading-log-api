@@ -5,7 +5,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-28 00:28'
-updated_date: '2026-04-28 01:55'
+updated_date: '2026-05-01 14:56'
 labels:
   - handler
   - phase-1
@@ -14,6 +14,7 @@ dependencies: []
 documentation:
   - doc-010
 priority: high
+ordinal: 26000
 ---
 
 ## Description

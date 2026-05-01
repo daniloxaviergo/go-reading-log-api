@@ -5,7 +5,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-21 12:12'
-updated_date: '2026-04-21 14:32'
+updated_date: '2026-05-01 14:56'
 labels:
   - deployment
   - devops
@@ -16,6 +16,7 @@ references:
 documentation:
   - doc-007
 priority: medium
+ordinal: 59000
 ---
 
 ## Description

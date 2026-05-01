@@ -5,7 +5,7 @@ status: Done
 assignee:
   - thomas
 created_date: '2026-04-15 12:15'
-updated_date: '2026-04-16 19:18'
+updated_date: '2026-05-01 14:56'
 labels:
   - benchmark
   - performance
@@ -16,6 +16,7 @@ references:
 documentation:
   - doc-004
 priority: medium
+ordinal: 83000
 ---
 
 ## Description

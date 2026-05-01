@@ -5,7 +5,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-15 12:14'
-updated_date: '2026-04-16 10:38'
+updated_date: '2026-05-01 14:56'
 labels:
   - build
   - automation
@@ -16,6 +16,7 @@ references:
 documentation:
   - doc-004
 priority: medium
+ordinal: 85000
 ---
 
 ## Description

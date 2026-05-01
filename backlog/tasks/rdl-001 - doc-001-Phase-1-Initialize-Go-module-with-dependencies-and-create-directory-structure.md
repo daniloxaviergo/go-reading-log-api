@@ -7,7 +7,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-01 00:57'
-updated_date: '2026-04-01 10:16'
+updated_date: '2026-05-01 14:56'
 labels: []
 dependencies: []
 references:
@@ -17,6 +17,7 @@ references:
 documentation:
   - doc-001
 priority: high
+ordinal: 133000
 ---
 
 ## Description

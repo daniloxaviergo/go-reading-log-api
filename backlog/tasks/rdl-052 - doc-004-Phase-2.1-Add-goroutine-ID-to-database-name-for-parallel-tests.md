@@ -5,7 +5,7 @@ status: Done
 assignee:
   - thomas
 created_date: '2026-04-15 12:15'
-updated_date: '2026-04-16 10:57'
+updated_date: '2026-05-01 14:56'
 labels:
   - parallel
   - concurrency
@@ -16,6 +16,7 @@ references:
 documentation:
   - doc-004
 priority: high
+ordinal: 84000
 ---
 
 ## Description

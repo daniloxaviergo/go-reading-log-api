@@ -5,7 +5,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 13:21'
+updated_date: '2026-05-01 14:56'
 labels:
   - phase-2
   - median-day
@@ -17,6 +17,7 @@ references:
 documentation:
   - doc-005
 priority: medium
+ordinal: 73000
 ---
 
 ## Description

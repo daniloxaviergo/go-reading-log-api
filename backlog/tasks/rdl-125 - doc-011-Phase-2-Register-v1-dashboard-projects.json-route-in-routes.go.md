@@ -1,10 +1,10 @@
 ---
 id: RDL-125
 title: '[doc-011 Phase 2] Register /v1/dashboard/projects.json route in routes.go'
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-04-28 11:15'
-updated_date: '2026-05-01 14:55'
+updated_date: '2026-05-01 14:56'
 labels:
   - feature
   - backend
@@ -13,7 +13,7 @@ dependencies: []
 documentation:
   - doc-011
 priority: high
-ordinal: 2000
+ordinal: 134000
 ---
 
 ## Description

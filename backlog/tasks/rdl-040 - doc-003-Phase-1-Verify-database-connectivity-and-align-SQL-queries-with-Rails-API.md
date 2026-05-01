@@ -7,7 +7,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-12 23:50'
-updated_date: '2026-04-13 00:40'
+updated_date: '2026-05-01 14:56'
 labels:
   - database
   - query
@@ -19,6 +19,7 @@ references:
 documentation:
   - doc-003
 priority: high
+ordinal: 97000
 ---
 
 ## Description

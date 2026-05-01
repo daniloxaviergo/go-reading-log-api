@@ -5,7 +5,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 15:29'
+updated_date: '2026-05-01 14:56'
 labels:
   - phase-4
   - regression-testing
@@ -17,6 +17,7 @@ references:
 documentation:
   - doc-005
 priority: high
+ordinal: 70000
 ---
 
 ## Description

@@ -4,9 +4,10 @@ title: Create a report of all routes of rails app
 status: Done
 assignee: []
 created_date: '2026-04-08 12:26'
-updated_date: '2026-04-08 12:40'
+updated_date: '2026-05-01 14:56'
 labels: []
 dependencies: []
+ordinal: 99000
 ---
 
 ## Description

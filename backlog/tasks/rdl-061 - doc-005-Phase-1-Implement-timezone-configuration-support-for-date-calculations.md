@@ -7,7 +7,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-18 11:46'
-updated_date: '2026-04-18 12:50'
+updated_date: '2026-05-01 14:56'
 labels:
   - phase-1
   - timezone
@@ -19,6 +19,7 @@ references:
 documentation:
   - doc-005
 priority: high
+ordinal: 75000
 ---
 
 ## Description

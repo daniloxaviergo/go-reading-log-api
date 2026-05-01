@@ -5,7 +5,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-15 12:15'
-updated_date: '2026-04-16 19:41'
+updated_date: '2026-05-01 14:56'
 labels:
   - documentation
   - guide
@@ -16,6 +16,7 @@ references:
 documentation:
   - doc-004
 priority: low
+ordinal: 82000
 ---
 
 ## Description

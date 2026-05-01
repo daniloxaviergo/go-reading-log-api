@@ -5,7 +5,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-24 13:41'
-updated_date: '2026-04-24 15:16'
+updated_date: '2026-05-01 14:56'
 labels:
   - feature
   - test-fix
@@ -17,6 +17,7 @@ references:
 documentation:
   - doc-009
 priority: high
+ordinal: 38000
 ---
 
 ## Description

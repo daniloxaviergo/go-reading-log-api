@@ -7,7 +7,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-21 15:49'
-updated_date: '2026-04-21 16:22'
+updated_date: '2026-05-01 14:56'
 labels:
   - phase-1
   - infrastructure
@@ -20,6 +20,7 @@ references:
 documentation:
   - doc-008
 priority: high
+ordinal: 58000
 ---
 
 ## Description

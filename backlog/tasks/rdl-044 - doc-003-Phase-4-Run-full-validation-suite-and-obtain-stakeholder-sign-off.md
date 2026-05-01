@@ -5,7 +5,7 @@ status: Done
 assignee:
   - thomas
 created_date: '2026-04-12 23:51'
-updated_date: '2026-04-13 09:37'
+updated_date: '2026-05-01 14:56'
 labels:
   - testing
   - validation
@@ -22,6 +22,7 @@ references:
 documentation:
   - doc-003
 priority: medium
+ordinal: 93000
 ---
 
 ## Description

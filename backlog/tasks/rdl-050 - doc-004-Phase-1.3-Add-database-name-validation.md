@@ -5,7 +5,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-15 12:14'
-updated_date: '2026-04-16 10:01'
+updated_date: '2026-05-01 14:56'
 labels:
   - validation
   - security
@@ -16,6 +16,7 @@ references:
 documentation:
   - doc-004
 priority: high
+ordinal: 86000
 ---
 
 ## Description

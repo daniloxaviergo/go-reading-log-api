@@ -5,7 +5,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-28 00:30'
-updated_date: '2026-04-28 05:47'
+updated_date: '2026-05-01 14:56'
 labels:
   - comparison-testing
   - phase-5
@@ -14,6 +14,7 @@ dependencies: []
 documentation:
   - doc-010
 priority: high
+ordinal: 17000
 ---
 
 ## Description

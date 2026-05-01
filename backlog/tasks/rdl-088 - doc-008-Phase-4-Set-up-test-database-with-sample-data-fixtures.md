@@ -5,7 +5,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-21 15:51'
-updated_date: '2026-04-22 11:46'
+updated_date: '2026-05-01 14:56'
 labels:
   - phase-4
   - testing
@@ -18,6 +18,7 @@ references:
 documentation:
   - doc-008
 priority: medium
+ordinal: 48000
 ---
 
 ## Description

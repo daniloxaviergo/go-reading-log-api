@@ -7,7 +7,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-18 11:48'
-updated_date: '2026-04-18 16:07'
+updated_date: '2026-05-01 14:56'
 labels:
   - phase-4
   - configuration
@@ -20,6 +20,7 @@ references:
 documentation:
   - doc-005
 priority: medium
+ordinal: 68000
 ---
 
 ## Description

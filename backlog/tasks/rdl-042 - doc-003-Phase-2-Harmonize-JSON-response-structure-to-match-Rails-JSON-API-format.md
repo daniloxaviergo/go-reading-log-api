@@ -7,7 +7,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-12 23:50'
-updated_date: '2026-04-13 02:29'
+updated_date: '2026-05-01 14:56'
 labels:
   - json
   - api
@@ -20,6 +20,7 @@ references:
 documentation:
   - doc-003
 priority: medium
+ordinal: 95000
 ---
 
 ## Description

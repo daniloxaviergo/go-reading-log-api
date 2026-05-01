@@ -5,7 +5,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-21 15:50'
-updated_date: '2026-04-21 20:24'
+updated_date: '2026-05-01 14:56'
 labels:
   - phase-2
   - service
@@ -18,6 +18,7 @@ references:
 documentation:
   - doc-008
 priority: high
+ordinal: 54000
 ---
 
 ## Description

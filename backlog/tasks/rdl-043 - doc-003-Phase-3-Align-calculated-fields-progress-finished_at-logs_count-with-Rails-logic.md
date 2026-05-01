@@ -7,7 +7,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-12 23:51'
-updated_date: '2026-04-13 09:35'
+updated_date: '2026-05-01 14:56'
 labels:
   - calculation
   - logic
@@ -19,6 +19,7 @@ references:
 documentation:
   - doc-003
 priority: low
+ordinal: 94000
 ---
 
 ## Description

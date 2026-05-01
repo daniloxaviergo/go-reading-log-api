@@ -7,7 +7,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-18 11:47'
-updated_date: '2026-04-18 14:37'
+updated_date: '2026-05-01 14:56'
 labels:
   - phase-3
   - naming-convention
@@ -19,6 +19,7 @@ references:
 documentation:
   - doc-005
 priority: medium
+ordinal: 71000
 ---
 
 ## Description

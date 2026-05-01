@@ -5,7 +5,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-03 14:02'
-updated_date: '2026-04-03 16:25'
+updated_date: '2026-05-01 14:56'
 labels:
   - phase-2
   - derived-calculation
@@ -19,6 +19,7 @@ references:
 documentation:
   - doc-002
 priority: high
+ordinal: 117000
 ---
 
 ## Description

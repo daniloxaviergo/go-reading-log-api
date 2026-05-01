@@ -5,7 +5,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-03 14:04'
-updated_date: '2026-04-04 00:39'
+updated_date: '2026-05-01 14:56'
 labels:
   - phase-3
   - performance-test
@@ -17,6 +17,7 @@ references:
 documentation:
   - doc-002
 priority: medium
+ordinal: 108000
 ---
 
 ## Description

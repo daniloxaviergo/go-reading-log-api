@@ -5,7 +5,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-21 12:11'
-updated_date: '2026-04-21 13:31'
+updated_date: '2026-05-01 14:56'
 labels:
   - serialization
   - backend
@@ -16,6 +16,7 @@ references:
 documentation:
   - doc-007
 priority: high
+ordinal: 62000
 ---
 
 ## Description

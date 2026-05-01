@@ -5,9 +5,10 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-01 17:19'
-updated_date: '2026-04-01 17:43'
+updated_date: '2026-05-01 14:56'
 labels: []
 dependencies: []
+ordinal: 123000
 ---
 
 ## Description
@@ -15,6 +16,9 @@ dependencies: []
 <!-- SECTION:DESCRIPTION:BEGIN -->
 Add readme to project
 <!-- SECTION:DESCRIPTION:END -->
+
+## Acceptance Criteria
+No acceptance criteria defined
 
 ## Acceptance Criteria
 No acceptance criteria defined

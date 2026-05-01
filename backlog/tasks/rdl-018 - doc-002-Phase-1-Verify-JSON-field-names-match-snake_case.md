@@ -5,7 +5,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-03 14:02'
-updated_date: '2026-04-03 14:15'
+updated_date: '2026-05-01 14:56'
 labels:
   - phase-1
   - field-alignment
@@ -18,6 +18,7 @@ references:
 documentation:
   - doc-002
 priority: high
+ordinal: 118000
 ---
 
 ## Description

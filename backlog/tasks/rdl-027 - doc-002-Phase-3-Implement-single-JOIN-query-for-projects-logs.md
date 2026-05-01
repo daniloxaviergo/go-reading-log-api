@@ -5,7 +5,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-03 14:03'
-updated_date: '2026-04-03 22:35'
+updated_date: '2026-05-01 14:56'
 labels:
   - phase-3
   - query-optimization
@@ -18,6 +18,7 @@ documentation:
   - >-
     /home/danilo/scripts/github/go-reading-log-api-next/docs/README.go-project.md
 priority: high
+ordinal: 111000
 ---
 
 ## Description

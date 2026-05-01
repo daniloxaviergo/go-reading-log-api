@@ -5,7 +5,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-03 14:04'
-updated_date: '2026-04-04 02:53'
+updated_date: '2026-05-01 14:56'
 labels:
   - phase-4
   - validation-rule
@@ -17,6 +17,7 @@ references:
 documentation:
   - doc-002
 priority: high
+ordinal: 106000
 ---
 
 ## Description

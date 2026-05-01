@@ -5,7 +5,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-21 12:11'
-updated_date: '2026-04-21 13:57'
+updated_date: '2026-05-01 14:56'
 labels:
   - testing
   - backend
@@ -16,6 +16,7 @@ references:
 documentation:
   - doc-007
 priority: medium
+ordinal: 61000
 ---
 
 ## Description

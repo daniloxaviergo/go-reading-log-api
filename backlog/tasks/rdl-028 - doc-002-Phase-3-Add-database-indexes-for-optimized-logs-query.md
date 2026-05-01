@@ -5,7 +5,7 @@ status: Done
 assignee:
   - next-task
 created_date: '2026-04-03 14:03'
-updated_date: '2026-04-03 23:18'
+updated_date: '2026-05-01 14:56'
 labels:
   - phase-3
   - database-index
@@ -16,6 +16,7 @@ references:
 documentation:
   - doc-002
 priority: medium
+ordinal: 109000
 ---
 
 ## Description
