@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:08'
-updated_date: '2026-05-01 17:34'
+updated_date: '2026-05-01 17:38'
 labels:
   - bugfix
   - testing
@@ -283,9 +283,15 @@ The integration test needs to:
 1. ✅ Review task details and acceptance criteria
 2. ✅ Examine current test implementation and fixture
 3. ✅ Understand SQL query logic in `GetWeekdayFaults`
-4. 🔄 Update `ScenarioFaultsByWeekday()` fixture to create proper fault scenarios
-5. ⏳ Update integration test with expected values
-6. ⏳ Run tests and verify
+4. ✅ Update `ScenarioFaultsByWeekday()` fixture to create proper fault scenarios
+   - Created 6-month date range (Oct 1, 2025 to Apr 1, 2026)
+   - Logs on Sun/Tue/Thu/Sat (no faults)
+   - NO logs on Mon/Wed/Fri (these become faults)
+5. ✅ Update integration test with expected values
+   - Set fixed "today" date for predictable results
+   - Calculate expected faults based on fixture design
+   - Validate each weekday's fault count
+6. 🔄 Run tests and verify
 7. ⏳ Check acceptance criteria
 <!-- SECTION:NOTES:END -->
 
