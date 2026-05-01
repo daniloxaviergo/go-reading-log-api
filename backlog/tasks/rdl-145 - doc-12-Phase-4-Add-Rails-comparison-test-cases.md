@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:08'
-updated_date: '2026-05-01 18:16'
+updated_date: '2026-05-01 18:19'
 labels:
   - testing
   - rails-parity
@@ -298,6 +298,37 @@ go test -cover ./test/... -run "TestFaultsComparison"
 - RDL-146: Create faults calculation documentation (related documentation task)
 - RDL-147: Update API documentation with fault definition (related documentation task)
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress
+
+### Task Overview
+Implementing Rails comparison test cases for fault calculation logic validation:
+1. 30-day range with random gaps
+2. 6-month range for weekday faults validation  
+3. Edge case with leap year February
+
+### Phase 1: Understanding Codebase (COMPLETE)
+- ✅ Reviewed task RDL-145 details and implementation plan
+- ✅ Examined existing test infrastructure (`dashboard_integration_test.go`)
+- ✅ Analyzed fixture patterns (`scenarios.go`, `fixtures.go`)
+- ✅ Reviewed repository implementation (`dashboard_repository.go`)
+- ✅ Understood Rails parity requirements from doc-012
+
+### Phase 2: Implementation (IN PROGRESS)
+- 🔄 Adding new scenario functions to `test/fixtures/dashboard/scenarios.go`
+- 📝 Creating `test/faults_rails_comparison_test.go` with three test scenarios
+- ⏳ Running tests and validating against expected Rails outputs
+
+### Next Steps
+1. Add `ScenarioFaults30DayRandomGaps()` - 30-day period with 12 reading days
+2. Add `ScenarioFaults6MonthWeekday()` - 6-month period for weekday validation
+3. Add `ScenarioFaultsLeapYearFebruary()` - February 2024 leap year scenario
+4. Create main test file with comparison tests
+5. Run tests and verify all scenarios pass
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
