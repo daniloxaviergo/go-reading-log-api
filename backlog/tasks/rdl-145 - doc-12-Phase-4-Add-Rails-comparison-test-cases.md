@@ -2,8 +2,10 @@
 id: RDL-145
 title: '[doc-12 Phase 4] Add Rails comparison test cases'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-05-01 15:08'
+updated_date: '2026-05-01 18:09'
 labels:
   - testing
   - rails-parity
