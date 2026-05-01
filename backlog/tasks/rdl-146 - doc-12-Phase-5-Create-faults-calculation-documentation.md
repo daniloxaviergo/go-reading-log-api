@@ -249,6 +249,72 @@ Since this is a documentation task, "testing" involves:
 - [x] #10 Integration tests verify actual database interactions (verified with TestFaultsComparison tests)
 <!-- SECTION:NOTES:END -->
 
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## PR: Create Faults Calculation Documentation
+
+### What Was Done
+Created comprehensive technical documentation for the faults calculation logic that was fixed in Phase 4 (RDL-139, RDL-140). The documentation serves as a reference for developers to understand the fault calculation concept, SQL implementation, and Rails parity.
+
+### Key Changes
+- **Created:** `docs/faults-calculation-explanation.md` (21KB, 200+ lines)
+- **Documentation Sections:**
+  1. Overview - High-level fault concept explanation
+  2. Fault Definition - Precise definition matching Rails behavior
+  3. SQL Query Breakdown - Detailed CTE structure explanation
+  4. Visual Examples - 4 detailed scenarios with ASCII diagrams
+  5. Edge Cases - NULL values, single-day ranges, empty database, leap year
+  6. Rails Comparison - Side-by-side implementation comparison
+  7. Previous Incorrect Implementation - What was wrong and how it was fixed
+  8. Related Files - Complete reference to implementation and test files
+
+### Technical Details
+- Documented both `GetFaultsByDateRange` and `GetWeekdayFaults` methods
+- Included complete SQL query breakdowns with inline comments
+- Created visual diagrams for 4 test scenarios:
+  - 10-day period with irregular reading
+  - 30-day period with random gaps (18 faults)
+  - 6-month weekday distribution (79 faults)
+  - Leap year February (14 faults)
+- Explained the CTE approach with daily_read and all_dates CTEs
+- Documented all edge cases from PRD doc-012
+
+### Tests Run
+- ✅ TestFaultsComparison_30DayRandomGaps: PASS (18 faults)
+- ✅ TestFaultsComparison_6MonthWeekdayValidation: PASS (79 faults)
+- ✅ TestFaultsComparison_LeapYearFebruary: PASS (14 faults)
+- ✅ TestFaultsComparison_ErrorHandling: PASS (empty DB, single day, weekday)
+- ✅ go fmt: No errors
+- ✅ go vet: No errors
+
+### Documentation Accuracy
+- SQL queries match current implementation in `dashboard_repository.go`
+- Examples use dates from existing test fixtures
+- Fault counts match expected values in tests
+- Edge cases fully documented
+- Rails comparison accurate and complete
+
+### Files Modified
+- `docs/faults-calculation-explanation.md` (created)
+
+### Related Tasks
+- RDL-139: Update GetFaultsByDateRange SQL query with CTE ✅
+- RDL-140: Update GetWeekdayFaults SQL query with CTE ✅
+- RDL-145: Add Rails comparison test cases ✅
+- RDL-147: Update API documentation with fault definition (in progress)
+
+### Notes for Reviewers
+- Documentation follows existing style in `docs/README.go-project.md`
+- Includes version reference and last-updated date for maintenance
+- Technical writing aimed at developers with both high-level concepts and low-level SQL details
+- Success criteria met: new developers can understand faults calculation without reading code
+
+### Risks/Follow-ups
+- None - Documentation is version-controlled and will stay synchronized with code changes
+- Future code changes should update this documentation accordingly
+<!-- SECTION:FINAL_SUMMARY:END -->
+
 ## Definition of Done
 <!-- DOD:BEGIN -->
 - [ ] #1 All unit tests pass
