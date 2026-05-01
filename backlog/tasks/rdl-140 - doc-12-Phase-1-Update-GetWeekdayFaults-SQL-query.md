@@ -2,8 +2,10 @@
 id: RDL-140
 title: '[doc-12 Phase 1] Update GetWeekdayFaults SQL query'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-05-01 15:07'
+updated_date: '2026-05-01 16:22'
 labels:
   - bugfix
   - repository
