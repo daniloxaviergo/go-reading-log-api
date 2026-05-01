@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:08'
-updated_date: '2026-05-01 19:07'
+updated_date: '2026-05-01 19:08'
 labels:
   - documentation
   - phase-5
@@ -300,6 +300,89 @@ This task involves updating the API documentation to clarify the fault definitio
 
 **Ready to mark task as Done**
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## PR Summary: Update API documentation with fault definition
+
+### What was done
+
+Updated `QWEN.md` to add comprehensive documentation for the Dashboard API endpoints and fault calculation metrics. This task completes Phase 5 of the documentation update initiative.
+
+### Key Changes
+
+#### 1. Added "Dashboard Endpoints" Section
+
+New section added after "Logs Endpoints" documenting all dashboard-related API endpoints:
+
+- **Health Check** (`/healthz`) - Already existed, included for completeness
+- **Daily Statistics** (`/v1/dashboard/day.json`) - Daily stats with weekday breakdown
+- **Faults** (`/v1/dashboard/echart/faults.json`) - Gauge chart for fault percentage
+- **Weekday Faults** (`/v1/dashboard/echart/faults_week_day.json`) - Radar chart for weekday distribution
+- **Speculate vs Actual** (`/v1/dashboard/echart/speculate_actual.json`) - Line chart comparison
+- **Mean Progress** (`/v1/dashboard/echart/mean_progress.json`) - Progress trend over time
+- **Yearly Total** (`/v1/dashboard/echart/last_year_total.json`) - Weekly fault totals for 52 weeks
+- **Dashboard Projects** (`/v1/dashboard/projects.json`) - Running projects in JSON:API format
+- **Projects With Logs** (`/v1/dashboard/projects_with_logs.json`) - Projects with eager-loaded logs
+- **Last Days Trend** (`/v1/dashboard/last_days.json`) - Trend data for last N days
+
+Each endpoint includes:
+- Method, path, description, authentication, response codes
+- Query parameters (where applicable)
+- curl request examples
+- Sample JSON responses
+- Error responses (where applicable)
+
+#### 2. Added "Fault Metrics" Subsection
+
+New subsection under "Calculated Fields" documenting fault calculation:
+
+- **Clear fault definition:** "A fault is a day with zero pages read"
+- **Key concept:** Faults are counted per day, not per log entry
+- **Metric table:** `fault_count`, `fault_percentage`, `weekday_faults`
+- **Calculation example:** 10-day period visual table showing fault counting
+- **SQL query pattern:** CTE-based query with detailed breakdown
+- **Weekday faults documentation:** DOW mapping (0=Sunday to 6=Saturday)
+- **6 edge cases documented:**
+  1. Empty Database
+  2. Single-Day Range
+  3. NULL Values in Logs
+  4. Logs with Zero Pages
+  5. All Days Have Reading
+  6. Date Range Boundaries
+
+- **Rails parity section:** Confirms Go implementation matches Rails behavior
+
+### Files Modified
+
+| File | Change Type | Lines Added |
+|------|-------------|-------------|
+| `QWEN.md` | Modified | ~650 lines |
+
+### Testing
+
+**This is a documentation task - no code changes were made.**
+
+Validation completed:
+- ✅ All unit tests pass (`go test ./...`)
+- ✅ All integration tests pass
+- ✅ `go fmt ./...` passes with no errors
+- ✅ `go vet ./...` passes with no errors
+- ✅ Documentation accuracy verified against `docs/faults-calculation-explanation.md`
+- ✅ SQL queries in documentation match actual implementation in `internal/adapter/postgres/dashboard_repository.go`
+
+### Risks/Follow-ups
+
+**No risks identified.** This is a documentation-only change with no impact on existing functionality.
+
+**Future maintenance note:** If faults calculation logic changes in the code, both `QWEN.md` and `docs/faults-calculation-explanation.md` need to be updated to stay in sync.
+
+### Related Tasks
+
+- **RDL-146:** Created faults calculation documentation (`docs/faults-calculation-explanation.md`) - Prerequisite ✅
+- **RDL-139 to RDL-145:** Implemented and tested faults calculation logic - Prerequisites ✅
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
