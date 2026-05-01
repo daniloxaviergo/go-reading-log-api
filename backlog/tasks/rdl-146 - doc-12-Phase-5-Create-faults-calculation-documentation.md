@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:08'
-updated_date: '2026-05-01 18:43'
+updated_date: '2026-05-01 18:45'
 labels:
   - documentation
   - phase-5
@@ -207,6 +207,27 @@ Since this is a documentation task, "testing" involves:
 
 **Total Estimated Time:** ~2 hours
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Starting implementation of faults calculation documentation.
+
+**Progress:**
+1. ✅ Read reference materials:
+   - `internal/adapter/postgres/dashboard_repository.go` - Current SQL implementation
+   - `test/faults_rails_comparison_test.go` - Test scenarios
+   - `test/fixtures/dashboard/scenarios.go` - Test fixture definitions
+   - `prd_view doc-012` - PRD with technical decisions
+
+2. 🔄 Creating documentation structure for `docs/faults-calculation-explanation.md`
+
+**Next Steps:**
+- Create the documentation file with all required sections
+- Include SQL query breakdowns with CTE explanations
+- Add visual examples and diagrams
+- Document edge cases and Rails comparisons
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
