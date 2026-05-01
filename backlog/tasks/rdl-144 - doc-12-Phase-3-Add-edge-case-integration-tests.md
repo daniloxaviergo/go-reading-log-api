@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-01 15:08'
-updated_date: '2026-05-01 17:54'
+updated_date: '2026-05-01 18:05'
 labels:
   - bugfix
   - testing
@@ -222,18 +222,23 @@ func TestDashboardFaults_<Scenario>_Integration(t *testing.T) {
 ### Analysis Complete
 - Reviewed existing integration tests in `test/dashboard_integration_test.go`
 - Found existing edge case tests: EmptyDatabase, SingleLogEntry, MonthBoundary, AllDaysReading, NoReadingActivity
-- Identified missing tests from implementation plan:
-  1. WeekdayFaults_EmptyDatabase_Integration
-  2. WeekdayFaults_SingleLogEntry_Integration
-  3. Faults_YearBoundary_Integration
-  4. Faults_NULLValues_Integration
-  5. WeekdayFaults edge cases integration tests
+- Identified missing tests from implementation plan
+
+### Tests Added (All Passing)
+1. ✅ `TestDashboardFaults_YearBoundary_Integration` - Year transition edge case (Dec 30 to Jan 2)
+2. ✅ `TestDashboardFaults_ZeroPagesRead_Integration` - Integration test for zero pages scenario
+3. ✅ `TestDashboardWeekdayFaults_EmptyDatabase_Integration` - Weekday faults with empty database
+4. ✅ `TestDashboardWeekdayFaults_SingleLogEntry_Integration` - Weekday faults with single log
+
+### Notes
+- NULL values test was removed because the logs table has NOT NULL constraints on start_page/end_page
+- NULL handling is covered in unit tests (dashboard_repository_test.go)
+- Zero pages read scenario covers the practical equivalent
 
 ### Next Steps
-- Add missing integration tests for weekday faults edge cases
-- Add year boundary integration test
-- Add NULL values handling integration test
-- Run all tests to verify coverage
+- Run all tests to verify nothing broke
+- Run go fmt and go vet
+- Update task status
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
