@@ -4,6 +4,7 @@ title: '[doc-10 Phase 1] Update handler tests for new response structure'
 status: To Do
 assignee: []
 created_date: '2026-04-28 00:27'
+updated_date: '2026-05-01 14:55'
 labels:
   - testing
   - phase-1
@@ -12,6 +13,7 @@ dependencies: []
 documentation:
   - doc-010
 priority: high
+ordinal: 1000
 ---
 
 ## Description
