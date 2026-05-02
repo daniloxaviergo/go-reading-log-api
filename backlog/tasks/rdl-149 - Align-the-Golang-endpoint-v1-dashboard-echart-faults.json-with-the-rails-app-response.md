@@ -6,6 +6,7 @@ title: >-
 status: To Do
 assignee: []
 created_date: '2026-05-02 11:43'
+updated_date: '2026-05-02 11:50'
 labels: []
 dependencies: []
 ---
@@ -52,6 +53,38 @@ Phase 5: Verification Loop
 
 Constraint: Modify only the Golang code. The final JSON response must be identical to the Rails application response.
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Phase 1: Baseline Analysis - COMPLETED
+
+### Rails Reference Response
+```json
+{"echart":{"tooltip":{"formatter":"{a}: {c}%"},"toolbox":{},"series":[{"name":"Faults","type":"gauge","detail":{"formatter":"{value}%"},"data":[{"value":1000.0}]}]}}
+```
+
+### Key Findings:
+1. **Structure**: Rails returns flat JSON with `echart` at root level (NOT JSON:API envelope)
+2. **Tooltip**: Has `formatter: "{a}: {c}%"` 
+3. **Toolbox**: Empty object `{}`
+4. **Series**: 
+   - Has `detail` field with `formatter: "{value}%"`
+   - Data is array of objects: `[{"value": 1000.0}]`
+   - NOT a simple array of values
+
+### Discrepancies Identified:
+1. Go wraps response in JSON:API envelope - needs to be removed
+2. Series missing `detail` field configuration
+3. Series data format differs (objects vs simple values)
+4. Tooltip formatter differs
+
+## Phase 2: Implementation Plan
+1. Add `Detail` field to Series struct in DTO
+2. Update Faults handler to return flat JSON (not JSON:API envelope)
+3. Update CreateGaugeChart to include detail formatter and proper data format
+4. Add SetToolbox method support if needed
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
