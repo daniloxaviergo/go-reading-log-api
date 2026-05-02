@@ -6,7 +6,7 @@ title: >-
 status: To Do
 assignee: []
 created_date: '2026-05-02 11:43'
-updated_date: '2026-05-02 12:04'
+updated_date: '2026-05-02 12:05'
 labels: []
 dependencies: []
 ---
@@ -137,6 +137,83 @@ Constraint: Modify only the Golang code. The final JSON response must be identic
 | Detail formatter | `"{value}%"` | `"{value}%"` | ✅ Match |
 | Data format | `[{"value": 1000.0}]` | `[{"value": 80}]` | ✅ Match |
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Aligned the Golang endpoint `/v1/dashboard/echart/faults.json` response with the Rails application response by modifying the response structure from JSON:API envelope format to flat JSON with `echart` at root level.
+
+## What Was Done
+
+### Main Changes
+1. **DTO Layer** (`internal/domain/dto/dashboard_response.go`):
+   - Added `Detail` field to `Series` struct to support gauge chart detail configuration
+   - Added `SetDetail()` method to Series for fluent configuration
+   - Updated `NewSeries()` to initialize Detail map
+   - Changed `Toolbox` field from `omitempty` to always serialize (to match Rails empty `{}`)
+
+2. **Service Layer** (`internal/service/dashboard/faults_service.go`):
+   - Updated `CreateGaugeChart()` to match Rails response structure:
+     - Removed title (Rails response has no title)
+     - Changed tooltip formatter from `"{a} <br/>{b} : {c}%"` to `"{a}: {c}%"`
+     - Added empty toolbox: `{}`
+     - Added detail formatter: `"{value}%"`
+     - Changed data format from `[percentage]` to `[{"value": percentage}]`
+
+3. **Handler Layer** (`internal/api/v1/handlers/dashboard_handler.go`):
+   - Updated `Faults()` handler to return flat JSON with `echart` key at root level
+   - Removed JSON:API envelope wrapping
+   - Changed content type from `application/vnd.api+json` to `application/json`
+
+### Test Updates
+- `test/unit/faults_service_test.go`: Updated `TestFaultsService_CreateGaugeChart` to verify new structure
+- `test/dashboard_integration_test.go`: 
+  - Updated `parseDashboardResponse()` to handle flat JSON with echart at root
+  - Updated `TestDashboardFaultsChart_Integration` to verify new structure
+  - Fixed type assertions for data object format
+- `internal/api/v1/handlers/dashboard_handler_test.go`: Updated `TestDashboardHandler_Faults` to test new response format
+
+## Key Changes Summary
+
+| Component | Before | After |
+|-----------|--------|-------|
+| Response Structure | JSON:API envelope | Flat JSON with `echart` at root |
+| Content-Type | `application/vnd.api+json` | `application/json` |
+| Series Data | `[80.0]` | `[{"value": 80.0}]` |
+| Tooltip Formatter | `"{a} <br/>{b} : {c}%"` | `"{a}: {c}%"` |
+| Toolbox | Not present | `{}` |
+| Detail | Not present | `{"formatter": "{value}%"}` |
+
+## Tests Run
+- All unit tests pass
+- All integration tests pass
+- `go fmt` passes
+- `go vet` passes
+- Code compiles successfully
+
+## Final Response Example
+```json
+{
+  "echart": {
+    "tooltip": {"formatter": "{a}: {c}%"},
+    "toolbox": {},
+    "series": [{
+      "name": "Faults",
+      "type": "gauge",
+      "detail": {"formatter": "{value}%"},
+      "data": [{"value": 80}],
+      "itemStyle": {"color": "#f44336"}
+    }]
+  }
+}
+```
+
+## Risks/Follow-ups
+- No risks identified - changes are isolated to the faults endpoint
+- Other ECharts endpoints remain unaffected (they still use JSON:API envelope format)
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
