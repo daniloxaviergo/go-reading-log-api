@@ -1,0 +1,68 @@
+---
+id: RDL-149
+title: >-
+  Align the Golang endpoint v1/dashboard/echart/faults.json with the @rails-app
+  response
+status: To Do
+assignee: []
+created_date: '2026-05-02 11:43'
+labels: []
+dependencies: []
+---
+
+## Description
+
+<!-- SECTION:DESCRIPTION:BEGIN -->
+You are tasked with aligning the Golang API response with the Rails application response for the v1/dashboard/echart/faults.json endpoint. Follow this step-by-step reasoning process to solve the problem:
+
+1. Retrieve Reference Data: Execute curl http://0.0.0.0:3001/v1/dashboard/echart/faults.json to capture the exact JSON output from the Rails application.
+2. Analyze Rails Structure: Inspect the Rails JSON response to determine the schema, including key names, value types (strings, integers, booleans, nulls), array structures, and any specific formatting requirements.
+3. Review Golang Implementation: Examine the existing Golang code handling the v1/dashboard/echart/faults.json endpoint to understand how it currently constructs the JSON response.
+4. Identify Discrepancies: Systematically compare the Rails response schema from Step 2 with the Golang output. Note differences in field naming, data serialization, null handling, or missing fields.
+5. Plan Modifications: Determine the specific changes required in the Golang structs, serialization logic, or data mapping to match the Rails output exactly.
+6. Implement Changes: Write the corrected Golang code. You must change only the Golang code, and the final response must be identical to the Rails response.
+7. Verify Consistency: Confirm that the new Golang code will produce a response byte-for-byte identical to the Rails response captured in Step 1.
+
+Provide the final corrected Golang code and a summary of the differences found and resolved.
+<!-- SECTION:DESCRIPTION:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+Phase 1: Baseline Analysis
+1. Execute curl http://0.0.0.0:3001/v1/dashboard/echart/faults.json to retrieve the Rails reference response.
+2. Analyze the JSON structure, including data types, key ordering, null values, and array structures.
+
+Phase 2: Initial Implementation
+1. Review the existing Golang code for the target endpoint.
+2. Draft changes to the Golang structs and handlers to mirror the Rails response structure.
+
+Phase 3: Critique and Comparison
+1. Generate the output of the Draft Implementation.
+2. Compare it byte-for-byte or structurally against the Rails reference from Phase 1.
+3. Identify all discrepancies, such as type mismatches, missing fields, or serialization differences.
+
+Phase 4: Refinement
+1. Adjust the Golang code to address every discrepancy identified in Phase 3.
+2. Ensure only the necessary Golang code is changed; do not modify other endpoints or logic.
+
+Phase 5: Verification Loop
+1. Repeat Phase 3 and Phase 4 until the Golang response matches the Rails response exactly.
+2. Confirm the final output is identical.
+
+Constraint: Modify only the Golang code. The final JSON response must be identical to the Rails application response.
+<!-- SECTION:PLAN:END -->
+
+## Definition of Done
+<!-- DOD:BEGIN -->
+- [ ] #1 All unit tests pass
+- [ ] #2 All integration tests pass execution and verification
+- [ ] #3 go fmt and go vet pass with no errors
+- [ ] #4 Clean Architecture layers properly followed
+- [ ] #5 Error responses consistent with existing patterns
+- [ ] #6 HTTP status codes correct for response type
+- [ ] #7 Documentation updated in QWEN.md
+- [ ] #8 New code paths include error path tests
+- [ ] #9 HTTP handlers test both success and error responses
+- [ ] #10 Integration tests verify actual database interactions
+<!-- DOD:END -->
