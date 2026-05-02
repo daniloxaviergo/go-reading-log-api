@@ -6,7 +6,7 @@ title: >-
 status: To Do
 assignee: []
 created_date: '2026-05-02 11:43'
-updated_date: '2026-05-02 11:50'
+updated_date: '2026-05-02 11:54'
 labels: []
 dependencies: []
 ---
@@ -79,11 +79,49 @@ Constraint: Modify only the Golang code. The final JSON response must be identic
 3. Series data format differs (objects vs simple values)
 4. Tooltip formatter differs
 
-## Phase 2: Implementation Plan
-1. Add `Detail` field to Series struct in DTO
-2. Update Faults handler to return flat JSON (not JSON:API envelope)
-3. Update CreateGaugeChart to include detail formatter and proper data format
-4. Add SetToolbox method support if needed
+## Phase 2: Initial Implementation - COMPLETED
+
+### Changes Made:
+
+#### 1. DTO Updates (`internal/domain/dto/dashboard_response.go`)
+- Added `Detail` field to `Series` struct
+- Added `SetDetail()` method to Series
+- Updated `NewSeries()` to initialize Detail map
+
+#### 2. Service Layer Updates (`internal/service/dashboard/faults_service.go`)
+- Updated `CreateGaugeChart()` to:
+  - Remove title (Rails response has no title)
+  - Use correct tooltip formatter: `"{a}: {c}%"`
+  - Add empty toolbox: `{}`
+  - Add detail formatter: `"{value}%"`
+  - Change data format from `[percentage]` to `[{"value": percentage}]`
+
+#### 3. Handler Updates (`internal/api/v1/handlers/dashboard_handler.go`)
+- Updated `Faults()` handler to:
+  - Return flat JSON with `echart` key at root level
+  - Remove JSON:API envelope wrapping
+  - Change content type from `application/vnd.api+json` to `application/json`
+
+#### 4. Test Updates (`test/unit/faults_service_test.go`)
+- Updated `TestFaultsService_CreateGaugeChart` to verify:
+  - No title in response
+  - Data format as objects with "value" key
+  - Detail formatter present
+  - Tooltip formatter matches Rails
+  - Toolbox present
+
+## Phase 3: Critique and Comparison - IN PROGRESS
+
+### Verification:
+- ✅ Code compiles successfully
+- ✅ `go vet` passes with no errors
+- ✅ `go fmt` applied
+- ✅ Unit tests pass
+
+### Next Steps:
+- Run full test suite
+- Verify integration tests
+- Compare final output structure
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
