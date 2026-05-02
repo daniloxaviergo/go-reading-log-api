@@ -3,7 +3,7 @@ id: RDL-149
 title: >-
   Align the Golang endpoint v1/dashboard/echart/faults.json with the @rails-app
   response
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-05-02 11:43'
 updated_date: '2026-05-02 12:05'
