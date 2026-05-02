@@ -1,9 +1,10 @@
 ---
 id: RDL-150
 title: test
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-05-02 11:46'
+updated_date: '2026-05-02 11:46'
 labels: []
 dependencies: []
 ---
