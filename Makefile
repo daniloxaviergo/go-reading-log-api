@@ -108,28 +108,27 @@ build:
 test:
 	@echo "$(BLUE)Running all tests...$(NC)"
 	@echo "$(BLUE)Loading test configuration from .env.test...$(NC)"
-	@export $$(xargs < .env.test | grep -v '^#' | xargs) && $(GO_TEST) -timeout=5m $(TEST_PKG)
+	$(GO_TEST) -timeout=5m $(TEST_PKG)
 	@echo "$(GREEN)All tests passed!$(NC)"
 
 # Run tests with verbose output
 test-verbose:
 	@echo "$(BLUE)Running tests with verbose output...$(NC)"
 	@echo "$(BLUE)Loading test configuration from .env.test...$(NC)"
-	@export $$(xargs < .env.test | grep -v '^#' | xargs) && $(GO_TEST) -v -timeout=5m $(TEST_PKG)
+	$(GO_TEST) -v -timeout=5m $(TEST_PKG)
 
 # Run tests with coverage report
 test-coverage:
 	@echo "$(BLUE)Running tests with coverage...$(NC)"
 	@echo "$(BLUE)Loading test configuration from .env.test...$(NC)"
-	@export $$(xargs < .env.test | grep -v '^#' | xargs) && $(GO_TEST) -coverprofile=$(COVERAGE_FILE) -timeout=5m $(TEST_PKG)
+	$(GO_TEST) -coverprofile=$(COVERAGE_FILE) -timeout=5m $(TEST_PKG)
 	@echo "$(GREEN)Coverage report generated: $(COVERAGE_FILE)$(NC)"
 	$(GO) tool cover -func=$(COVERAGE_FILE)
 
 # Clean up orphaned test databases
 test-clean:
 	@echo "$(BLUE)Cleaning up orphaned test databases...$(NC)"
-	@export $$(xargs < .env.test | grep -v '^#' | xargs) && \
-		$(GO) run ./test/cleanup_orphaned_databases.go 2>/dev/null || \
+	$(GO) run ./test/cleanup_orphaned_databases.go 2>/dev/null || \
 		echo "$(YELLOW)No orphaned databases found or cleanup skipped$(NC)"
 	@echo "$(GREEN)Cleanup complete$(NC)"
 
@@ -138,8 +137,7 @@ benchmark-parallel:
 	@echo "$(BLUE)========================================$(NC)"
 	@echo "$(BLUE)  Running Parallel Performance Benchmarks$(NC)"
 	@echo "$(BLUE)========================================$(NC)"
-	@export $$(xargs < .env.test | grep -v '^#' | xargs) && \
-		$(GO) test -bench=BenchmarkParallel -benchmem -count=3 $(TEST_PKG)/performance
+	$(GO) test -bench=BenchmarkParallel -benchmem -count=3 $(TEST_PKG)/performance
 	@echo "$(GREEN)Benchmark complete$(NC)"
 	@echo "$(YELLOW)Run 'go tool pprof -http=:8080 profile.out' to analyze results$(NC)"
 
@@ -150,8 +148,7 @@ benchmark-large-scale:
 	@echo "$(BLUE)  Dataset: 100 projects, 10,000+ logs$(NC)"
 	@echo "$(BLUE)  Threshold: P95 < 500ms$(NC)"
 	@echo "$(BLUE)========================================$(NC)"
-	@export $$(xargs < .env.test | grep -v '^#' | xargs) && \
-		$(GO) test -bench=BenchmarkLargeScale -benchmem -count=3 $(TEST_PKG)/performance
+	$(GO) test -bench=BenchmarkLargeScale -benchmem -count=3 $(TEST_PKG)/performance
 	@echo "$(GREEN)Large-scale benchmark complete$(NC)"
 	@echo "$(YELLOW)Results documented in: docs/performance/large-scale-benchmarks.md$(NC)"
 
@@ -163,8 +160,7 @@ compare-responses:
 	@echo "$(YELLOW)Note: RAILS_API_URL must be set (e.g., http://localhost:3001)$(NC)"
 	@echo "$(YELLOW)Make sure Rails API is running on port 3001$(NC)"
 	@echo ""
-	@export $$(xargs < .env.test | grep -v '^#' | xargs) && \
-		$(GO) test -v ./test/integration/... -run ".*Comparison.*"
+	$(GO) test -v ./test/integration/... -run ".*Comparison.*"
 
 # Alias for test-clean (convenience)
 test-cleanup: test-clean

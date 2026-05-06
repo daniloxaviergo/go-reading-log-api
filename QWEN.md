@@ -432,6 +432,465 @@ curl http://localhost:3000/v1/projects/1/logs.json
 
 ---
 
+## Dashboard Endpoints
+
+The Dashboard API provides statistics, trends, and visualization data for the reading log dashboard. All endpoints return JSON responses.
+
+### Health Check (Dashboard)
+
+| Property | Value |
+|----------|-------|
+| **Method** | GET |
+| **Path** | `/healthz` |
+| **Description** | Returns health status of the API service |
+| **Authentication** | None |
+| **Response Code** | 200 OK |
+
+**Request:**
+```bash
+curl http://localhost:3000/healthz
+```
+
+**Response (200 OK):**
+```json
+{
+  "status": "healthy",
+  "message": "API is running"
+}
+```
+
+---
+
+### Daily Statistics
+
+| Property | Value |
+|----------|-------|
+| **Method** | GET |
+| **Path** | `/v1/dashboard/day.json` |
+| **Description** | Returns daily statistics with weekday breakdown for a target date |
+| **Authentication** | None |
+| **Response Code** | 200 OK, 400 Bad Request |
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `date` | string | No | Target date in RFC3339 format. Defaults to today if not provided |
+
+**Request:**
+```bash
+# Get today's statistics
+curl http://localhost:3000/v1/dashboard/day.json
+
+# Get statistics for a specific date
+curl http://localhost:3000/v1/dashboard/day.json?date=2024-01-15T00:00:00Z
+```
+
+**Response (200 OK):**
+```json
+{
+  "stats": {
+    "total_pages": 150,
+    "mean_day": 25.0,
+    "spec_mean_day": 28.75,
+    "progress_geral": 35.5,
+    "per_pages": 1.2,
+    "max_day": 45.0,
+    "mean_geral": 22.5,
+    "per_mean_day": 1.1,
+    "per_spec_mean_day": 1.15
+  }
+}
+```
+
+**Error Response (400 Bad Request) - Invalid Date:**
+```json
+{
+  "error": "invalid date format",
+  "details": {
+    "date": "must be in RFC3339 format"
+  }
+}
+```
+
+---
+
+### Faults (ECharts Gauge)
+
+| Property | Value |
+|----------|-------|
+| **Method** | GET |
+| **Path** | `/v1/dashboard/echart/faults.json` |
+| **Description** | Returns gauge chart configuration for fault percentage visualization |
+| **Authentication** | None |
+| **Response Code** | 200 OK |
+
+**Request:**
+```bash
+curl http://localhost:3000/v1/dashboard/echart/faults.json
+```
+
+**Response (200 OK):**
+```json
+{
+  "data": {
+    "type": "dashboard_echart_faults",
+    "id": "1714521600",
+    "attributes": {
+      "title": "Fault Percentage",
+      "series": [
+        {
+          "type": "gauge",
+          "data": [
+            {
+              "value": 25.5,
+              "name": "Fault %"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+**Fault Definition:**  
+A **fault** is a day with zero pages read. The fault percentage is calculated as:
+```
+fault_percentage = (fault_days / total_days_in_range) * 100
+```
+
+Where the default date range is the last 30 days.
+
+---
+
+### Weekday Faults (ECharts Radar)
+
+| Property | Value |
+|----------|-------|
+| **Method** | GET |
+| **Path** | `/v1/dashboard/echart/faults_week_day.json` |
+| **Description** | Returns radar chart configuration for weekday fault distribution |
+| **Authentication** | None |
+| **Response Code** | 200 OK |
+
+**Request:**
+```bash
+curl http://localhost:3000/v1/dashboard/echart/faults_week_day.json
+```
+
+**Response (200 OK):**
+```json
+{
+  "data": {
+    "type": "dashboard_echart_weekday_faults",
+    "id": "1714521600",
+    "attributes": {
+      "title": "Weekday Fault Distribution",
+      "radar": {
+        "indicator": [
+          { "name": "Sunday", "max": 10 },
+          { "name": "Monday", "max": 10 },
+          { "name": "Tuesday", "max": 10 },
+          { "name": "Wednesday", "max": 10 },
+          { "name": "Thursday", "max": 10 },
+          { "name": "Friday", "max": 10 },
+          { "name": "Saturday", "max": 10 }
+        ]
+      },
+      "series": [
+        {
+          "type": "radar",
+          "data": [
+            { "value": [2, 5, 1, 4, 3, 6, 2], "name": "Faults" }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+**Weekday Mapping:**  
+The radar chart displays faults for each weekday (0=Sunday to 6=Saturday) over a 6-month period.
+
+---
+
+### Speculate vs Actual (ECharts Line)
+
+| Property | Value |
+|----------|-------|
+| **Method** | GET |
+| **Path** | `/v1/dashboard/echart/speculate_actual.json` |
+| **Description** | Returns line chart comparing actual faults vs speculated (predicted) faults |
+| **Authentication** | None |
+| **Response Code** | 200 OK |
+
+**Request:**
+```bash
+curl http://localhost:3000/v1/dashboard/echart/speculate_actual.json
+```
+
+**Response (200 OK):**
+```json
+{
+  "data": {
+    "type": "dashboard_echart_speculate_actual",
+    "id": "1714521600",
+    "attributes": {
+      "title": "Speculated vs Actual Faults",
+      "tooltip": { "trigger": "axis" },
+      "legend": { "data": ["Actual", "Speculated"] },
+      "series": [
+        {
+          "name": "Actual",
+          "type": "line",
+          "data": [5, 3, 7, 2, 4, 6, 1, 3, 5, 4, 2, 6, 3, 5, 4]
+        },
+        {
+          "name": "Speculated",
+          "type": "line",
+          "data": [5.75, 3.45, 8.05, 2.3, 4.6, 6.9, 1.15, 3.45, 5.75, 4.6, 2.3, 6.9, 3.45, 5.75, 4.6]
+        }
+      ]
+    }
+  }
+}
+```
+
+**Calculation:**  
+Speculated faults are calculated as: `actual_faults * 1.15` (15% prediction buffer)
+
+---
+
+### Mean Progress (ECharts Line)
+
+| Property | Value |
+|----------|-------|
+| **Method** | GET |
+| **Path** | `/v1/dashboard/echart/mean_progress.json` |
+| **Description** | Returns line chart showing mean progress over the last 30 days |
+| **Authentication** | None |
+| **Response Code** | 200 OK |
+
+**Request:**
+```bash
+curl http://localhost:3000/v1/dashboard/echart/mean_progress.json
+```
+
+**Response (200 OK):**
+```json
+{
+  "data": {
+    "type": "dashboard_echart_mean_progress",
+    "id": "1714521600",
+    "attributes": {
+      "title": "Mean Progress Over Time",
+      "series": [
+        {
+          "name": "Progress",
+          "type": "line",
+          "data": [10, 15, 12, 18, 20, 17, 22, 25, 23, 28, ...]
+        }
+      ]
+    }
+  }
+}
+```
+
+---
+
+### Yearly Total (ECharts Line)
+
+| Property | Value |
+|----------|-------|
+| **Method** | GET |
+| **Path** | `/v1/dashboard/echart/last_year_total.json` |
+| **Description** | Returns line chart showing weekly fault totals for the last 52 weeks |
+| **Authentication** | None |
+| **Response Code** | 200 OK |
+
+**Request:**
+```bash
+curl http://localhost:3000/v1/dashboard/echart/last_year_total.json
+```
+
+**Response (200 OK):**
+```json
+{
+  "data": {
+    "type": "dashboard_echart_yearly_total",
+    "id": "1714521600",
+    "attributes": {
+      "title": "Yearly Total Faults",
+      "series": [
+        {
+          "name": "Faults",
+          "type": "line",
+          "data": [3, 5, 2, 4, 6, 3, 5, 4, 7, 3, ...]
+        }
+      ]
+    }
+  }
+}
+```
+
+---
+
+### Dashboard Projects
+
+| Property | Value |
+|----------|-------|
+| **Method** | GET |
+| **Path** | `/v1/dashboard/projects.json` |
+| **Description** | Returns running projects in JSON:API format with aggregate calculations |
+| **Authentication** | None |
+| **Response Code** | 200 OK |
+
+**Request:**
+```bash
+curl http://localhost:3000/v1/dashboard/projects.json
+```
+
+**Response (200 OK):**
+```json
+{
+  "data": [
+    {
+      "type": "projects",
+      "id": "1",
+      "attributes": {
+        "id": 1,
+        "name": "My Book",
+        "total-page": 300,
+        "page": 150,
+        "progress": 50.0,
+        "status": "running"
+      }
+    }
+  ],
+  "stats": {
+    "total_pages": 450,
+    "total_projects": 3
+  }
+}
+```
+
+---
+
+### Projects With Logs
+
+| Property | Value |
+|----------|-------|
+| **Method** | GET |
+| **Path** | `/v1/dashboard/projects_with_logs.json` |
+| **Description** | Returns all projects with eager-loaded logs and aggregate calculations |
+| **Authentication** | None |
+| **Response Code** | 200 OK |
+
+**Request:**
+```bash
+curl http://localhost:3000/v1/dashboard/projects_with_logs.json
+```
+
+**Response (200 OK):**
+```json
+{
+  "data": [
+    {
+      "type": "dashboard_projects_with_logs",
+      "id": "1714521600",
+      "attributes": [
+        {
+          "id": 1,
+          "name": "My Book",
+          "total-pages": 300,
+          "pages": 150,
+          "progress": 50.0,
+          "logs": [
+            {
+              "id": 1,
+              "data": "2024-01-15T10:30:00",
+              "start_page": 0,
+              "end_page": 25,
+              "note": "Morning reading"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### Last Days Trend
+
+| Property | Value |
+|----------|-------|
+| **Method** | GET |
+| **Path** | `/v1/dashboard/last_days.json` |
+| **Description** | Returns trend data for the last N days with fault count and average |
+| **Authentication** | None |
+| **Response Code** | 200 OK, 422 Unprocessable Entity |
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `days` | integer | No | Number of days to include. Defaults to 7 |
+| `type` | string | No | Trend type (1-5). Optional filter |
+
+**Request:**
+```bash
+# Get last 7 days (default)
+curl http://localhost:3000/v1/dashboard/last_days.json
+
+# Get last 30 days
+curl http://localhost:3000/v1/dashboard/last_days.json?days=30
+
+# Get last 7 days with type filter
+curl http://localhost:3000/v1/dashboard/last_days.json?days=7&type=1
+```
+
+**Response (200 OK):**
+```json
+{
+  "data": {
+    "type": "dashboard_last_days",
+    "id": "1714521600",
+    "attributes": {
+      "days": 7,
+      "start_date": "2024-01-08T00:00:00Z",
+      "end_date": "2024-01-14T23:59:59Z",
+      "total_faults": 3,
+      "avg_per_day": 25.5,
+      "type": "1",
+      "logs": [
+        {
+          "id": 1,
+          "data": "2024-01-14T10:30:00",
+          "read_pages": 30
+        }
+      ]
+    }
+  }
+}
+```
+
+**Error Response (422 Unprocessable Entity) - Invalid Type:**
+```json
+{
+  "error": "invalid type parameter",
+  "details": {
+    "type": "must be between 1 and 5"
+  }
+}
+```
+
+---
+
 ## Calculated Fields
 
 The API computes several derived fields for each project:
@@ -531,6 +990,265 @@ The `status` field can have one of these values:
 - `sleeping` - Paused reading
 - `stopped` - Stopped reading
 - `finished` - Completed the book
+
+### Fault Metrics
+
+**Fault Definition:**  
+A **fault** represents a day with **zero pages read**. It's a metric used to track reading consistency and identify missed reading days.
+
+**Key Concept:**  
+A fault is counted per **day**, not per **log entry**. This is the fundamental distinction that drives the entire calculation logic.
+
+| Metric | Type | Description | Formula |
+|--------|------|-------------|---------|
+| `fault_count` | int | Number of days with zero pages read | Count of days where `SUM(read_pages) = 0` |
+| `fault_percentage` | float | Percentage of fault days in a period | `(fault_days / total_days) * 100` |
+| `weekday_faults` | map[int]int | Fault distribution by weekday (0-6) | Count of faults grouped by `EXTRACT(DOW FROM data)` |
+
+**Read Pages Calculation:**
+```
+read_pages = end_page - start_page
+```
+
+**Daily Sum Calculation:**
+```
+daily_pages = SUM(read_pages) for all logs on that date
+```
+
+**Fault Condition:**
+```
+IF daily_pages IS NULL OR daily_pages = 0 THEN count as fault
+```
+
+#### Calculation Example
+
+**Scenario:** 10-day period with irregular reading
+
+| Day | Date | Logs | Pages Read | Daily Sum | Fault? |
+|-----|------|------|------------|-----------|--------|
+| 1 | Jan 1 (Mon) | Yes | 25 | 25 | No |
+| 2 | Jan 2 (Tue) | No | 0 | NULL | **YES** ⚠️ |
+| 3 | Jan 3 (Wed) | Yes | 30 | 30 | No |
+| 4 | Jan 4 (Thu) | No | 0 | NULL | **YES** ⚠️ |
+| 5 | Jan 5 (Fri) | Yes | 20 | 20 | No |
+| 6 | Jan 6 (Sat) | No | 0 | NULL | **YES** ⚠️ |
+| 7 | Jan 7 (Sun) | No | 0 | NULL | **YES** ⚠️ |
+| 8 | Jan 8 (Mon) | Yes | 35 | 35 | No |
+| 9 | Jan 9 (Tue) | No | 0 | NULL | **YES** ⚠️ |
+| 10 | Jan 10 (Wed) | Yes | 15 | 15 | No |
+
+**Result:** 5 faults out of 10 days (50% fault rate)
+
+#### SQL Query Pattern
+
+The faults calculation uses PostgreSQL CTEs (Common Table Expressions):
+
+```sql
+WITH daily_read AS (
+    SELECT 
+        data::date as log_date,
+        SUM(CASE 
+            WHEN start_page IS NOT NULL AND end_page IS NOT NULL 
+            THEN end_page - start_page 
+            ELSE 0 
+        END) as daily_pages
+    FROM logs
+    WHERE data::date BETWEEN $1 AND $2
+    GROUP BY data::date
+),
+all_dates AS (
+    SELECT generate_series($1::date, $2::date, '1 day'::interval)::date as log_date
+)
+SELECT COUNT(*) as fault_count
+FROM all_dates ad
+LEFT JOIN daily_read dr ON ad.log_date = dr.log_date
+WHERE dr.daily_pages IS NULL OR dr.daily_pages = 0
+```
+
+**Query Breakdown:**
+
+1. **`daily_read` CTE:** Aggregates all logs by date and calculates total pages read per day
+2. **`all_dates` CTE:** Generates all calendar dates in the range using `generate_series`, even if no logs exist
+3. **LEFT JOIN:** Ensures all dates are represented, with NULL for days without logs
+4. **WHERE clause:** Filters to days where `daily_pages IS NULL` (no logs) OR `daily_pages = 0` (logs but zero pages)
+
+#### Weekday Faults
+
+Weekday faults are calculated similarly but grouped by day of week:
+
+```sql
+SELECT 
+    EXTRACT(DOW FROM ad.log_date)::int as weekday,
+    COUNT(*) as fault_count
+FROM all_dates ad
+LEFT JOIN daily_read dr ON ad.log_date = dr.log_date
+WHERE dr.daily_pages IS NULL OR dr.daily_pages = 0
+GROUP BY EXTRACT(DOW FROM ad.log_date)
+ORDER BY weekday
+```
+
+**Weekday Mapping (PostgreSQL DOW):**
+
+| DOW Value | Weekday |
+|-----------|---------|
+| 0 | Sunday |
+| 1 | Monday |
+| 2 | Tuesday |
+| 3 | Wednesday |
+| 4 | Thursday |
+| 5 | Friday |
+| 6 | Saturday |
+
+#### Edge Cases
+
+**Edge Case: Empty Database**
+
+**Scenario:** No logs exist in the database.
+
+**Expected Result:** All days in the date range are counted as faults.
+
+```sql
+-- Date range: Jan 1-30, 2024
+-- No logs exist
+
+Result: fault_count = 30
+```
+
+**Key Takeaway:**  
+When there are no logs, every day in the range is a fault.
+
+---
+
+**Edge Case: Single-Day Range**
+
+**Scenario:** Start date equals end date.
+
+**Expected Result:**
+
+```sql
+-- Date range: Jan 15, 2024 only
+-- No logs on Jan 15
+
+Result: fault_count = 1
+
+-- If log exists with pages > 0:
+Result: fault_count = 0
+
+-- If log exists with pages = 0 (start_page = end_page):
+Result: fault_count = 1
+```
+
+**Key Takeaway:**  
+A single-day range correctly counts 1 fault if no reading occurred.
+
+---
+
+**Edge Case: NULL Values in Logs**
+
+**Scenario:** Log entry with NULL `start_page` or `end_page`.
+
+**Expected Result:** NULL values are treated as 0 pages read.
+
+```sql
+-- Log entry: start_page = NULL, end_page = 10
+-- CASE statement evaluates to: 0 (due to ELSE 0)
+-- Day counts as 1 fault
+
+-- Log entry: start_page = 10, end_page = NULL
+-- CASE statement evaluates to: 0 (due to ELSE 0)
+-- Day counts as 1 fault
+
+-- Log entry: start_page = NULL, end_page = NULL
+-- CASE statement evaluates to: 0 (due to ELSE 0)
+-- Day counts as 1 fault
+```
+
+**SQL Implementation:**
+```sql
+CASE 
+    WHEN start_page IS NOT NULL AND end_page IS NOT NULL 
+    THEN end_page - start_page 
+    ELSE 0 
+END
+```
+
+**Key Takeaway:**  
+The CASE statement ensures NULL values are handled gracefully and treated as 0 pages.
+
+---
+
+**Edge Case: Logs with Zero Pages**
+
+**Scenario:** Log entry where `start_page` equals `end_page`.
+
+**Expected Result:** Day counts as a fault even though a log exists.
+
+```sql
+-- Log entry: start_page = 50, end_page = 50
+-- Calculation: 50 - 50 = 0 pages
+-- Day counts as 1 fault (even though a log exists)
+```
+
+**Key Takeaway:**  
+A day with logs is NOT automatically "not a fault". The day is only "not a fault" if `SUM(read_pages) > 0`.
+
+---
+
+**Edge Case: All Days Have Reading**
+
+**Scenario:** Every day in the range has at least one log with pages > 0.
+
+**Expected Result:** 0 faults.
+
+```sql
+-- Date range: Jan 1-10, 2024
+-- Every day has logs with pages > 0
+
+Result: fault_count = 0
+```
+
+---
+
+**Edge Case: Date Range Boundaries**
+
+**Scenario:** Inclusive date range handling.
+
+**Expected Result:** Both start and end dates are included.
+
+```sql
+-- Date range: Jan 1-10, 2024 (inclusive)
+-- Logs on Jan 1: counted
+-- Logs on Jan 10: counted
+-- Logs on Dec 31: NOT counted (before range)
+-- Logs on Jan 11: NOT counted (after range)
+```
+
+**SQL Implementation:**
+```sql
+WHERE data::date BETWEEN $1 AND $2
+```
+
+The `BETWEEN` operator is inclusive on both ends.
+
+**Key Takeaway:**  
+Date range boundaries are inclusive - both start_date and end_date are included in the calculation.
+
+---
+
+### Rails Parity
+
+The Go implementation matches the Rails behavior exactly. Both implementations:
+
+1. Count **days** with zero pages, not log entries
+2. Use the same NULL handling (NULL treated as 0)
+3. Include both date boundaries (inclusive range)
+4. Group weekdays using PostgreSQL's `EXTRACT(DOW FROM ...)` where 0=Sunday
+
+**Functional Equivalence Test:**  
+RDL-145 added comprehensive Rails comparison test cases that verify identical outputs for the same input data.
+
+**Reference:**  
+For deep technical details on faults calculation, see `docs/faults-calculation-explanation.md`.
 
 ---
 
