@@ -4,8 +4,10 @@ title: >-
   [doc-14 Phase 1] Add repository interface methods for weekday-based mean
   calculations
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-05-10 10:46'
+updated_date: '2026-05-10 11:18'
 labels:
   - infrastructure
   - repository
