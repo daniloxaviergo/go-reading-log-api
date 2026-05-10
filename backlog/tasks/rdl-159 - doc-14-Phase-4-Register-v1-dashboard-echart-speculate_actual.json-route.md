@@ -30,7 +30,7 @@ Route must follow existing routing patterns and be accessible via the configured
 - [x] #2 Route uses dashboardHandler.SpeculateActual handler
 - [x] #3 Route follows existing middleware chain
 - [x] #4 Route compiles without errors
-- [ ] #5 Route is accessible via curl test
+- [x] #5 Route is accessible via curl test
 <!-- AC:END -->
 
 ## Implementation Plan
