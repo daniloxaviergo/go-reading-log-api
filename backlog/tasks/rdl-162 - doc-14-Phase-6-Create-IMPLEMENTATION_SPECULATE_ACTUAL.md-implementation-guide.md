@@ -3,7 +3,7 @@ id: RDL-162
 title: >-
   [doc-14 Phase 6] Create IMPLEMENTATION_SPECULATE_ACTUAL.md implementation
   guide
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-05-10 10:49'
