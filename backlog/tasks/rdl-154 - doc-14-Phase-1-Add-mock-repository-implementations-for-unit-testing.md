@@ -2,8 +2,10 @@
 id: RDL-154
 title: '[doc-14 Phase 1] Add mock repository implementations for unit testing'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-05-10 10:47'
+updated_date: '2026-05-10 12:22'
 labels:
   - infrastructure
   - testing
