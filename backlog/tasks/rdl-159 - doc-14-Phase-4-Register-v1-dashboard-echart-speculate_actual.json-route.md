@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:48'
-updated_date: '2026-05-10 14:56'
+updated_date: '2026-05-10 14:57'
 labels:
   - routing
   - api
@@ -385,6 +385,6 @@ This task (RDL-159) is **already complete**. The route is registered, the handle
 - [x] #6 HTTP status codes correct for response type
 - [ ] #7 Documentation updated in QWEN.md and AGENTS.md
 - [x] #8 New code paths include error path tests
-- [ ] #9 HTTP handlers test both success and error responses
+- [x] #9 HTTP handlers test both success and error responses
 - [ ] #10 Integration tests verify actual database interactions
 <!-- DOD:END -->
