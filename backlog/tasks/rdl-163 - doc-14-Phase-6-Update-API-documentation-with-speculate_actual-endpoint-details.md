@@ -5,9 +5,9 @@ title: >-
   details
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-05-10 10:49'
-updated_date: '2026-05-10 17:09'
+updated_date: '2026-05-10 17:14'
 labels:
   - documentation
   - api-docs
