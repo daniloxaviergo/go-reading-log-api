@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:47'
-updated_date: '2026-05-10 11:49'
+updated_date: '2026-05-10 11:52'
 labels:
   - infrastructure
   - repository
@@ -415,6 +415,42 @@ go test ./...
 - Task requires integration tests and verification to mark as "Done"
 - All acceptance criteria can be verified through integration tests
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Verification
+
+### Status: Implementation Complete, Testing Pending
+
+**Verified Implementation:**
+✅ All three methods implemented in `internal/adapter/postgres/dashboard_repository.go`:
+1. `GetWeekdayPagesGrouped` (lines 541-584) - Groups logs by weekday with pagination stats
+2. `GetFirstLogDate` (lines 586-611) - Returns earliest log timestamp
+3. `GetWeekdayMeanWithIntervals` (lines 630-679) - Calculates mean using 7-day intervals
+
+**Code Quality Checks:**
+✅ `go fmt` - Passes with no errors
+✅ `go vet` - Passes with no errors
+✅ `go build ./cmd/server.go` - Compiles successfully
+
+**Test Status:**
+⏳ Integration tests need to be created for the three methods
+✅ Mock implementations exist in `test/testutil/mock_dashboard_repository.go`
+✅ Unit tests use mocks in `test/unit/day_service_test.go` and `test/unit/weekday_faults_service_test.go`
+
+**Next Steps:**
+1. Create integration tests in `test/integration/postgres/`
+2. Run integration tests to verify implementation
+3. Check acceptance criteria
+4. Mark task as Done
+
+**Notes:**
+- Implementation follows Clean Architecture patterns
+- All methods use 15-second context timeout
+- NULL values handled gracefully (returns nil, nil for no data)
+- SQL queries use proper indexing and COALESCE for NULL handling
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
