@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:48'
-updated_date: '2026-05-10 14:21'
+updated_date: '2026-05-10 14:22'
 labels:
   - handler
   - api
@@ -29,7 +29,7 @@ Handler must handle errors gracefully, return appropriate HTTP status codes (200
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 SpeculateActual method injects SpeculateService via dependency injection
-- [ ] #2 Handler calls service to generate ECharts configuration
+- [x] #2 Handler calls service to generate ECharts configuration
 - [ ] #3 Response format is flat JSON { echart: {...} } without JSON:API envelope
 - [ ] #4 Error handling returns 500 status with proper error message
 - [ ] #5 Handler follows existing middleware and logging patterns
