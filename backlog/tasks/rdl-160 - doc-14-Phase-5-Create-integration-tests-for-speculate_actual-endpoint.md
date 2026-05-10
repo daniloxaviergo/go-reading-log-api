@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:48'
-updated_date: '2026-05-10 15:44'
+updated_date: '2026-05-10 15:46'
 labels:
   - testing
   - integration-tests
@@ -28,7 +28,7 @@ Tests use TestHelper for database setup/teardown and verify actual HTTP endpoint
 <!-- AC:BEGIN -->
 - [x] #1 TestEmptyDatabase validates all series are zero-filled
 - [x] #2 TestPartialData validates zero-fill for missing days
-- [ ] #3 TestCompleteData validates 15 data points in all series
+- [x] #3 TestCompleteData validates 15 data points in all series
 - [x] #4 TestResponseFormat validates flat JSON with echart key
 - [ ] #5 TestSeriesNames validates 'Pages' and 'Mean' names
 - [ ] #6 TestMarkElements validates markPoint max/min and markLine yAxis: 40
