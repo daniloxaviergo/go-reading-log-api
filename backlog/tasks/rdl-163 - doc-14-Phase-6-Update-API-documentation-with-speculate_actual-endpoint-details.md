@@ -3,7 +3,7 @@ id: RDL-163
 title: >-
   [doc-14 Phase 6] Update API documentation with speculate_actual endpoint
   details
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-05-10 10:49'
