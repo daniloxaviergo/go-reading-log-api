@@ -29,7 +29,7 @@ Route must follow existing routing patterns and be accessible via the configured
 - [x] #1 Route registered with GET method on /v1/dashboard/echart/speculate_actual.json
 - [x] #2 Route uses dashboardHandler.SpeculateActual handler
 - [x] #3 Route follows existing middleware chain
-- [ ] #4 Route compiles without errors
+- [x] #4 Route compiles without errors
 - [ ] #5 Route is accessible via curl test
 <!-- AC:END -->
 
