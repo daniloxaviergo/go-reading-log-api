@@ -31,7 +31,7 @@ Tests must use mock repository and cover all edge cases defined in acceptance cr
 - [ ] #2 TestCalculateSpeculativeMean validates 10% buffer and zero-mean edge case
 - [ ] #3 TestGenerateXAxisLabels verifies 'DD-MMM (Day)' format for all 15 dates
 - [x] #4 TestZeroFillLogic validates missing days are filled with zero values
-- [ ] #5 TestCalculateHistoricalMean_WeekdayGrouping validates weekday-specific calculations
+- [x] #5 TestCalculateHistoricalMean_WeekdayGrouping validates weekday-specific calculations
 - [x] #6 All tests achieve >80% code coverage
 <!-- AC:END -->
 
