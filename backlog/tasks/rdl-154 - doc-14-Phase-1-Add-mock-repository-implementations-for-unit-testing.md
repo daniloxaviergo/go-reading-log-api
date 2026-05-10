@@ -27,7 +27,7 @@ Mocks must follow existing mock repository patterns and support testing of edge 
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 MockGetWeekdayPagesGrouped method with configurable return values
+- [x] #1 MockGetWeekdayPagesGrouped method with configurable return values
 - [ ] #2 MockGetFirstLogDate method supporting nil return
 - [ ] #3 MockGetWeekdayMeanWithIntervals method with error injection support
 - [ ] #4 All mocks follow existing MockDashboardRepository pattern
