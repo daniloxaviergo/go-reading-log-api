@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:47'
-updated_date: '2026-05-10 13:40'
+updated_date: '2026-05-10 13:41'
 labels:
   - testing
   - unit-tests
@@ -30,9 +30,9 @@ Tests must use mock repository and cover all edge cases defined in acceptance cr
 - [ ] #1 TestCalculateHistoricalMean covers normal data, empty data, and single-read scenarios
 - [ ] #2 TestCalculateSpeculativeMean validates 10% buffer and zero-mean edge case
 - [ ] #3 TestGenerateXAxisLabels verifies 'DD-MMM (Day)' format for all 15 dates
-- [ ] #4 TestZeroFillLogic validates missing days are filled with zero values
+- [x] #4 TestZeroFillLogic validates missing days are filled with zero values
 - [ ] #5 TestCalculateHistoricalMean_WeekdayGrouping validates weekday-specific calculations
-- [ ] #6 All tests achieve >80% code coverage
+- [x] #6 All tests achieve >80% code coverage
 <!-- AC:END -->
 
 ## Implementation Plan
