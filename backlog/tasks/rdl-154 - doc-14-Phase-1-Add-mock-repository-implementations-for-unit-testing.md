@@ -1,7 +1,7 @@
 ---
 id: RDL-154
 title: '[doc-14 Phase 1] Add mock repository implementations for unit testing'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-05-10 10:47'
