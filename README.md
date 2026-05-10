@@ -230,6 +230,7 @@ The API is versioned under `/api/v1/`. All responses are in JSON format.
 | `/api/v1/projects` | GET | List all projects |
 | `/api/v1/projects/:id` | GET | Get project by ID |
 | `/api/v1/projects/:project_id/logs` | GET | Get logs for a project |
+| `/v1/dashboard/echart/speculate_actual.json` | GET | Returns line chart for speculation vs actual |
 
 ### Example Requests
 
@@ -331,6 +332,153 @@ curl http://localhost:3000/api/v1/projects/1/logs
   ]
 }
 ```
+
+---
+
+#### Get Speculate vs Actual Chart
+
+| Property | Value |
+|----------|-------|
+| **Method** | GET |
+| **Path** | `/v1/dashboard/echart/speculate_actual.json` |
+| **Description** | Returns line chart configuration comparing actual vs speculated reading progress for the last 15 days |
+| **Authentication** | None |
+| **Response Code** | 200 OK |
+
+**Request:**
+```bash
+curl http://localhost:3000/v1/dashboard/echart/speculate_actual.json
+```
+
+**Response (200 OK):**
+```json
+{
+  "echart": {
+    "title": "Speculated vs Actual",
+    "tooltip": {
+      "trigger": "axis",
+      "formatter": "{a} <br/>{b}: {c}"
+    },
+    "legend": {
+      "show": true,
+      "data": ["Actual", "Speculated"]
+    },
+    "xAxis": {
+      "type": "category",
+      "boundaryGap": [false, false]
+    },
+    "yAxis": {
+      "type": "value"
+    },
+    "grid": {
+      "left": "3%",
+      "right": "4%",
+      "top": "15%",
+      "bottom": "3%"
+    },
+    "series": [
+      {
+        "name": "Actual",
+        "type": "line",
+        "data": [0, 10, 15, 20, 0, 25, 30, 0, 18, 22, 0, 12, 8, 5, 0],
+        "itemStyle": {
+          "color": "#5470C6"
+        },
+        "lineStyle": {
+          "width": 2
+        }
+      },
+      {
+        "name": "Speculated",
+        "type": "line",
+        "data": [0, 11, 17, 22, 0, 28, 33, 0, 20, 24, 0, 14, 9, 6, 0],
+        "itemStyle": {
+          "color": "#91CC75"
+        },
+        "lineStyle": {
+          "width": 2,
+          "type": "dashed"
+        }
+      }
+    ]
+  }
+}
+```
+
+**Response Schema:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `echart` | object | ECharts configuration object |
+| `echart.title` | string | Chart title ("Speculated vs Actual") |
+| `echart.tooltip` | object | Tooltip configuration |
+| `echart.tooltip.trigger` | string | Tooltip trigger type ("axis") |
+| `echart.tooltip.formatter` | string | Tooltip formatter template |
+| `echart.legend` | object | Legend configuration |
+| `echart.legend.show` | boolean | Whether to show legend |
+| `echart.legend.data` | string[] | Legend data labels (["Actual", "Speculated"]) |
+| `echart.xAxis` | object | X-axis configuration |
+| `echart.xAxis.type` | string | Axis type ("category") |
+| `echart.xAxis.boundaryGap` | boolean[] | Boundary gap setting ([false, false]) |
+| `echart.yAxis` | object | Y-axis configuration |
+| `echart.yAxis.type` | string | Axis type ("value") |
+| `echart.grid` | object | Grid layout configuration |
+| `echart.grid.left` | string | Left margin (e.g., "3%") |
+| `echart.grid.right` | string | Right margin (e.g., "4%") |
+| `echart.grid.top` | string | Top margin (e.g., "15%") |
+| `echart.grid.bottom` | string | Bottom margin (e.g., "3%") |
+| `echart.series` | array | Array of chart series (2 elements) |
+| `echart.series[0].name` | string | First series name ("Actual") |
+| `echart.series[0].type` | string | Series type ("line") |
+| `echart.series[0].data` | number[] | Actual pages read per day (15 data points) |
+| `echart.series[0].itemStyle.color` | string | Series color ("#5470C6" - blue) |
+| `echart.series[0].lineStyle.width` | number | Line width (2) |
+| `echart.series[1].name` | string | Second series name ("Speculated") |
+| `echart.series[1].type` | string | Series type ("line") |
+| `echart.series[1].data` | number[] | Speculated pages per day (15 data points) |
+| `echart.series[1].itemStyle.color` | string | Series color ("#91CC75" - green) |
+| `echart.series[1].lineStyle.width` | number | Line width (2) |
+| `echart.series[1].lineStyle.type` | string | Line style ("dashed") |
+
+**Data Points:**
+
+- Both series contain exactly 15 data points representing the last 15 days including today
+- Index 0 represents 14 days ago, index 14 represents today
+- Missing days are zero-filled (not omitted)
+- "Actual" series contains actual pages read per day
+- "Speculated" series contains predicted pages calculated as: `actual * (1 + prediction_pct)` where `prediction_pct` defaults to 10%
+
+**Edge Cases:**
+
+| Scenario | Behavior |
+|----------|----------|
+| Empty database | Both series return 15 zero-filled data points |
+| Partial data | Missing days are zero-filled |
+| Invalid page numbers | Logs with `end_page < start_page` are handled gracefully (treated as 0 pages) |
+
+**Acceptance Criteria:**
+
+This endpoint implements the following acceptance criteria from the PRD (doc-014):
+
+| AC ID | Description | Status |
+|-------|-------------|--------|
+| AC-001 | GET returns 200 OK | ✅ Implemented |
+| AC-002 | Response has `echart` key (flat JSON) | ✅ Implemented |
+| AC-003 | xAxis contains 15 date strings | ⚠️ Not yet implemented (xAxis data array not populated) |
+| AC-004 | xAxis dates formatted as 'DD-MMM (Day)' | ⚠️ Not yet implemented |
+| AC-005 | Series array has 2 elements | ✅ Implemented |
+| AC-006 | First series name is 'Actual' | ✅ Implemented |
+| AC-007 | Second series name is 'Speculated' | ✅ Implemented |
+| AC-008 | Both series have 15 data points | ✅ Implemented |
+| AC-009 | 'Actual' series contains actual page counts | ✅ Implemented |
+| AC-010 | 'Speculated' series contains speculative mean values | ✅ Implemented |
+| AC-011 | markPoint includes max/min markers | ⚠️ Not yet implemented |
+| AC-012 | markLine includes pages_per_day reference | ⚠️ Not yet implemented |
+| AC-013 | Both series have smooth: true | ⚠️ Not yet implemented |
+| AC-014 | Both series have areaStyle configured | ⚠️ Not yet implemented |
+| AC-015 | xAxis has boundaryGap: false | ✅ Implemented |
+
+**Note:** Some acceptance criteria (AC-003, AC-004, AC-011 to AC-014) are not yet implemented in the current codebase. These are planned for future enhancements.
 
 ### Error Responses
 
