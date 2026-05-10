@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:47'
-updated_date: '2026-05-10 12:41'
+updated_date: '2026-05-10 12:44'
 labels:
   - service
   - calculations
@@ -372,6 +372,41 @@ if mean == nil {
 - [ ] Integration tests verify actual database interactions
 - [ ] Rails parity verified via comparison tests
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+**Implementation Started - 2026-05-10**
+
+**Current Status:** Analyzing existing codebase and implementation plan
+
+**Completed:**
+- ✅ Reviewed task RDL-155 details and acceptance criteria
+- ✅ Analyzed existing `speculate_service.go` implementation
+- ✅ Reviewed `dashboard_handler.go` SpeculateActual method
+- ✅ Checked repository interface methods (GetWeekdayMeanWithIntervals, GetWeekdayPagesGrouped, GetLogsByDateRange, GetFirstLogDate)
+- ✅ Reviewed existing unit tests in `test/unit/speculate_service_test.go`
+- ✅ Checked mock repository implementations in `test/testutil/mock_dashboard_repository.go`
+
+**Next Steps:**
+1. Rewrite `internal/service/dashboard/speculate_service.go` with:
+   - `CalculateHistoricalMean(ctx, weekday, currentDate)` - weekday grouping with 7-day interval logic
+   - `CalculateSpeculativeMean(mean, 0.1)` - 10% prediction buffer (update from 15%)
+   - `GenerateXAxisLabels(startDate, endDate)` - 15 dates in 'DD-MMM (Day)' format
+   - `GenerateSeriesData(ctx, startDate, endDate)` - Pages and Mean arrays
+   - `GetChartConfig(ctx)` - orchestrate all calculations
+
+2. Update `internal/api/v1/handlers/dashboard_handler.go`:
+   - Rewrite `SpeculateActual` method to use new SpeculateService
+   - Return flat JSON `{ echart: chartConfig }` instead of JSON:API envelope
+   - Inject SpeculateService via constructor
+
+3. Create comprehensive unit tests in `test/unit/service/dashboard/speculate_service_test.go`
+
+4. Create integration tests in `test/integration/api/v1/dashboard/echart_speculate_actual_test.go`
+
+**Blockers:** None - all prerequisite dependencies (RDL-151, RDL-152, RDL-153, RDL-154) are complete
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
