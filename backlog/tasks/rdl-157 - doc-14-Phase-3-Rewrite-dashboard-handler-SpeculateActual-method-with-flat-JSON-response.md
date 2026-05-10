@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:48'
-updated_date: '2026-05-10 13:54'
+updated_date: '2026-05-10 13:59'
 labels:
   - handler
   - api
@@ -397,6 +397,29 @@ curl http://localhost:3000/v1/dashboard/echart/speculate_actual.json | jq
 - RDL-162: Implementation guide documentation (NEXT)
 - RDL-163: API documentation update (NEXT)
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress
+
+### Completed Steps (2026-05-10)
+
+1. ✅ **Modified DashboardHandler struct** - Added `speculateService *dashboard.SpeculateService` field
+2. ✅ **Modified NewDashboardHandler constructor** - Added `speculateService` parameter
+3. ✅ **Rewrote SpeculateActual method** - Now uses SpeculateService.GenerateChartConfig() and returns flat JSON
+4. ✅ **Updated routes.go** - Added speculateService parameter and registered new route `/v1/dashboard/echart/speculate_actual.json`
+5. ✅ **Updated cmd/server.go** - Created SpeculateService instance and passed to SetupRoutes
+6. ✅ **Updated test/integration/test_context.go** - Updated SetupRoutes wrapper and Setup function
+7. ✅ **Code compiles** - `go build ./...` passes without errors
+
+### Next Steps
+
+- Run existing tests to verify no regressions
+- Check acceptance criteria
+- Run go fmt and go vet
+- Mark acceptance criteria as met
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
