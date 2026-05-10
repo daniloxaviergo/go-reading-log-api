@@ -26,7 +26,7 @@ Tests use TestHelper for database setup/teardown and verify actual HTTP endpoint
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 TestEmptyDatabase validates all series are zero-filled
+- [x] #1 TestEmptyDatabase validates all series are zero-filled
 - [ ] #2 TestPartialData validates zero-fill for missing days
 - [ ] #3 TestCompleteData validates 15 data points in all series
 - [ ] #4 TestResponseFormat validates flat JSON with echart key
