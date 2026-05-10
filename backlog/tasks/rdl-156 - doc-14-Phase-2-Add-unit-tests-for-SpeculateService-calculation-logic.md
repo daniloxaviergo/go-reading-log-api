@@ -3,9 +3,9 @@ id: RDL-156
 title: '[doc-14 Phase 2] Add unit tests for SpeculateService calculation logic'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-05-10 10:47'
-updated_date: '2026-05-10 13:47'
+updated_date: '2026-05-10 13:48'
 labels:
   - testing
   - unit-tests
