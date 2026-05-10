@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:47'
-updated_date: '2026-05-10 11:52'
+updated_date: '2026-05-10 11:56'
 labels:
   - infrastructure
   - repository
@@ -421,7 +421,7 @@ go test ./...
 <!-- SECTION:NOTES:BEGIN -->
 ## Implementation Verification
 
-### Status: Implementation Complete, Testing Pending
+### Status: Implementation Complete, Integration Tests Created
 
 **Verified Implementation:**
 ✅ All three methods implemented in `internal/adapter/postgres/dashboard_repository.go`:
@@ -433,23 +433,36 @@ go test ./...
 ✅ `go fmt` - Passes with no errors
 ✅ `go vet` - Passes with no errors
 ✅ `go build ./cmd/server.go` - Compiles successfully
+✅ `go build ./test/integration/...` - Tests compile successfully
 
-**Test Status:**
-⏳ Integration tests need to be created for the three methods
-✅ Mock implementations exist in `test/testutil/mock_dashboard_repository.go`
-✅ Unit tests use mocks in `test/unit/day_service_test.go` and `test/unit/weekday_faults_service_test.go`
+**Integration Tests Created:**
+✅ New file: `test/integration/dashboard_repository_weekday_grouping_test.go`
+- TestDashboardRepository_GetWeekdayPagesGrouped_Integration (5 test cases)
+  - Empty database returns empty map
+  - Single weekday returns single entry
+  - Multiple weekdays returns all weekdays with data
+  - Date range filtering works correctly
+  - NULL page values handled gracefully
+- TestDashboardRepository_GetFirstLogDate_Integration (3 test cases)
+  - Empty database returns nil
+  - Single log returns log timestamp
+  - Multiple logs returns earliest timestamp
+- TestDashboardRepository_GetWeekdayMeanWithIntervals_Integration (6 test cases)
+  - No logs for weekday returns nil
+  - Logs within same 7-day period returns nil
+  - Single 7-day interval calculates mean correctly
+  - Multiple intervals calculates mean with correct divisor
+  - NULL page values excluded from calculation
+  - Exactly 14 days (2 full intervals) edge case
+- TestDashboardRepository_WeekdayGroupingMethods_ContextTimeout (1 test case)
+  - All methods respect 15-second context timeout
+
+**Total Test Coverage:** 15 comprehensive integration test cases
 
 **Next Steps:**
-1. Create integration tests in `test/integration/postgres/`
-2. Run integration tests to verify implementation
-3. Check acceptance criteria
-4. Mark task as Done
-
-**Notes:**
-- Implementation follows Clean Architecture patterns
-- All methods use 15-second context timeout
-- NULL values handled gracefully (returns nil, nil for no data)
-- SQL queries use proper indexing and COALESCE for NULL handling
+1. Run integration tests to verify implementation
+2. Check acceptance criteria
+3. Mark task as Done
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
