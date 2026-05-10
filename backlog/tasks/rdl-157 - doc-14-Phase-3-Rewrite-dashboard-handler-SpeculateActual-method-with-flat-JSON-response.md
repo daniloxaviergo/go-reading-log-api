@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:48'
-updated_date: '2026-05-10 13:59'
+updated_date: '2026-05-10 14:21'
 labels:
   - handler
   - api
@@ -405,20 +405,53 @@ curl http://localhost:3000/v1/dashboard/echart/speculate_actual.json | jq
 
 ### Completed Steps (2026-05-10)
 
-1. ✅ **Modified DashboardHandler struct** - Added `speculateService *dashboard.SpeculateService` field
-2. ✅ **Modified NewDashboardHandler constructor** - Added `speculateService` parameter
-3. ✅ **Rewrote SpeculateActual method** - Now uses SpeculateService.GenerateChartConfig() and returns flat JSON
+1. ✅ **Modified DashboardHandler struct** - Added `speculateService dashboard.SpeculateServiceInterface` field
+2. ✅ **Modified NewDashboardHandler constructor** - Added `speculateService dashboard.SpeculateServiceInterface` parameter
+3. ✅ **Rewrote SpeculateActual method** - Now uses SpeculateService.GenerateChartConfig() and returns flat JSON `{ echart: {...} }`
 4. ✅ **Updated routes.go** - Added speculateService parameter and registered new route `/v1/dashboard/echart/speculate_actual.json`
 5. ✅ **Updated cmd/server.go** - Created SpeculateService instance and passed to SetupRoutes
 6. ✅ **Updated test/integration/test_context.go** - Updated SetupRoutes wrapper and Setup function
-7. ✅ **Code compiles** - `go build ./...` passes without errors
+7. ✅ **Created SpeculateServiceInterface** - Added interface in speculate_service.go for testability
+8. ✅ **Updated all test files** - Added MockSpeculateService and updated all NewDashboardHandler calls
+9. ✅ **Code compiles** - `go build ./...` passes without errors
+10. ✅ **go vet passes** - No issues found
+11. ✅ **All tests pass** - `go test ./internal/api/v1/handlers/` passes
+
+### Code Changes Summary
+
+**Modified Files:**
+- `internal/api/v1/handlers/dashboard_handler.go` - Handler struct, constructor, and SpeculateActual method
+- `internal/api/v1/routes.go` - SetupRoutes function signature and route registration
+- `cmd/server.go` - Service instantiation
+- `internal/service/dashboard/speculate_service.go` - Added SpeculateServiceInterface
+- `test/integration/test_context.go` - Test context setup
+- `internal/api/v1/handlers/dashboard_handler_test.go` - Added MockSpeculateService
+- `test/dashboard_integration_test.go` - Added MockSpeculateService and updated calls
+- `test/unit/dashboard_handler_test.go` - Added MockSpeculateService and updated calls
+- `test/performance/dashboard_benchmark_test.go` - Added MockSpeculateService and updated calls
+- `test/integration/dashboard_mock_test.go` - Added MockSpeculateService
+- `test/integration/dashboard_day_permean_integration_test.go` - Updated calls
+- `test/integration/dashboard_projects_test.go` - Updated calls
+- `test/integration/dashboard_stats_integration_test.go` - Updated calls
+- `test/integration/error_scenarios_test.go` - Updated calls
+- `test/integration/projects_integration_test.go` - Updated SetupRoutes calls
+- `test/integration/projects_rails_comparison_test.go` - Updated SetupRoutes calls
+- `internal/api/v1/routes_test.go` - Added MockSpeculateService and updated calls
+
+### Acceptance Criteria Status
+
+- ✅ #1 SpeculateActual method injects SpeculateService via dependency injection
+- ✅ #2 Handler calls service to generate ECharts configuration
+- ✅ #3 Response format is flat JSON { echart: {...} } without JSON:API envelope
+- ✅ #4 Error handling returns 500 status with proper error message
+- ✅ #5 Handler follows existing middleware and logging patterns
+- ✅ #6 Code compiles without errors
 
 ### Next Steps
 
-- Run existing tests to verify no regressions
-- Check acceptance criteria
-- Run go fmt and go vet
-- Mark acceptance criteria as met
+- Run go fmt
+- Check all acceptance criteria
+- Mark task as Done
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
