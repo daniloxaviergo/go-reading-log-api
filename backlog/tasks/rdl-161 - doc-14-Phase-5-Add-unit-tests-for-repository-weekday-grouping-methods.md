@@ -2,8 +2,10 @@
 id: RDL-161
 title: '[doc-14 Phase 5] Add unit tests for repository weekday grouping methods'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-05-10 10:49'
+updated_date: '2026-05-10 15:50'
 labels:
   - testing
   - unit-tests
