@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:49'
-updated_date: '2026-05-10 17:02'
+updated_date: '2026-05-10 17:07'
 labels:
   - documentation
   - api-docs
@@ -28,7 +28,7 @@ Documentation must match the format of existing endpoint documentation and inclu
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Endpoint documented in API reference section
+- [x] #1 Endpoint documented in API reference section
 - [ ] #2 Request format shows GET method with no parameters
 - [ ] #3 Response schema includes echart object structure
 - [ ] #4 Example JSON response with all fields documented
