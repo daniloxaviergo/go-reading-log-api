@@ -5,7 +5,7 @@ title: >-
   JSON response
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-05-10 10:48'
 updated_date: '2026-05-10 13:54'
 labels:
