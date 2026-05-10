@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:49'
-updated_date: '2026-05-10 16:29'
+updated_date: '2026-05-10 16:30'
 labels:
   - testing
   - unit-tests
@@ -326,6 +326,87 @@ go vet ./... ✅
 go test ./test/unit/repository/... ✅ (18/18 tests pass)
 ```
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Task RDL-161: Add unit tests for repository weekday grouping methods
+
+### What Was Done
+
+This task required implementing 3 new repository methods that were defined in the PRD but not yet in the codebase, then creating comprehensive unit tests for them.
+
+**New Repository Methods Implemented:**
+1. `GetWeekdayPagesGrouped(ctx, startDate, endDate)` - Returns pages aggregated by weekday within a date range
+2. `GetFirstLogDate(ctx)` - Returns the first log timestamp (nil if empty table)
+3. `GetWeekdayMeanWithIntervals(ctx, weekday, currentDate)` - Calculates mean using 7-day intervals per V1::MeanLog algorithm
+
+**Files Created:**
+- `test/unit/repository/dashboard_weekday_test.go` - 18 test functions covering all edge cases
+
+**Files Modified:**
+- `internal/domain/dto/dashboard_response.go` - Added `WeekdayPages` DTO
+- `internal/repository/dashboard_repository.go` - Added 3 interface methods
+- `internal/adapter/postgres/dashboard_repository.go` - Implemented 3 repository methods with SQL queries
+- `test/testutil/mock_dashboard_repository.go` - Added mock implementations
+- `test/unit/day_service_test.go` - Added missing interface methods to mock
+- `internal/api/v1/handlers/dashboard_handler_test.go` - Added missing interface methods to mock
+- `internal/api/v1/routes_test.go` - Added missing interface methods to mock
+- `internal/service/dashboard/projects_service_test.go` - Added missing interface methods to mock
+- `test/unit/weekday_faults_service_test.go` - Added missing interface methods to mock
+- `test/mean_progress_service_test.go` - Added missing interface methods to mock
+
+### Key Changes
+
+**WeekdayPages DTO:**
+```go
+type WeekdayPages struct {
+    Weekday    int     `json:"weekday"`
+    TotalPages int     `json:"total_pages"`
+    LogCount   int     `json:"log_count"`
+    Mean       float64 `json:"mean"`
+}
+```
+
+**SQL Query Pattern (GetWeekdayPagesGrouped):**
+```sql
+SELECT 
+    EXTRACT(DOW FROM data::timestamp)::int as weekday,
+    COALESCE(SUM(CASE WHEN start_page IS NOT NULL AND end_page IS NOT NULL 
+        THEN end_page - start_page ELSE 0 END), 0) as total_pages,
+    COUNT(*) as log_count
+FROM logs
+WHERE data::date BETWEEN $1 AND $2
+GROUP BY EXTRACT(DOW FROM data::timestamp)
+ORDER BY weekday
+```
+
+**NULL Handling:**
+- Used `sql.NullTime` for timestamp scanning to handle NULL values correctly
+- Returns `nil` pointers for empty results (consistent with existing patterns)
+
+### Testing
+
+**Test Coverage:**
+- `TestGetWeekdayPagesGrouped` - 5 test cases (MultipleWeekdays, DateRangeFiltering, NULLHandling, AllWeekdaysPresent, InvalidData)
+- `TestGetFirstLogDate` - 3 test cases (EmptyTable, SingleEntry, MultipleEntries)
+- `TestGetWeekdayMeanWithIntervals` - 5 test cases (NoData, ZeroIntervals, SingleInterval, MultipleIntervals, SingleLog)
+- `TestEmptyResults` - 3 test cases
+- `TestSingleRow` - 3 test cases
+
+**Results:**
+- All 18 test functions pass ✅
+- `go build ./...` - No errors ✅
+- `go fmt ./...` - Passes ✅
+- `go vet ./...` - No errors ✅
+
+### Notes for Reviewers
+
+- The implementation follows existing Clean Architecture patterns
+- SQL queries use PostgreSQL `EXTRACT(DOW FROM ...)` where 0=Sunday, 6=Saturday
+- Edge cases handled: empty results, single row, NULL values, zero intervals
+- Mock implementations updated across 6 test files to maintain interface compliance
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
