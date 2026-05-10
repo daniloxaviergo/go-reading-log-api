@@ -3,11 +3,11 @@ id: RDL-153
 title: >-
   [doc-14 Phase 1] Implement PostgreSQL repository methods for weekday grouping
   queries
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-05-10 10:47'
-updated_date: '2026-05-10 12:20'
+updated_date: '2026-05-10 12:21'
 labels:
   - infrastructure
   - repository
