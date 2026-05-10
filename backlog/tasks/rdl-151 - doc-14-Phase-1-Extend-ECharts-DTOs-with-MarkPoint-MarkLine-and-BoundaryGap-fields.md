@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:46'
-updated_date: '2026-05-10 11:10'
+updated_date: '2026-05-10 11:11'
 labels:
   - infrastructure
   - dto
@@ -31,7 +31,7 @@ This enables the speculate_actual endpoint to return complete ECharts configurat
 - [x] #1 MarkPoint struct with data array containing type and name fields
 - [x] #2 MarkLine struct with data array containing name and yAxis fields
 - [x] #3 BoundaryGap field added to Axis struct as []bool
-- [ ] #4 NewEchartConfig() updated to accept markPoint and markLine parameters
+- [x] #4 NewEchartConfig() updated to accept markPoint and markLine parameters
 - [x] #5 All DTOs compile without errors
 <!-- AC:END -->
 
