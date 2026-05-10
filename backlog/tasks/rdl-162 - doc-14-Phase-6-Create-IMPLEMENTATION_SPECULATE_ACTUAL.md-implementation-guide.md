@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:49'
-updated_date: '2026-05-10 16:52'
+updated_date: '2026-05-10 16:54'
 labels:
   - documentation
   - phase-6
@@ -369,6 +369,98 @@ Documentation successfully created with comprehensive coverage of:
 
 The document serves as a complete reference for future maintenance and onboarding of new developers.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Created comprehensive implementation guide documentation for the `/v1/dashboard/echart/speculate_actual.json` endpoint.
+
+## What Was Done
+
+Created `docs/IMPLEMENTATION_SPECULATE_ACTUAL.md` (35KB) with the following sections:
+
+1. **Overview** - Endpoint purpose, URL, response format (flat JSON), and use cases for dashboard visualization
+2. **Algorithm Explanation** - Detailed explanation of weekday-based historical mean calculation including:
+   - Weekday grouping concept (0-6 = Sunday-Saturday)
+   - 7-day interval calculation formula: `mean_day = total_pages / count_reads`
+   - Speculative mean calculation: `spec_mean = actual_mean * 1.10`
+   - 15-day date range explanation
+   - Zero-fill logic for missing days
+   - Step-by-step algorithm flow diagram
+3. **SQL Query Examples** - Five repository methods documented with complete SQL queries and breakdowns:
+   - GetWeekdayPagesGrouped
+   - GetFirstLogDate
+   - GetWeekdayMeanWithIntervals
+   - GetLogsByDateRange
+   - GetProjectWeekdayMean
+4. **ECharts Configuration** - Complete DTO structure documentation:
+   - EchartConfig, Legend, Series, Axis, Grid structures
+   - Field descriptions with examples
+   - Complete JSON response example
+5. **Curl Examples** - Three testing scenarios:
+   - Basic endpoint call
+   - Sample response with data
+   - Sample response with empty database
+   - Sample response with partial data
+   - Response validation checklist
+6. **Edge Cases** - Eight edge cases documented:
+   - Empty database
+   - Partial data (missing days)
+   - NULL page values
+   - Zero intervals (count_reads = 0)
+   - Single day reading history
+   - Invalid page numbers
+   - Project without logs
+   - Date range boundaries
+7. **Troubleshooting** - Common errors, debugging tips, and performance optimization guide
+8. **Related Files** - Implementation files, test files, documentation files, and related task numbers
+
+## Key Changes
+
+- **New File**: `docs/IMPLEMENTATION_SPECULATE_ACTUAL.md` (35KB, 33962 bytes)
+- **No code modifications** - This was a documentation-only task
+
+## Testing Performed
+
+1. **Integration Tests**: All 10 test cases pass:
+   - TestEchartSpeculateActual_EmptyDatabase ✅
+   - TestEchartSpeculateActual_PartialData ✅
+   - TestEchartSpeculateActual_CompleteData ✅
+   - TestEchartSpeculateActual_ResponseFormat ✅
+   - TestEchartSpeculateActual_SeriesNames ✅
+   - TestEchartSpeculateActual_MarkElements ✅
+   - TestEchartSpeculateActual_DateRange ✅
+   - TestEchartSpeculateActual_SeriesStyling ✅
+   - TestEchartSpeculateActual_EdgeCases/ProjectsWithoutLogs ✅
+   - TestEchartSpeculateActual_EdgeCases/InvalidPageNumbers ✅
+
+2. **Code Quality**:
+   - `go fmt ./...` - Passes with no errors
+   - `go vet ./...` - Passes with no errors
+
+## Acceptance Criteria Met
+
+- ✅ #1 Algorithm section explains weekday grouping and 7-day interval calculation
+- ✅ #2 SQL query examples for GetWeekdayPagesGrouped, GetFirstLogDate, GetWeekdayMeanWithIntervals
+- ✅ #3 ECharts configuration structure documented with field descriptions
+- ✅ #4 Curl examples for testing the endpoint with sample data
+- ✅ #5 Edge cases and troubleshooting section included
+- ✅ #6 Document follows existing documentation patterns (matches `faults-calculation-explanation.md`)
+
+## Notes for Reviewers
+
+- Document follows the same structure as `docs/faults-calculation-explanation.md` for consistency
+- All SQL queries match the actual implementation in `internal/adapter/postgres/dashboard_repository.go`
+- ECharts configuration matches the actual DTO definitions in `internal/domain/dto/dashboard_response.go`
+- Document includes references to related tasks (RDL-152, RDL-153, RDL-155, RDL-157, RDL-158, RDL-159, RDL-160, RDL-162) for traceability
+- Document versioned with date and PRD reference (doc-014)
+
+## Follow-ups
+
+None - This documentation task is complete and ready for use by developers for maintenance and onboarding.
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
