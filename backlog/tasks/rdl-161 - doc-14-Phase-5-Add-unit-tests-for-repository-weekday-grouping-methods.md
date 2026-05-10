@@ -31,7 +31,7 @@ Tests use mock database or test database with TestHelper for verification of act
 - [ ] #2 TestGetFirstLogDate validates nil return on empty table
 - [x] #3 TestGetWeekdayMeanWithIntervals validates 7-day interval calculation
 - [ ] #4 TestEmptyResults validates empty slice returns
-- [ ] #5 TestSingleRow validates single log entry handling
+- [x] #5 TestSingleRow validates single log entry handling
 - [ ] #6 All tests compile and execute without errors
 <!-- AC:END -->
 
