@@ -4,8 +4,10 @@ title: >-
   [doc-14 Phase 3] Rewrite dashboard handler SpeculateActual method with flat
   JSON response
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-05-10 10:48'
+updated_date: '2026-05-10 13:48'
 labels:
   - handler
   - api
