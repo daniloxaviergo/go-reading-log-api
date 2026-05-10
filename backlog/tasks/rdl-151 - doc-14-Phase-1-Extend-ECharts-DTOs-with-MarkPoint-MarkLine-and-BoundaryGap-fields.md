@@ -3,7 +3,7 @@ id: RDL-151
 title: >-
   [doc-14 Phase 1] Extend ECharts DTOs with MarkPoint, MarkLine, and BoundaryGap
   fields
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-05-10 10:46'
