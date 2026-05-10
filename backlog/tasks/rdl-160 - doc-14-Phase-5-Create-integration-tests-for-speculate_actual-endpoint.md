@@ -3,7 +3,7 @@ id: RDL-160
 title: '[doc-14 Phase 5] Create integration tests for speculate_actual endpoint'
 status: To Do
 assignee:
-  - workflow
+  - thomas
 created_date: '2026-05-10 10:48'
 updated_date: '2026-05-10 15:08'
 labels:
