@@ -5,7 +5,7 @@ title: >-
   JSON response
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-05-10 10:48'
 updated_date: '2026-05-10 14:27'
 labels:
