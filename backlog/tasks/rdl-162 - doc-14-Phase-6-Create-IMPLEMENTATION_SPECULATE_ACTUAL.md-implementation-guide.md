@@ -29,7 +29,7 @@ Document must serve as reference for future maintenance and onboarding of new de
 <!-- AC:BEGIN -->
 - [ ] #1 Algorithm section explains weekday grouping and 7-day interval calculation
 - [x] #2 SQL query examples for GetWeekdayPagesGrouped, GetFirstLogDate, GetWeekdayMeanWithIntervals
-- [ ] #3 ECharts configuration structure documented with field descriptions
+- [x] #3 ECharts configuration structure documented with field descriptions
 - [ ] #4 Curl examples for testing the endpoint with sample data
 - [ ] #5 Edge cases and troubleshooting section included
 - [x] #6 Document follows existing documentation patterns
