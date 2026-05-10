@@ -2,8 +2,10 @@
 id: RDL-156
 title: '[doc-14 Phase 2] Add unit tests for SpeculateService calculation logic'
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-05-10 10:47'
+updated_date: '2026-05-10 13:20'
 labels:
   - testing
   - unit-tests
