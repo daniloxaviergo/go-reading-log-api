@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:48'
-updated_date: '2026-05-10 14:35'
+updated_date: '2026-05-10 14:41'
 labels:
   - testing
   - unit-tests
@@ -27,7 +27,7 @@ Tests use mock SpeculateService to avoid database dependencies and follow existi
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 TestSpeculateActual_Success validates 200 OK and flat JSON structure
+- [x] #1 TestSpeculateActual_Success validates 200 OK and flat JSON structure
 - [ ] #2 TestSpeculateActual_ServiceError validates 500 status on service error
 - [ ] #3 TestSpeculateActual_ResponseFormat verifies echart key exists at root level
 - [ ] #4 Tests use mock SpeculateService with configurable return values
