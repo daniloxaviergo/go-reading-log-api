@@ -3,9 +3,9 @@ id: RDL-155
 title: '[doc-14 Phase 2] Implement SpeculateService weekday-based calculation methods'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-05-10 10:47'
-updated_date: '2026-05-10 13:19'
+updated_date: '2026-05-10 13:20'
 labels:
   - service
   - calculations
