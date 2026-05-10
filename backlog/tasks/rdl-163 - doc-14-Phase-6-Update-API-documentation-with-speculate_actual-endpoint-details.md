@@ -4,8 +4,10 @@ title: >-
   [doc-14 Phase 6] Update API documentation with speculate_actual endpoint
   details
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-05-10 10:49'
+updated_date: '2026-05-10 16:55'
 labels:
   - documentation
   - api-docs
