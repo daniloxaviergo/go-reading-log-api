@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - catarina
 created_date: '2026-05-10 10:49'
-updated_date: '2026-05-10 16:32'
+updated_date: '2026-05-10 16:38'
 labels:
   - documentation
   - phase-6
@@ -34,6 +34,250 @@ Document must serve as reference for future maintenance and onboarding of new de
 - [ ] #5 Edge cases and troubleshooting section included
 - [ ] #6 Document follows existing documentation patterns
 <!-- AC:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+### 1. Technical Approach
+
+This task involves creating comprehensive documentation for the `/v1/dashboard/echart/speculate_actual.json` endpoint. The endpoint provides a line chart comparing actual reading progress ("Pages") against speculative predictions ("Mean") over a 15-day period.
+
+**Algorithm Explanation:**
+The speculate_actual endpoint implements a weekday-based historical mean calculation:
+
+1. **15-Day Date Range**: The endpoint analyzes the last 15 days (14 days ago to today, inclusive)
+2. **Weekday Grouping**: Historical logs are grouped by weekday (0-6 = Sunday-Saturday) using `EXTRACT(DOW FROM data::timestamp)`
+3. **7-Day Interval Calculation**: The mean is calculated as `total_pages / count_reads` where `count_reads = floor((log_data - begin_data) / 7 days)`
+4. **Speculative Mean**: The speculative mean applies a 10% prediction buffer: `spec_mean = mean * 1.10`
+5. **Zero-Fill**: Days without reading activity are zero-filled in the series data
+
+**Response Format:**
+- Flat JSON structure: `{ echart: {...} }` (no JSON:API envelope)
+- X-axis: 15 date strings formatted as 'DD-MMM (Day)' (e.g., '10-05 (Sat)')
+- Series: Two line series - "Pages" (actual) and "Mean" (speculative)
+- Mark elements: markPoint (max/min) and markLine (pages_per_day: 40)
+
+**Architecture Decisions:**
+- Uses SpeculateService for calculation logic (separation of concerns)
+- Repository methods handle weekday grouping queries efficiently
+- Handler returns flat JSON to match Rails endpoint behavior
+- 15-second context timeout for database queries
+
+---
+
+### 2. Files to Modify
+
+**New File to Create:**
+- `docs/IMPLEMENTATION_SPECULATE_ACTUAL.md` - Comprehensive implementation guide
+
+**Existing Files to Reference (Read Only):**
+- `internal/service/dashboard/speculate_service.go` - Service layer implementation
+- `internal/adapter/postgres/dashboard_repository.go` - Repository SQL implementations
+- `internal/domain/dto/dashboard_response.go` - ECharts DTO definitions
+- `internal/api/v1/handlers/dashboard_handler.go` - Handler implementation
+- `internal/repository/dashboard_repository.go` - Repository interface
+- `test/integration/api/v1/dashboard/echart_speculate_actual_test.go` - Integration tests
+
+**No modifications required** - This task is purely documentation.
+
+---
+
+### 3. Dependencies
+
+**Prerequisites:**
+- No code changes required (endpoint is already implemented)
+- Documentation must reference existing implementation files
+- Acceptance criteria from doc-014 (Phase 4 PRD) must be covered
+
+**Related Completed Tasks:**
+- RDL-159: Route registration for speculate_actual endpoint
+- RDL-157: Dashboard handler SpeculateActual method implementation
+- RDL-155: SpeculateService weekday-based calculation methods
+- RDL-158: Unit tests for dashboard handler
+- RDL-160: Integration tests for speculate_actual endpoint
+- RDL-152: Repository interface methods for weekday calculations
+- RDL-153: PostgreSQL repository methods for weekday grouping
+
+**Documentation Dependencies:**
+- Follows existing documentation pattern from `docs/faults-calculation-explanation.md`
+- Must align with PRD doc-014 requirements
+- Should reference RDL task numbers for traceability
+
+---
+
+### 4. Code Patterns
+
+**Documentation Structure Pattern:**
+Following the pattern established in `docs/faults-calculation-explanation.md`:
+
+```markdown
+# Document Title
+
+**Version:** 1.0  
+**Last Updated:** YYYY-MM-DD  
+**Related Tasks:** RDL-XXX, RDL-YYY  
+**PRD Reference:** doc-XX
+
+---
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Algorithm Explanation](#algorithm-explanation)
+3. [SQL Query Examples](#sql-query-examples)
+4. [ECharts Configuration](#echarts-configuration)
+5. [Curl Examples](#curl-examples)
+6. [Edge Cases](#edge-cases)
+7. [Troubleshooting](#troubleshooting)
+8. [Related Files](#related-files)
+```
+
+**Code Snippet Formatting:**
+- Use SQL code blocks with PostgreSQL syntax highlighting
+- Include Go code snippets for service/repository usage
+- Provide curl examples with sample responses
+
+**Naming Conventions:**
+- Use snake_case for database columns and JSON fields
+- Use PascalCase for Go types and methods
+- Use DOW (Day of Week) terminology: 0=Sunday to 6=Saturday
+
+**Integration Patterns:**
+- Document the dependency injection pattern used in service layer
+- Explain the flat JSON response format vs JSON:API envelope
+- Show how repository methods are called from service
+
+---
+
+### 5. Testing Strategy
+
+**Documentation Validation:**
+- ✅ Verify all algorithm steps are correctly explained
+- ✅ Confirm SQL queries match actual implementation
+- ✅ Check ECharts configuration matches response structure
+- ✅ Test curl examples against running server
+- ✅ Validate edge cases cover all scenarios
+
+**Acceptance Criteria Verification:**
+
+| Criteria | Verification Method |
+|----------|-------------------|
+| #1 Algorithm section explains weekday grouping | Document includes step-by-step algorithm with examples |
+| #2 SQL query examples for repository methods | Document includes GetWeekdayPagesGrouped, GetFirstLogDate, GetWeekdayMeanWithIntervals queries |
+| #3 ECharts configuration structure documented | Document includes EchartConfig fields and example response |
+| #4 Curl examples for testing endpoint | Document includes curl command with sample JSON response |
+| #5 Edge cases and troubleshooting section | Document includes empty database, partial data, NULL handling scenarios |
+| #6 Document follows existing patterns | Document structure matches faults-calculation-explanation.md |
+
+**Test Data Scenarios to Document:**
+1. Empty database (all zeros in series)
+2. Partial data (some days missing, zero-filled)
+3. Complete data (all 15 days populated)
+4. Single reading day (edge case for interval calculation)
+5. NULL page values (handled by CASE statement)
+
+---
+
+### 6. Risks and Considerations
+
+**Known Implementation Details:**
+
+1. **Prediction Percentage**: Currently hardcoded to 10% (0.1) in service layer
+   - Future enhancement: Could be made configurable via UserConfig service
+   - Document this as a known limitation
+
+2. **Date Formatting**: X-axis uses 'DD-MMM (Day)' format
+   - Example: '10-05 (Sat)' for May 10, Saturday
+   - Must match Rails strftime '%d-%m (%a)'
+
+3. **7-Day Interval Edge Cases**:
+   - Returns `nil` when `count_reads = 0` (logs within same 7-day period)
+   - Returns `nil` when no logs exist for weekday
+   - Document these nil return scenarios
+
+4. **Flat JSON Response**:
+   - Unlike other Go endpoints using JSON:API envelope
+   - Matches Rails `/v1/dashboard/echart/speculate_actual.json` behavior
+   - Consistent with `/v1/dashboard/echart/faults.json` endpoint
+
+**Potential Pitfalls:**
+
+1. **Weekday Calculation**: PostgreSQL DOW (0=Sunday) must be clearly documented
+   - Go's `time.Weekday()` also uses 0=Sunday (compatible)
+   - Ensure consistency across documentation
+
+2. **Timezone Handling**:
+   - Server local time used for date calculations
+   - Document timezone configuration in `.env`
+
+3. **Context Timeout**:
+   - 15-second timeout for dashboard queries
+   - Document this in troubleshooting section
+
+**Deployment Considerations:**
+- No deployment changes required (documentation only)
+- Document can be reviewed independently of code changes
+- Version document with date and related task numbers
+
+**Maintenance Notes:**
+- Update document when algorithm changes
+- Add new curl examples when test data changes
+- Keep SQL queries synchronized with repository implementation
+- Reference PRD doc-014 for requirement traceability
+
+---
+
+## Document Content Outline
+
+### Section 1: Overview
+- Endpoint purpose and URL
+- Response format (flat JSON)
+- Use cases (dashboard visualization)
+
+### Section 2: Algorithm Explanation
+- Weekday grouping concept
+- 7-day interval calculation formula
+- Speculative mean calculation (mean * 1.10)
+- Step-by-step algorithm with flow diagram
+
+### Section 3: SQL Query Examples
+- GetWeekdayPagesGrouped query with explanation
+- GetFirstLogDate query with explanation
+- GetWeekdayMeanWithIntervals query with explanation
+- CTE structure breakdown (if applicable)
+
+### Section 4: ECharts Configuration
+- EchartConfig structure fields
+- Series configuration (Pages and Mean)
+- MarkPoint and MarkLine elements
+- X-axis and Y-axis configuration
+- Example JSON response
+
+### Section 5: Curl Examples
+- Basic endpoint call
+- Sample response with actual data
+- Sample response with empty database
+- Response validation checklist
+
+### Section 6: Edge Cases
+- Empty database handling
+- Partial data (missing days)
+- NULL page values
+- Zero intervals (count_reads = 0)
+- Single day reading history
+
+### Section 7: Troubleshooting
+- Common errors and solutions
+- Context timeout issues
+- Date format problems
+- Weekday calculation mismatches
+
+### Section 8: Related Files
+- Implementation files with line numbers
+- Test files with key test cases
+- Related documentation links
+- Related task numbers
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
