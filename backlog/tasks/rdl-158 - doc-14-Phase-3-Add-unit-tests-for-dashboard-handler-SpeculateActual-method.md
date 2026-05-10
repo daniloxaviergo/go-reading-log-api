@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:48'
-updated_date: '2026-05-10 14:43'
+updated_date: '2026-05-10 14:44'
 labels:
   - testing
   - unit-tests
@@ -543,6 +543,59 @@ PASS
 - [x] #4 Tests use mock SpeculateService with configurable return values
 - [x] #5 All handler tests compile and run without errors
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Added comprehensive unit tests for the `SpeculateActual` handler method in the dashboard handler.
+
+### What Was Done
+
+Created 5 new unit test functions in `internal/api/v1/handlers/dashboard_handler_test.go`:
+
+1. **TestDashboardHandler_SpeculateActual_Success** - Validates 200 OK status and flat JSON structure with proper echart key at root level, no JSON:API envelope
+2. **TestDashboardHandler_SpeculateActual_ServiceError** - Validates 500 Internal Server Error status when service returns an error
+3. **TestDashboardHandler_SpeculateActual_ResponseFormat** - Verifies echart key exists at root level and Content-Type is application/json
+4. **TestDashboardHandler_SpeculateActual_EmptySeries** - Edge case test for service returning chart with empty series
+5. **TestDashboardHandler_NilChartConfig** - Edge case test for service returning nil chart config
+
+All tests use `MockSpeculateService` with configurable return values to avoid database dependencies, following existing handler test patterns.
+
+### Key Changes
+
+**Files Modified:**
+- `internal/api/v1/handlers/dashboard_handler_test.go` - Added 5 test functions and `errors` import
+
+**Test Coverage:**
+- Success case: 200 OK, flat JSON with echart key, proper series structure
+- Error case: 500 status, error message in response body
+- Format validation: No JSON:API envelope, application/json content-type
+- Edge cases: Empty series, nil chart config
+
+### Tests Run
+
+```bash
+go test -v ./internal/api/v1/handlers/ -run TestDashboardHandler_SpeculateActual
+go fmt ./internal/api/v1/handlers/dashboard_handler_test.go
+go vet ./internal/api/v1/handlers/...
+```
+
+All tests pass successfully:
+- TestDashboardHandler_SpeculateActual_Success: PASS
+- TestDashboardHandler_SpeculateActual_ServiceError: PASS
+- TestDashboardHandler_SpeculateActual_ResponseFormat: PASS
+- TestDashboardHandler_SpeculateActual_EmptySeries: PASS
+- TestDashboardHandler_SpeculateActual_NilChartConfig: PASS
+
+### Notes for Reviewers
+
+- Tests follow existing Clean Architecture patterns (handler uses mock service, no database dependency)
+- Error responses are consistent with existing patterns (500 status, "Internal server error" message)
+- HTTP status codes are correct (200 for success, 500 for service error)
+- All mocks properly verified with `AssertExpectations(t)`
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
