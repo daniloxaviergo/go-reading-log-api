@@ -30,7 +30,7 @@ Mocks must follow existing mock repository patterns and support testing of edge 
 - [x] #1 MockGetWeekdayPagesGrouped method with configurable return values
 - [x] #2 MockGetFirstLogDate method supporting nil return
 - [x] #3 MockGetWeekdayMeanWithIntervals method with error injection support
-- [ ] #4 All mocks follow existing MockDashboardRepository pattern
+- [x] #4 All mocks follow existing MockDashboardRepository pattern
 - [ ] #5 Mocks compile without errors
 <!-- AC:END -->
 
