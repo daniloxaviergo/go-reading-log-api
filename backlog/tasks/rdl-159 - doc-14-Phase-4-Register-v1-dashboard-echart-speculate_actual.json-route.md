@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:48'
-updated_date: '2026-05-10 14:52'
+updated_date: '2026-05-10 14:53'
 labels:
   - routing
   - api
@@ -26,7 +26,7 @@ Route must follow existing routing patterns and be accessible via the configured
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Route registered with GET method on /v1/dashboard/echart/speculate_actual.json
+- [x] #1 Route registered with GET method on /v1/dashboard/echart/speculate_actual.json
 - [ ] #2 Route uses dashboardHandler.SpeculateActual handler
 - [ ] #3 Route follows existing middleware chain
 - [ ] #4 Route compiles without errors
