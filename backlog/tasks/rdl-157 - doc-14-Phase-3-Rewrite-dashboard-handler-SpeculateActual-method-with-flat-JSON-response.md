@@ -3,11 +3,11 @@ id: RDL-157
 title: >-
   [doc-14 Phase 3] Rewrite dashboard handler SpeculateActual method with flat
   JSON response
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-05-10 10:48'
-updated_date: '2026-05-10 14:25'
+updated_date: '2026-05-10 14:26'
 labels:
   - handler
   - api
