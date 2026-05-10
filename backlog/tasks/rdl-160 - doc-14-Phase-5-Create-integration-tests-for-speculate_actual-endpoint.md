@@ -1,11 +1,11 @@
 ---
 id: RDL-160
 title: '[doc-14 Phase 5] Create integration tests for speculate_actual endpoint'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-05-10 10:48'
-updated_date: '2026-05-10 15:48'
+updated_date: '2026-05-10 15:49'
 labels:
   - testing
   - integration-tests
