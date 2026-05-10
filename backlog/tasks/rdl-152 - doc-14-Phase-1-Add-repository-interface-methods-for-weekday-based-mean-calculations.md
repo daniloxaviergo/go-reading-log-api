@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:46'
-updated_date: '2026-05-10 11:27'
+updated_date: '2026-05-10 11:39'
 labels:
   - infrastructure
   - repository
@@ -417,6 +417,74 @@ func TestWeekdayPages_Validate_Invalid_Weekday(t *testing.T) {
 - Interface-first approach enables parallel development of implementation and mocks
 - DTO definition is critical dependency for interface compilation
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress
+
+### Completed ✅
+
+#### 1. DTO Definition (WeekdayPages struct)
+- **File**: `internal/domain/dto/dashboard_response.go`
+- Added `WeekdayPages` struct with fields:
+  - `Weekday int` (0-6, Sunday-Saturday)
+  - `TotalPages int`
+  - `LogCount int`
+  - `Mean float64` (rounded to 3 decimals)
+- Added constructor: `NewWeekdayPages(weekday, totalPages, logCount, mean)`
+- Added builder methods: `SetWeekday()`, `SetTotalPages()`, `SetLogCount()`, `SetMean()`
+- Added `Validate()` method with comprehensive validation
+- Added context embedding with `GetContext()` and `SetContext()` methods
+
+#### 2. Interface Method Definitions
+- **File**: `internal/repository/dashboard_repository.go`
+- Added three new interface methods:
+  1. `GetWeekdayPagesGrouped(ctx, startDate, endDate) (map[int]dto.WeekdayPages, error)`
+  2. `GetFirstLogDate(ctx) (*time.Time, error)`
+  3. `GetWeekdayMeanWithIntervals(ctx, weekday, currentDate) (*float64, error)`
+- All methods properly documented with comments explaining algorithm and edge cases
+
+#### 3. PostgreSQL Implementation (Stubs)
+- **File**: `internal/adapter/postgres/dashboard_repository.go`
+- Implemented all three methods with full SQL queries:
+  - `GetWeekdayPagesGrouped`: Groups logs by weekday, calculates totals and means
+  - `GetFirstLogDate`: Returns MIN(data::timestamp) from logs table
+  - `GetWeekdayMeanWithIntervals`: Implements V1::MeanLog algorithm with 7-day intervals
+- All methods use 15-second context timeout
+- Proper error handling with `(nil, nil)` for empty data
+
+#### 4. Mock Implementations
+- Updated all mock repositories to implement new interface methods:
+  - `test/testutil/mock_dashboard_repository.go` - Full mock with testdouble
+  - `internal/service/dashboard/projects_service_test.go` - MockDashboardRepositoryForProjects
+  - `internal/api/v1/handlers/dashboard_handler_test.go` - MockDashboardRepository
+  - `test/unit/day_service_test.go` - MockDashboardRepository
+  - `internal/api/v1/routes_test.go` - MockDashboardRepository
+  - `test/unit/weekday_faults_service_test.go` - MockDashboardRepositoryWeekdayFaults
+
+#### 5. Unit Tests
+- **File**: `test/unit/domain/dto/weekday_pages_test.go`
+- Created 33 comprehensive test cases covering:
+  - Struct definition and field verification
+  - Constructor with valid/zero values
+  - Context embedding
+  - Builder methods with chaining
+  - Validation (valid data, all edge cases)
+  - JSON marshaling/unmarshaling
+  - Map usage integration
+
+### Verification
+- ✅ Code compiles without errors
+- ✅ `go fmt` passes with no errors
+- ✅ `go vet` passes for modified packages
+- ✅ All WeekdayPages unit tests pass (33 tests)
+- ✅ Interface compiles correctly
+- ✅ All mock implementations updated
+
+### Next Steps
+- Task is ready for acceptance criteria verification
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
