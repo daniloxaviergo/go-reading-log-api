@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:49'
-updated_date: '2026-05-10 16:28'
+updated_date: '2026-05-10 16:29'
 labels:
   - testing
   - unit-tests
@@ -29,7 +29,7 @@ Tests use mock database or test database with TestHelper for verification of act
 <!-- AC:BEGIN -->
 - [ ] #1 TestGetWeekdayPagesGrouped validates weekday aggregation results
 - [ ] #2 TestGetFirstLogDate validates nil return on empty table
-- [ ] #3 TestGetWeekdayMeanWithIntervals validates 7-day interval calculation
+- [x] #3 TestGetWeekdayMeanWithIntervals validates 7-day interval calculation
 - [ ] #4 TestEmptyResults validates empty slice returns
 - [ ] #5 TestSingleRow validates single log entry handling
 - [ ] #6 All tests compile and execute without errors
