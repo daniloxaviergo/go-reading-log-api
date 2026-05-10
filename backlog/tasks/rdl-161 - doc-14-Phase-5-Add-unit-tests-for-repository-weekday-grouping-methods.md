@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:49'
-updated_date: '2026-05-10 15:56'
+updated_date: '2026-05-10 15:59'
 labels:
   - testing
   - unit-tests
@@ -270,6 +270,29 @@ func TestDashboardRepository_GetWeekdayPagesGrouped(t *testing.T) {
 - **RDL-155**: Service layer tests (depends on this task)
 - **RDL-162**: Implementation guide documentation
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress
+
+### Phase 1: Prerequisite Implementation (In Progress)
+
+The task requires implementing 3 new repository methods that are not yet in the codebase:
+- `GetWeekdayPagesGrouped` - Returns pages aggregated by weekday within a date range
+- `GetFirstLogDate` - Returns the first log timestamp (nil if empty)
+- `GetWeekdayMeanWithIntervals` - Calculates mean using 7-day intervals
+
+**Steps:**
+1. ✅ Analyzed task requirements and existing codebase structure
+2. ⏳ Add `WeekdayPages` DTO to `internal/domain/dto/dashboard_response.go`
+3. ⏳ Add 3 interface methods to `internal/repository/dashboard_repository.go`
+4. ⏳ Implement methods in `internal/adapter/postgres/dashboard_repository.go`
+5. ⏳ Add mock implementations to `test/testutil/mock_dashboard_repository.go`
+6. ⏳ Create test file `test/unit/repository/dashboard_weekday_test.go`
+
+**Current Status:** Starting prerequisite implementation
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
