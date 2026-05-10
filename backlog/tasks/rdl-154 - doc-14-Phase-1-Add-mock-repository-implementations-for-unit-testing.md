@@ -3,9 +3,9 @@ id: RDL-154
 title: '[doc-14 Phase 1] Add mock repository implementations for unit testing'
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-05-10 10:47'
-updated_date: '2026-05-10 12:32'
+updated_date: '2026-05-10 12:33'
 labels:
   - infrastructure
   - testing
