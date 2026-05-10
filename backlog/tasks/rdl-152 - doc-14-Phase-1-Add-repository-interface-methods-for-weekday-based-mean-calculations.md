@@ -5,9 +5,9 @@ title: >-
   calculations
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-05-10 10:46'
-updated_date: '2026-05-10 11:42'
+updated_date: '2026-05-10 11:43'
 labels:
   - infrastructure
   - repository
