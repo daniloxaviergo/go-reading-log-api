@@ -29,10 +29,10 @@ Each method must use 15-second context timeout and handle NULL/empty data gracef
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 GetWeekdayPagesGrouped implemented with EXTRACT(DOW FROM data) weekday grouping
+- [x] #1 GetWeekdayPagesGrouped implemented with EXTRACT(DOW FROM data) weekday grouping
 - [ ] #2 GetFirstLogDate returns *time.Time (nil when no logs exist)
 - [ ] #3 GetWeekdayMeanWithIntervals calculates 7-day intervals correctly
-- [ ] #4 All methods use 15-second context timeout
+- [x] #4 All methods use 15-second context timeout
 - [ ] #5 NULL values handled gracefully in all queries
 - [ ] #6 Code compiles without errors
 <!-- AC:END -->
