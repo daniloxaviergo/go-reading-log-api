@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:47'
-updated_date: '2026-05-10 13:17'
+updated_date: '2026-05-10 13:18'
 labels:
   - service
   - calculations
@@ -436,6 +436,68 @@ if mean == nil {
 - Update documentation in AGENTS.md
 - Mark task as Done
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Implementation Summary
+
+**Task:** RDL-155 - Implement SpeculateService weekday-based calculation methods
+
+### What Was Done
+
+Rewrote the `SpeculateService` to implement weekday-based historical mean calculation for the `/v1/dashboard/echart/speculate_actual.json` endpoint.
+
+### Key Changes
+
+**Service Layer (`internal/service/dashboard/speculate_service.go`):**
+- Implemented `CalculateHistoricalMean(ctx, weekday, currentDate)` - weekday grouping with 7-day interval division
+- Implemented `CalculateSpeculativeMean(actualMean)` - applies 10% buffer (mean * 1.10)
+- Implemented `GenerateXAxisLabels(startDate, endDate)` - returns 15 dates in 'DD-MMM (Day)' format
+- Implemented `GenerateSeriesData(ctx, startDate, endDate)` - creates Pages and Mean arrays with 15 elements each
+- Implemented `GetChartConfig(ctx)` - orchestrates all calculations and returns ECharts configuration
+- Added zero-fill logic for missing days in date range
+- Added edge case handling: nil data, empty database, zero mean values
+
+**Handler Layer (`internal/api/v1/handlers/dashboard_handler.go`):**
+- Updated `NewDashboardHandler` constructor to accept `*dashboard.SpeculateService`
+- Rewrote `SpeculateActual` method to use new SpeculateService
+- Changed response format from JSON:API envelope to flat JSON `{ echart: {...} }`
+
+**Routes (`internal/api/v1/routes.go`):**
+- Added SpeculateService injection
+- Registered `/v1/dashboard/echart/speculate_actual.json` route
+
+**DTOs (`internal/domain/dto/dashboard_response.go`):**
+- Added `Data []string` field to `Axis` struct for xAxis labels
+
+**Tests (`test/unit/service/dashboard/speculate_service_test.go`):**
+- Created 20 comprehensive unit tests covering all calculation methods
+- All tests pass successfully
+
+### Tests Run
+
+- `go test ./test/unit/service/dashboard/...` - 20 tests PASS
+- `go vet ./internal/service/dashboard/...` - PASS
+- `go vet ./internal/api/v1/handlers/...` - PASS
+- `go build ./...` - PASS
+
+### Acceptance Criteria Met
+
+- ✅ AC#1: CalculateHistoricalMean implements weekday grouping with 7-day interval division
+- ✅ AC#2: CalculateSpeculativeMean applies 10% buffer (mean * 1.10)
+- ✅ AC#3: GenerateXAxisLabels returns 15 dates in 'DD-MMM (Day)' format
+- ✅ AC#4: GenerateSeriesData creates Pages and Mean arrays with 15 elements each
+- ✅ AC#5: Zero-fill logic for missing days in date range
+- ✅ AC#6: Edge cases handled: nil data, empty database, zero mean values
+
+### Notes for Reviewers
+
+- Prediction percentage is hardcoded to 10% (0.1) as per Rails implementation
+- Response format changed from JSON:API envelope to flat JSON to match Rails API
+- MarkPoint includes max/min values, MarkLine set at yAxis: 40
+- All calculations rounded to 3 decimal places for consistency
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
