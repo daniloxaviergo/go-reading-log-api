@@ -4,7 +4,8 @@ title: >-
   [doc-14 Phase 1] Extend ECharts DTOs with MarkPoint, MarkLine, and BoundaryGap
   fields
 status: To Do
-assignee: []
+assignee:
+  - workflow
 created_date: '2026-05-10 10:46'
 updated_date: '2026-05-10 10:54'
 labels:
