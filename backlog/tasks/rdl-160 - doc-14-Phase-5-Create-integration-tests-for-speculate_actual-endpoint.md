@@ -30,8 +30,8 @@ Tests use TestHelper for database setup/teardown and verify actual HTTP endpoint
 - [x] #2 TestPartialData validates zero-fill for missing days
 - [x] #3 TestCompleteData validates 15 data points in all series
 - [x] #4 TestResponseFormat validates flat JSON with echart key
-- [ ] #5 TestSeriesNames validates 'Pages' and 'Mean' names
-- [ ] #6 TestMarkElements validates markPoint max/min and markLine yAxis: 40
+- [x] #5 TestSeriesNames validates 'Pages' and 'Mean' names
+- [x] #6 TestMarkElements validates markPoint max/min and markLine yAxis: 40
 - [x] #7 TestDateRange validates 15 dates in xAxis
 - [ ] #8 All tests use real database via TestHelper
 <!-- AC:END -->
