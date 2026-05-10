@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:47'
-updated_date: '2026-05-10 13:42'
+updated_date: '2026-05-10 13:46'
 labels:
   - testing
   - unit-tests
@@ -376,6 +376,79 @@ Function-level coverage for speculate_service.go:
 - ✅ Uses mock repository pattern consistently
 - ✅ Tests follow Arrange-Act-Assert pattern
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Task RDL-156: Add unit tests for SpeculateService calculation logic
+
+### Summary
+
+This task aimed to add comprehensive unit tests for the `SpeculateService` calculation logic in `internal/service/dashboard/speculate_service.go`. 
+
+### What Was Done
+
+1. **Analyzed the existing test infrastructure** - Reviewed the test file structure and mock repository patterns
+2. **Identified code coverage gaps** - Ran coverage analysis to identify untested code paths
+3. **Created comprehensive test suite** - Added 37+ test cases covering:
+   - Error handling tests (repository errors, invalid data)
+   - Weekday grouping tests (all 7 weekdays 0-6)
+   - Edge cases (negative pages, out-of-range dates, multiple logs per day)
+   - Chart configuration edge cases
+   - Date range edge cases (month boundaries, year boundaries, leap years)
+   - Precision boundary tests for floating-point calculations
+
+### Key Changes
+
+**Test File Created:** `test/unit/service/dashboard/speculate_service_test.go`
+- Uses `MockDashboardRepositoryForSpeculate` for isolated unit testing
+- Follows Arrange-Act-Assert pattern
+- Achieves 97-100% coverage on public API methods
+
+### Tests Implemented
+
+- `TestSpeculateService_CalculateHistoricalMean_*` - Historical mean calculation
+- `TestCalculateSpeculativeMean_*` - Speculative mean with 10% buffer
+- `TestGenerateXAxisLabels_*` - Date format validation
+- `TestGenerateSeriesData_*` - Series data generation with zero-fill
+- `TestGetChartConfig_*` - Full chart configuration
+- `TestGetDateRangeLast15Days_*` - Date range calculation
+- `TestCalculateHistoricalMean_WeekdayGrouping_*` - Weekday-specific calculations (AC #5)
+
+### Code Coverage Achieved
+
+Public API methods: 97-100% coverage
+- NewSpeculateService: 100%
+- CalculateHistoricalMean: 100%
+- CalculateSpeculativeMean: 100%
+- GenerateXAxisLabels: 100%
+- GenerateSeriesData: 97%
+- GetChartConfig: 100%
+- GetDateRangeLast15Days: 100%
+
+### Acceptance Criteria Met
+
+- ✅ #1 TestCalculateHistoricalMean covers normal data, empty data, and single-read scenarios
+- ✅ #2 TestCalculateSpeculativeMean validates 10% buffer and zero-mean edge case
+- ✅ #3 TestGenerateXAxisLabels verifies 'DD-MMM (Day)' format for all 15 dates
+- ✅ #4 TestZeroFillLogic validates missing days are filled with zero values
+- ✅ #5 TestCalculateHistoricalMean_WeekdayGrouping validates weekday-specific calculations
+- ✅ #6 All tests achieve >80% code coverage (public API: 97-100%)
+
+### Definition of Done
+
+- ✅ All unit tests pass (`go test ./test/unit/service/dashboard/...`)
+- ✅ `go fmt` and `go vet` pass with no errors
+- ✅ Code coverage >80% for speculate_service.go (public API: 97-100%)
+- ✅ Clean Architecture layers properly followed
+- ✅ Error responses consistent with existing patterns
+- ✅ Tests include both success and error path coverage
+- ✅ Test file follows existing naming and structure conventions
+
+### Notes
+
+The test file was created in `test/unit/service/dashboard/` following the project's external test pattern (separate package importing the service). All tests use mock repositories for isolated unit testing without database dependencies.
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
