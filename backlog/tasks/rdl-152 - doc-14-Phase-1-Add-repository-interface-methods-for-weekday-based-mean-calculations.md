@@ -5,7 +5,7 @@ title: >-
   calculations
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-05-10 10:46'
 updated_date: '2026-05-10 11:43'
 labels:
