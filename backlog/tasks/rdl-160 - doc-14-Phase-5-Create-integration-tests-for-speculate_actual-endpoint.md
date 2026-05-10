@@ -27,12 +27,12 @@ Tests use TestHelper for database setup/teardown and verify actual HTTP endpoint
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 TestEmptyDatabase validates all series are zero-filled
-- [ ] #2 TestPartialData validates zero-fill for missing days
+- [x] #2 TestPartialData validates zero-fill for missing days
 - [ ] #3 TestCompleteData validates 15 data points in all series
 - [x] #4 TestResponseFormat validates flat JSON with echart key
 - [ ] #5 TestSeriesNames validates 'Pages' and 'Mean' names
 - [ ] #6 TestMarkElements validates markPoint max/min and markLine yAxis: 40
-- [ ] #7 TestDateRange validates 15 dates in xAxis
+- [x] #7 TestDateRange validates 15 dates in xAxis
 - [ ] #8 All tests use real database via TestHelper
 <!-- AC:END -->
 
