@@ -1,11 +1,11 @@
 ---
 id: RDL-158
 title: '[doc-14 Phase 3] Add unit tests for dashboard handler SpeculateActual method'
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-05-10 10:48'
-updated_date: '2026-05-10 14:44'
+updated_date: '2026-05-10 14:45'
 labels:
   - testing
   - unit-tests
