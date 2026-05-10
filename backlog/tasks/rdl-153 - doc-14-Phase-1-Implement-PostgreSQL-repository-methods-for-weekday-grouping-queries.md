@@ -5,9 +5,9 @@ title: >-
   queries
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-05-10 10:47'
-updated_date: '2026-05-10 12:21'
+updated_date: '2026-05-10 12:22'
 labels:
   - infrastructure
   - repository
