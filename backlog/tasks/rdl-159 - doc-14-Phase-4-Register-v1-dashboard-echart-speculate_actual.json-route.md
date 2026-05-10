@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:48'
-updated_date: '2026-05-10 14:57'
+updated_date: '2026-05-10 14:58'
 labels:
   - routing
   - api
@@ -374,6 +374,42 @@ This task (RDL-159) is **already complete**. The route is registered, the handle
 *Codebase Analysis Date: 2026-05-10*
 *Status: READY FOR REVIEW (No Implementation Required)*
 <!-- SECTION:PLAN:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Task Completed: Route Registration for /v1/dashboard/echart/speculate_actual.json
+
+### What Was Done
+This task involved registering the `/v1/dashboard/echart/speculate_actual.json` route in the Go API. **No code modifications were required** as the route was already fully implemented and functional as part of RDL-157 (Phase 3) and related tasks.
+
+### Verification Completed
+- ✅ Route registered at `internal/api/v1/routes.go:40`
+- ✅ Handler implemented at `internal/api/v1/handlers/dashboard_handler.go:429-448`
+- ✅ Service layer in `internal/service/dashboard/speculate_service.go`
+- ✅ Dependency injection configured in `cmd/server.go`
+- ✅ All unit tests pass (5 tests in `dashboard_handler_test.go`)
+- ✅ Integration tests exist and verify database interactions
+- ✅ `go build ./...` compiles without errors
+- ✅ `go fmt` and `go vet` pass with no issues
+
+### Key Changes
+No changes were made. The implementation was already in place:
+- Route: `r.HandleFunc("/v1/dashboard/echart/speculate_actual.json", dashboardHandler.SpeculateActual).Methods("GET")`
+- Handler returns flat JSON `{ echart: chartConfig }` (not JSON:API envelope)
+- Content-Type: `application/json`
+- Error handling returns 500 status with proper error message
+
+### Testing
+- Unit tests: `TestDashboardHandler_SpeculateActual_Success`, `TestDashboardHandler_SpeculateActual_ServiceError`, `TestDashboardHandler_SpeculateActual_ResponseFormat`, `TestDashboardHandler_SpeculateActual_EmptySeries`, `TestDashboardHandler_SpeculateActual_NilChartConfig`
+- Integration tests verify actual database interactions
+- Error path tests included in `error_scenarios_test.go`
+
+### Notes for Reviewers
+- This task was already complete; verification confirmed the implementation meets all acceptance criteria
+- Documentation update (DoD #7) is tracked separately in RDL-163
+- All Clean Architecture layers properly followed (Handler → Service → Repository)
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
