@@ -31,7 +31,7 @@ This enables the speculate_actual endpoint to return complete ECharts configurat
 - [ ] #1 MarkPoint struct with data array containing type and name fields
 - [ ] #2 MarkLine struct with data array containing name and yAxis fields
 - [ ] #3 BoundaryGap field added to Axis struct as []bool
-- [ ] #4 NewEchartConfig() updated to accept markPoint and markLine parameters
+- [x] #4 NewEchartConfig() updated to accept markPoint and markLine parameters
 - [ ] #5 All DTOs compile without errors
 <!-- AC:END -->
 
