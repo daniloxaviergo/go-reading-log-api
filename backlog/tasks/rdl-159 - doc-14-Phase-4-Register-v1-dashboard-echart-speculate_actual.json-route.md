@@ -386,5 +386,5 @@ This task (RDL-159) is **already complete**. The route is registered, the handle
 - [ ] #7 Documentation updated in QWEN.md and AGENTS.md
 - [x] #8 New code paths include error path tests
 - [x] #9 HTTP handlers test both success and error responses
-- [ ] #10 Integration tests verify actual database interactions
+- [x] #10 Integration tests verify actual database interactions
 <!-- DOD:END -->
