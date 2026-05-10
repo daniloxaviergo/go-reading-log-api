@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:49'
-updated_date: '2026-05-10 17:07'
+updated_date: '2026-05-10 17:08'
 labels:
   - documentation
   - api-docs
@@ -273,6 +273,62 @@ The documentation must reference and explain:
 - [x] Documentation follows existing format conventions
 - [x] Markdown renders correctly without errors
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## Implementation Progress
+
+### Completed Tasks
+
+1. **Updated README.md documentation** for `/v1/dashboard/echart/speculate_actual.json` endpoint:
+   - Added endpoint to the API endpoints table
+   - Added detailed endpoint documentation section including:
+     - Method, Path, Description, Authentication, Response Code
+     - Request curl example
+     - Complete response schema with all fields documented
+     - Example JSON response with sample data
+     - Edge cases documentation (empty database, partial data, invalid page numbers)
+     - Acceptance criteria AC-001 to AC-015 reference table with status indicators
+     - Notes on known gaps (AC-003, AC-004, AC-011 to AC-014 not yet implemented)
+
+2. **Verified documentation accuracy** against actual implementation:
+   - Series names: 'Actual' and 'Speculated' (matches implementation)
+   - Response structure: flat JSON with `echart` key (matches implementation)
+   - Data points: 15 elements per series (matches implementation)
+   - Styling: colors (#5470C6 for Actual, #91CC75 for Speculated), line width (2), dashed line for Speculated
+
+3. **Tested and verified**:
+   - All integration tests pass (9 test functions, 10 test cases)
+   - `go fmt` passes with no errors
+   - `go vet` passes with no errors
+
+### Documentation Content Summary
+
+The documentation includes:
+- Complete endpoint reference with curl example
+- Response schema table with 20+ fields documented
+- Example JSON response showing both series with sample data
+- Edge cases table (3 scenarios)
+- Acceptance criteria status table (15 criteria with implementation status)
+
+### Files Modified
+
+- `README.md` - Added endpoint documentation section
+
+### Testing Results
+
+All tests pass:
+- TestEchartSpeculateActual_EmptyDatabase ✅
+- TestEchartSpeculateActual_PartialData ✅
+- TestEchartSpeculateActual_CompleteData ✅
+- TestEchartSpeculateActual_ResponseFormat ✅
+- TestEchartSpeculateActual_SeriesNames ✅
+- TestEchartSpeculateActual_MarkElements ✅
+- TestEchartSpeculateActual_DateRange ✅
+- TestEchartSpeculateActual_SeriesStyling ✅
+- TestEchartSpeculateActual_EdgeCases ✅
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
