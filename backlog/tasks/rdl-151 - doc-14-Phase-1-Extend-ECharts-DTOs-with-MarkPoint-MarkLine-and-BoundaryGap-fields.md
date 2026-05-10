@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:46'
-updated_date: '2026-05-10 11:11'
+updated_date: '2026-05-10 11:17'
 labels:
   - infrastructure
   - dto
@@ -339,6 +339,63 @@ All acceptance criteria and Definition of Done items have been satisfied:
 - ✅ Clean Architecture patterns followed
 - ✅ Comprehensive test coverage (48 tests)
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## RDL-151: Extend ECharts DTOs with MarkPoint, MarkLine, and BoundaryGap fields
+
+### What Was Done
+Extended the ECharts DTOs in `internal/domain/dto/dashboard_response.go` to support Rails-matching chart configuration for the `/v1/dashboard/echart/speculate_actual.json` endpoint.
+
+### Key Changes
+
+**Files Modified:**
+- `internal/domain/dto/dashboard_response.go` - Added MarkPoint, MarkLine, and related structs
+
+**New Structs Added:**
+1. `MarkPoint` - Mark point configuration for ECharts max/min markers
+2. `MarkPointData` - Individual mark point data item with Type and Name fields
+3. `MarkLine` - Mark line configuration for ECharts reference lines
+4. `MarkLineData` - Individual mark line data item with Name and YAxis fields
+
+**Struct Updates:**
+- `Series` struct - Added `MarkPoint *MarkPoint` and `MarkLine *MarkLine` fields
+- `Series.Validate()` - Updated to validate mark elements when present
+- `NewEchartConfigWithOptions()` - New function to support mark element configuration
+
+**Builder Methods Added:**
+- `Series.SetMarkPoint()` - Set mark point configuration
+- `Series.SetMarkLine()` - Set mark line configuration
+- `MarkPoint.SetData()`, `MarkPoint.AddData()` - Mark point data manipulation
+- `MarkLine.SetData()`, `MarkLine.AddData()` - Mark line data manipulation
+- `MarkPointData.SetType()`, `MarkPointData.SetName()` - Mark point data setters
+- `MarkLineData.SetName()`, `MarkLineData.SetYAxis()` - Mark line data setters
+
+**Tests Created:**
+- `test/unit/domain/dto/echart_config_test.go` - 48 comprehensive unit tests covering:
+  - Struct definitions and JSON marshaling
+  - Validation logic for all new structs
+  - Builder methods
+  - Series integration with mark elements
+  - BoundaryGap field verification
+  - Complete ECharts configuration with mark elements
+
+### Verification
+- ✅ All 48 unit tests pass
+- ✅ All existing integration tests pass
+- ✅ `go fmt` passes with no errors
+- ✅ `go vet` passes for modified packages
+- ✅ Code compiles without errors
+- ✅ Clean Architecture patterns followed
+- ✅ Backward compatible (mark elements are optional)
+
+### Notes for Reviewers
+- JSON tags use camelCase (`markPoint`, `markLine`) to match ECharts specification
+- MarkPoint/MarkLine are optional fields with `omitempty` for backward compatibility
+- Validation only triggers when mark elements are non-nil
+- `BoundaryGap` field was already present in `Axis` struct as `[]bool`
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
