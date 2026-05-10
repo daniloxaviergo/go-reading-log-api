@@ -29,10 +29,10 @@ Documentation must match the format of existing endpoint documentation and inclu
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 Endpoint documented in API reference section
-- [ ] #2 Request format shows GET method with no parameters
-- [ ] #3 Response schema includes echart object structure
-- [x] #4 Example JSON response with all fields documented
-- [x] #5 Curl example included for testing
+- [x] #2 Request format shows GET method with no parameters
+- [x] #3 Response schema includes echart object structure
+- [ ] #4 Example JSON response with all fields documented
+- [ ] #5 Curl example included for testing
 - [ ] #6 Acceptance criteria AC-001 to AC-015 listed
 <!-- AC:END -->
 
