@@ -3,11 +3,11 @@ id: RDL-152
 title: >-
   [doc-14 Phase 1] Add repository interface methods for weekday-based mean
   calculations
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-05-10 10:46'
-updated_date: '2026-05-10 11:41'
+updated_date: '2026-05-10 11:42'
 labels:
   - infrastructure
   - repository
