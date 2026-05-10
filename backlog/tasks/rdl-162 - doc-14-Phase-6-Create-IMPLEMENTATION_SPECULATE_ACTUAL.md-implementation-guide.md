@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:49'
-updated_date: '2026-05-10 16:39'
+updated_date: '2026-05-10 16:51'
 labels:
   - documentation
   - phase-6
@@ -28,11 +28,11 @@ Document must serve as reference for future maintenance and onboarding of new de
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [ ] #1 Algorithm section explains weekday grouping and 7-day interval calculation
-- [ ] #2 SQL query examples for GetWeekdayPagesGrouped, GetFirstLogDate, GetWeekdayMeanWithIntervals
+- [x] #2 SQL query examples for GetWeekdayPagesGrouped, GetFirstLogDate, GetWeekdayMeanWithIntervals
 - [ ] #3 ECharts configuration structure documented with field descriptions
 - [ ] #4 Curl examples for testing the endpoint with sample data
 - [ ] #5 Edge cases and troubleshooting section included
-- [ ] #6 Document follows existing documentation patterns
+- [x] #6 Document follows existing documentation patterns
 <!-- AC:END -->
 
 ## Implementation Plan
