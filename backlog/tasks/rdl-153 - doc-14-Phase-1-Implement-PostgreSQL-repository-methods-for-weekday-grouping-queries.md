@@ -5,7 +5,7 @@ title: >-
   queries
 status: To Do
 assignee:
-  - workflow
+  - thomas
 created_date: '2026-05-10 10:47'
 updated_date: '2026-05-10 11:49'
 labels:
