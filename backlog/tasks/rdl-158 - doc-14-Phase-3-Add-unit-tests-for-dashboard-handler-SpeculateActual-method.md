@@ -31,7 +31,7 @@ Tests use mock SpeculateService to avoid database dependencies and follow existi
 - [x] #2 TestSpeculateActual_ServiceError validates 500 status on service error
 - [ ] #3 TestSpeculateActual_ResponseFormat verifies echart key exists at root level
 - [ ] #4 Tests use mock SpeculateService with configurable return values
-- [ ] #5 All handler tests compile and run without errors
+- [x] #5 All handler tests compile and run without errors
 <!-- AC:END -->
 
 ## Implementation Plan
