@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:48'
-updated_date: '2026-05-10 14:24'
+updated_date: '2026-05-10 14:25'
 labels:
   - handler
   - api
@@ -453,6 +453,71 @@ curl http://localhost:3000/v1/dashboard/echart/speculate_actual.json | jq
 - Check all acceptance criteria
 - Mark task as Done
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Rewrote the `SpeculateActual` handler method in `internal/api/v1/handlers/dashboard_handler.go` to use the existing `SpeculateService` and return flat JSON response matching the Rails API format.
+
+## What Was Done
+
+1. **Handler Layer Changes**:
+   - Modified `DashboardHandler` struct to inject `speculateService dashboard.SpeculateServiceInterface`
+   - Updated `NewDashboardHandler` constructor to accept `SpeculateServiceInterface` parameter
+   - Rewrote `SpeculateActual()` method to:
+     - Call `h.speculateService.GenerateChartConfig(ctx)` instead of faults-based implementation
+     - Return flat JSON `{ echart: {...} }` without JSON:API envelope
+     - Use `application/json` content type
+     - Handle errors with 500 status and `slog.Error` logging
+
+2. **Service Layer Changes**:
+   - Added `SpeculateServiceInterface` in `internal/service/dashboard/speculate_service.go` for testability
+
+3. **Routing Changes**:
+   - Updated `SetupRoutes()` in `internal/api/v1/routes.go` to accept `SpeculateServiceInterface`
+   - Registered new route: `/v1/dashboard/echart/speculate_actual.json`
+
+4. **Server Initialization**:
+   - Updated `cmd/server.go` to create `SpeculateService` instance and pass to `SetupRoutes`
+
+5. **Test Updates**:
+   - Created `MockSpeculateService` in multiple test files
+   - Updated all `NewDashboardHandler` and `SetupRoutes` calls across 17 test files
+
+## Key Changes
+
+- **Files Modified**: 17 files
+- **Response Format**: Changed from JSON:API envelope to flat JSON `{ echart: {...} }`
+- **Content-Type**: Changed from `application/vnd.api+json` to `application/json`
+- **Implementation**: Replaced faults-based calculation with pages-based speculation from `SpeculateService`
+
+## Tests Run
+
+- ✅ `go build ./...` - Compiles without errors
+- ✅ `go vet ./...` - No issues found
+- ✅ `go fmt ./...` - Code formatted
+- ✅ `go test ./internal/api/v1/handlers/` - All tests pass
+- ✅ `TestDashboardHandler_SpeculateActual` - Tests flat JSON response format
+
+## Verification
+
+- All 6 acceptance criteria checked:
+  1. ✅ SpeculateActual method injects SpeculateService via dependency injection
+  2. ✅ Handler calls service to generate ECharts configuration
+  3. ✅ Response format is flat JSON { echart: {...} } without JSON:API envelope
+  4. ✅ Error handling returns 500 status with proper error message
+  5. ✅ Handler follows existing middleware and logging patterns
+  6. ✅ Code compiles without errors
+
+## Risks/Follow-ups
+
+- **Breaking Change**: Response format changed from JSON:API to flat JSON (matches Rails API)
+- **Frontend Impact**: Frontend should already handle Rails API format
+- **Documentation**: AGENTS.md and API documentation to be updated in RDL-163
+- **Testing**: Full unit and integration tests for the endpoint to be added in RDL-158 and RDL-160
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
