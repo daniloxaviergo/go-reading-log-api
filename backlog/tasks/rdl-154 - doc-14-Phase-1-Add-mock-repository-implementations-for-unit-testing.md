@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:47'
-updated_date: '2026-05-10 12:29'
+updated_date: '2026-05-10 12:30'
 labels:
   - infrastructure
   - testing
@@ -29,7 +29,7 @@ Mocks must follow existing mock repository patterns and support testing of edge 
 <!-- AC:BEGIN -->
 - [x] #1 MockGetWeekdayPagesGrouped method with configurable return values
 - [x] #2 MockGetFirstLogDate method supporting nil return
-- [ ] #3 MockGetWeekdayMeanWithIntervals method with error injection support
+- [x] #3 MockGetWeekdayMeanWithIntervals method with error injection support
 - [ ] #4 All mocks follow existing MockDashboardRepository pattern
 - [ ] #5 Mocks compile without errors
 <!-- AC:END -->
