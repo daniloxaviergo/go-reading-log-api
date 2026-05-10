@@ -5,9 +5,9 @@ title: >-
   calculations
 status: To Do
 assignee:
-  - catarina
+  - workflow
 created_date: '2026-05-10 10:46'
-updated_date: '2026-05-10 11:26'
+updated_date: '2026-05-10 11:27'
 labels:
   - infrastructure
   - repository
