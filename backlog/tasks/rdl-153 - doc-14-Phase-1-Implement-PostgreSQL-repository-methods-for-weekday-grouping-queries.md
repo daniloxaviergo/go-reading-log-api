@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:47'
-updated_date: '2026-05-10 12:19'
+updated_date: '2026-05-10 12:20'
 labels:
   - infrastructure
   - repository
@@ -473,6 +473,54 @@ go test ./...
 
 **Ready to mark task as DONE**
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## PR Summary: Implemented PostgreSQL Repository Methods for Weekday Grouping Queries
+
+### What Was Done
+Implemented and verified three PostgreSQL repository methods for weekday grouping queries in the dashboard repository:
+
+1. **GetWeekdayPagesGrouped** - Groups logs by weekday (0-6) within a date range, calculating total pages, log count, and mean per weekday
+2. **GetFirstLogDate** - Returns the earliest log timestamp in the database (nil when no logs exist)
+3. **GetWeekdayMeanWithIntervals** - Calculates mean pages per 7-day interval for a specific weekday using V1::MeanLog algorithm
+
+### Key Changes
+
+**Files Modified:**
+- `internal/adapter/postgres/dashboard_repository.go`
+  - Fixed `GetFirstLogDate` to use `*time.Time` instead of `time.Time` for proper NULL handling
+  - Fixed `GetWeekdayMeanWithIntervals` to use `*time.Time` for beginData and logData for proper NULL handling
+
+**Files Created:**
+- `test/integration/dashboard_repository_weekday_grouping_test.go` - 16 comprehensive integration test cases
+
+### Testing
+- All 16 integration tests pass:
+  - GetWeekdayPagesGrouped: 5 test cases (empty DB, single weekday, multiple weekdays, date range filtering, multiple logs same day)
+  - GetFirstLogDate: 3 test cases (empty DB, single log, multiple logs)
+  - GetWeekdayMeanWithIntervals: 6 test cases (no logs, same 7-day period, single interval, multiple intervals, different values, 14-day edge case)
+  - Context timeout: 1 test case (all methods respect 15-second timeout)
+
+### Code Quality
+- `go fmt` passes with no errors
+- `go vet` passes with no errors
+- Application builds successfully
+
+### Bug Fixes
+1. Fixed NULL handling in GetFirstLogDate and GetWeekdayMeanWithIntervals methods
+2. Fixed integration tests to create projects before inserting logs (foreign key constraint)
+3. Fixed SQL comments in INSERT statements (PostgreSQL doesn't support // comments)
+4. Fixed test data accumulation between subtests
+
+### Notes for Reviewers
+- Implementation follows Clean Architecture patterns
+- All methods use 15-second context timeout
+- NULL values handled gracefully (returns nil, nil for no data)
+- No breaking changes to existing API
+- Ready for service layer integration (RDL-155)
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
