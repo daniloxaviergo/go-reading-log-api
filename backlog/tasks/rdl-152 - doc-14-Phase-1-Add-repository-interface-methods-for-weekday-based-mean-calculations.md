@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:46'
-updated_date: '2026-05-10 11:40'
+updated_date: '2026-05-10 11:41'
 labels:
   - infrastructure
   - repository
@@ -485,6 +485,86 @@ func TestWeekdayPages_Validate_Invalid_Weekday(t *testing.T) {
 ### Next Steps
 - Task is ready for acceptance criteria verification
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## RDL-152: Add repository interface methods for weekday-based mean calculations
+
+### What Was Done
+Defined three new methods in the `DashboardRepository` interface to support weekday-based historical mean calculations required by the `speculate_actual` endpoint. Also implemented the full PostgreSQL adapter implementations and updated all mock repositories.
+
+### Key Changes
+
+**Files Modified:**
+
+1. **`internal/domain/dto/dashboard_response.go`** - Added WeekdayPages DTO
+   - New `WeekdayPages` struct with `Weekday`, `TotalPages`, `LogCount`, and `Mean` fields
+   - Constructor: `NewWeekdayPages(weekday, totalPages, logCount, mean)`
+   - Builder methods: `SetWeekday()`, `SetTotalPages()`, `SetLogCount()`, `SetMean()`
+   - Validation: `Validate()` with comprehensive edge case handling
+   - Context embedding: `GetContext()`, `SetContext()`
+
+2. **`internal/repository/dashboard_repository.go`** - Interface definitions
+   - Added `GetWeekdayPagesGrouped(ctx, startDate, endDate) (map[int]dto.WeekdayPages, error)`
+   - Added `GetFirstLogDate(ctx) (*time.Time, error)`
+   - Added `GetWeekdayMeanWithIntervals(ctx, weekday, currentDate) (*float64, error)`
+   - All methods fully documented with algorithm details and edge case behavior
+
+3. **`internal/adapter/postgres/dashboard_repository.go`** - PostgreSQL implementations
+   - `GetWeekdayPagesGrouped`: SQL query using `EXTRACT(DOW FROM data::timestamp)` to group by weekday
+   - `GetFirstLogDate`: `MIN(data::timestamp)` query with nil return for empty database
+   - `GetWeekdayMeanWithIntervals`: Implements V1::MeanLog algorithm with 7-day interval calculation
+   - All methods use 15-second context timeout and proper error handling
+
+4. **Mock implementations updated** (6 files):
+   - `test/testutil/mock_dashboard_repository.go`
+   - `internal/service/dashboard/projects_service_test.go`
+   - `internal/api/v1/handlers/dashboard_handler_test.go`
+   - `test/unit/day_service_test.go`
+   - `internal/api/v1/routes_test.go`
+   - `test/unit/weekday_faults_service_test.go`
+
+**Files Created:**
+
+1. **`test/unit/domain/dto/weekday_pages_test.go`** - 33 comprehensive unit tests
+   - Struct definition and field verification
+   - Constructor tests (valid data, zero values, rounding)
+   - Context embedding tests
+   - Builder methods with chaining
+   - Validation (valid data, all edge cases: nil, invalid weekday, negative values)
+   - JSON marshaling/unmarshaling
+   - Map usage integration tests
+
+### Verification
+
+✅ **Acceptance Criteria Met:**
+- #1 GetWeekdayPagesGrouped method defined with correct signature
+- #2 GetFirstLogDate method defined
+- #3 GetWeekdayMeanWithIntervals method defined
+- #4 All interface methods documented with comments
+- #5 Interface compiles without errors
+
+✅ **Definition of Done Met:**
+- #1 All unit tests pass (33 WeekdayPages tests)
+- #3 go fmt and go vet pass with no errors
+- #4 Clean Architecture layers properly followed
+- #5 Error responses consistent with existing patterns (nil, nil for empty data)
+
+✅ **Build & Tests:**
+- `go build ./...` - No errors
+- `go fmt ./...` - No errors
+- `go vet ./internal/repository/... ./internal/domain/dto/... ./internal/adapter/postgres/...` - No errors
+- `go test ./test/unit/domain/dto/... -run TestWeekdayPages` - All 33 tests pass
+
+### Notes for Reviewers
+
+- Interface-first approach enables parallel development of RDL-153 (PostgreSQL implementation details) and RDL-154 (mock implementations)
+- All methods follow existing repository patterns (GetMaxByWeekday, GetMeanByWeekday)
+- Nullable return types (`*time.Time`, `*float64`) handle missing data gracefully
+- WeekdayPages DTO uses map[int]dto.WeekdayPages for O(1) weekday lookup (0-6)
+- PostgreSQL implementations are complete and ready for integration testing in RDL-153
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
