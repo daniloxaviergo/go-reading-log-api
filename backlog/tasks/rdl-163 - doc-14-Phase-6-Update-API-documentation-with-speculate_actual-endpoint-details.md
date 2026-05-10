@@ -5,7 +5,7 @@ title: >-
   details
 status: To Do
 assignee:
-  - workflow
+  - thomas
 created_date: '2026-05-10 10:49'
 updated_date: '2026-05-10 17:02'
 labels:
