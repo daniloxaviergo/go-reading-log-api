@@ -5,7 +5,7 @@ title: >-
   queries
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-05-10 10:47'
 updated_date: '2026-05-10 12:22'
 labels:
