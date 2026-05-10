@@ -31,7 +31,7 @@ Mocks must follow existing mock repository patterns and support testing of edge 
 - [x] #2 MockGetFirstLogDate method supporting nil return
 - [x] #3 MockGetWeekdayMeanWithIntervals method with error injection support
 - [x] #4 All mocks follow existing MockDashboardRepository pattern
-- [ ] #5 Mocks compile without errors
+- [x] #5 Mocks compile without errors
 <!-- AC:END -->
 
 ## Implementation Plan
