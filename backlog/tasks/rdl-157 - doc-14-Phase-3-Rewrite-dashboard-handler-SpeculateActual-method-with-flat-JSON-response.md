@@ -5,9 +5,9 @@ title: >-
   JSON response
 status: Done
 assignee:
-  - thomas
+  - workflow
 created_date: '2026-05-10 10:48'
-updated_date: '2026-05-10 14:26'
+updated_date: '2026-05-10 14:27'
 labels:
   - handler
   - api
