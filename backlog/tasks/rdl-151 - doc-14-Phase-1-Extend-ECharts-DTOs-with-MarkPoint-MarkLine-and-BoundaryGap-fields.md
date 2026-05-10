@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:46'
-updated_date: '2026-05-10 10:59'
+updated_date: '2026-05-10 11:00'
 labels:
   - infrastructure
   - dto
@@ -284,6 +284,36 @@ func TestMarkPoint_JSONMarshaling(t *testing.T) {
 
 **Ready for Implementation:** ✅ Yes
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Starting implementation of RDL-151: Extend ECharts DTOs with MarkPoint, MarkLine, and BoundaryGap fields.
+
+## Progress Log
+
+### Step 1: Analysis Complete
+- Reviewed task requirements and implementation plan
+- Examined current `dashboard_response.go` file
+- Confirmed `BoundaryGap` field already exists in `Axis` struct (line ~265) as `[]bool`
+- Identified need to add:
+  - `MarkPoint` struct with `Data` array containing type and name fields
+  - `MarkLine` struct with `Data` array containing name and yAxis fields
+  - `MarkPointData` struct for mark point data items
+  - `MarkLineData` struct for mark line data items
+  - Update `Series` struct to include `MarkPoint` and `MarkLine` fields
+  - Add builder methods: `SetMarkPoint()`, `SetMarkLine()`
+  - Update validation to handle mark elements
+
+### Next Steps:
+1. Add MarkPoint, MarkPointData, MarkLine, MarkLineData structs
+2. Update Series struct with MarkPoint and MarkLine fields
+3. Add builder methods for mark elements
+4. Update Series.Validate() to validate mark elements
+5. Update NewEchartConfig() to support mark elements
+6. Create unit tests
+7. Run tests and verify acceptance criteria
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
