@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:47'
-updated_date: '2026-05-10 13:16'
+updated_date: '2026-05-10 13:17'
 labels:
   - service
   - calculations
@@ -28,7 +28,7 @@ Service must handle empty databases, partial data (missing days), and zero-fill 
 <!-- AC:BEGIN -->
 - [ ] #1 CalculateHistoricalMean implements weekday grouping with 7-day interval division
 - [ ] #2 CalculateSpeculativeMean applies 10% buffer (mean * 1.10)
-- [ ] #3 GenerateXAxisLabels returns 15 dates in 'DD-MMM (Day)' format
+- [x] #3 GenerateXAxisLabels returns 15 dates in 'DD-MMM (Day)' format
 - [ ] #4 GenerateSeriesData creates Pages and Mean arrays with 15 elements each
 - [ ] #5 Zero-fill logic for missing days in date range
 - [ ] #6 Edge cases handled: nil data, empty database, zero mean values
