@@ -7,7 +7,7 @@ status: To Do
 assignee:
   - thomas
 created_date: '2026-05-10 10:49'
-updated_date: '2026-05-10 17:08'
+updated_date: '2026-05-10 17:09'
 labels:
   - documentation
   - api-docs
@@ -329,6 +329,53 @@ All tests pass:
 - TestEchartSpeculateActual_SeriesStyling ✅
 - TestEchartSpeculateActual_EdgeCases ✅
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+## Summary
+
+Updated API documentation in `README.md` with complete details for the `GET /v1/dashboard/echart/speculate_actual.json` endpoint.
+
+## What Was Done
+
+1. **Added endpoint to API endpoints table** - Included `/v1/dashboard/echart/speculate_actual.json` in the endpoints list with method and description.
+
+2. **Created comprehensive endpoint documentation** including:
+   - Request format (GET method, no parameters)
+   - Response schema with 20+ fields documented (echart object structure, series configuration, styling)
+   - Complete example JSON response with sample data for both "Actual" and "Speculated" series
+   - Curl example for testing: `curl http://localhost:3000/v1/dashboard/echart/speculate_actual.json`
+   - Edge cases documentation (empty database, partial data, invalid page numbers)
+   - Acceptance criteria AC-001 to AC-015 reference table with implementation status indicators
+
+3. **Documented known gaps** - Clearly indicated which acceptance criteria are not yet implemented:
+   - AC-003, AC-004: xAxis data array not populated
+   - AC-011: markPoint configuration not implemented
+   - AC-012: markLine configuration not implemented
+   - AC-013: smooth: true not implemented
+   - AC-014: areaStyle configuration not implemented
+
+## Key Changes
+
+- **File modified**: `README.md`
+- **Section added**: "Get Speculate vs Actual Chart" under API Documentation
+- **Documentation format**: Follows existing endpoint documentation conventions
+- **Accuracy verified**: Series names ('Actual', 'Speculated'), response structure (flat JSON with echart key), and styling match the actual implementation
+
+## Tests Run
+
+- All integration tests pass (9 test functions, 10 test cases)
+- `go fmt` passes with no errors
+- `go vet` passes with no errors
+
+## Notes for Reviewers
+
+- Documentation accurately reflects current implementation (not the PRD specification)
+- Series names use 'Actual' and 'Speculated' (implementation choice, not PRD's 'Pages' and 'Mean')
+- Known feature gaps are clearly documented to avoid confusion
+- No code changes were made - this is a documentation-only update
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
