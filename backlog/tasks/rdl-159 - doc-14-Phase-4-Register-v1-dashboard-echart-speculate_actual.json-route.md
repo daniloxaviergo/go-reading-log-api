@@ -3,7 +3,7 @@ id: RDL-159
 title: '[doc-14 Phase 4] Register /v1/dashboard/echart/speculate_actual.json route'
 status: Done
 assignee:
-  - workflow
+  - next-task
 created_date: '2026-05-10 10:48'
 updated_date: '2026-05-10 14:59'
 labels:
