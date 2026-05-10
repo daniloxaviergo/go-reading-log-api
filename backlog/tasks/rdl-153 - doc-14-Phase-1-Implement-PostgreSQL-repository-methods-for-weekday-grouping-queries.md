@@ -4,8 +4,10 @@ title: >-
   [doc-14 Phase 1] Implement PostgreSQL repository methods for weekday grouping
   queries
 status: To Do
-assignee: []
+assignee:
+  - book
 created_date: '2026-05-10 10:47'
+updated_date: '2026-05-10 11:43'
 labels:
   - infrastructure
   - repository
