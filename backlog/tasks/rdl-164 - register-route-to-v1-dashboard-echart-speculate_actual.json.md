@@ -2,8 +2,10 @@
 id: RDL-164
 title: register route to v1/dashboard/echart/speculate_actual.json
 status: To Do
-assignee: []
+assignee:
+  - workflow
 created_date: '2026-05-11 11:31'
+updated_date: '2026-05-11 11:31'
 labels: []
 dependencies: []
 ---
