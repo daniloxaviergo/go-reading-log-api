@@ -1,7 +1,7 @@
 ---
 id: RDL-164
 title: register route to v1/dashboard/echart/speculate_actual.json
-status: To Do
+status: Done
 assignee:
   - thomas
 created_date: '2026-05-11 11:31'
